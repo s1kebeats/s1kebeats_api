@@ -11,8 +11,8 @@ class UserController {
                     ApiError.BadRequest('Ошибка валидации', errors.array())
                 );
             }
-            const { email, password } = req.body;
-            const userData = await userService.register(email, password);
+            const { email, username, password } = req.body;
+            const userData = await userService.register(email, username, password);
             // setting refresh token httpOnly cookie
             res.cookie('refreshToken', userData.refreshToken, {
                 // 30 days
@@ -27,8 +27,8 @@ class UserController {
     }
     async login(req, res, next) {
         try {
-            const { email, password } = req.body;
-            const userData = await userService.login(email, password);
+            const { login, password } = req.body;
+            const userData = await userService.login(login, password);
             // setting refresh token httpOnly cookie
             res.cookie('refreshToken', userData.refreshToken, {
                 // 30 days
@@ -78,7 +78,12 @@ class UserController {
     }
     async getUsers(req, res, next) {
         try {
-            const users = await userService.getUsers();
+            let users;
+            if (req.query.q) {
+                users = await userService.findUsers(req.query.q);
+            } else {
+                users = await userService.getUsers();
+            }
             return res.json(users);
         } catch (error) {
             next(error);

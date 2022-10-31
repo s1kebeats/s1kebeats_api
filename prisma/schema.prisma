@@ -19,9 +19,71 @@ model Token {
 
 model User {
   id             Int     @id @default(autoincrement())
+  username       String  @unique
   email          String  @unique
   password       String
   isActivated    Boolean @default(false)
   activationLink String  @unique
   token          Token?
+
+  beats    Beat[]
+  comments Comment[]
+  likes    Like[]
+
+  createdAt     DateTime @default(now())
+  displayedName String?
+  about         String?
+  image         String   @default("")
+
+  youtubeLink   String?
+  vkLink        String?
+  instagramLink String?
+}
+
+model Beat {
+  id          Int      @id @default(autoincrement())
+  name        String
+  bpm         Int
+  description String?
+  createdAt   DateTime @default(now())
+
+  tags     Tag[]
+  comments Comment[]
+  likes    Like[]
+
+  user       User    @relation(fields: [userId], references: [id])
+  userId     Int
+  downloads  Int     @default(0)
+  plays      Int     @default(0)
+  image      String  @default("")
+  wave       String
+  mp3        String
+  stems      String?
+  wavePrice  Int
+  stemsPrice Int?
+}
+
+model Tag {
+  id    Int    @id @default(autoincrement())
+  name  String
+  beats Beat[]
+}
+
+model Comment {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  beat      Beat     @relation(fields: [beatId], references: [id])
+  beatId    Int
+  content   String
+  createdAt DateTime @default(now())
+}
+
+model Like {
+  id        Int      @id @default(autoincrement())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    Int
+  beat      Beat     @relation(fields: [beatId], references: [id])
+  beatId    Int
+  createdAt DateTime @default(now())
 }

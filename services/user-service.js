@@ -17,13 +17,21 @@ class UserService {
             user: userDto,
         };
     }
-    async register(email, password) {
-        const candidate = await prisma.user.findUnique({
+    async register(email, username, password) {
+        let candidate = await prisma.user.findUnique({
+            where: { username },
+        });
+        if (candidate) {
+            throw ApiError.BadRequest(
+                `Имя пользователя ${username} занято`
+            );
+        }
+        candidate = await prisma.user.findUnique({
             where: { email },
         });
         if (candidate) {
             throw ApiError.BadRequest(
-                `Пользователь с почтовым адресом ${email} уже зарегистрирован.`
+                `Пользователь с почтовым адресом ${email} уже зарегистрирован`
             );
         }
         const hashedPassword = await bcrypt.hash(password, 3);
@@ -31,15 +39,16 @@ class UserService {
         const user = await prisma.user.create({
             data: {
                 email,
+                username,
                 password: hashedPassword,
                 activationLink,
             },
         });
         // sending email with activation link
-        await mailService.sendActivationMail(
-            email,
-            `${process.env.BASE_URL}/api/activate/${activationLink}`
-        );
+        // await mailService.sendActivationMail(
+        //     email,
+        //     `${process.env.BASE_URL}/api/activate/${activationLink}`
+        // );
         // generate tokens and DTO
         const data = await this.generateData(user);
         return data;
@@ -62,18 +71,23 @@ class UserService {
             },
         });
     }
-    async login(email, password) {
-        const user = await prisma.user.findUnique({
-            where: {
-                email,
-            },
-        });
+    async login(login, password) {
+        let user;
+        if (login.includes('@')) {
+            user = await prisma.user.findUnique({
+                where: { email: login }
+            });
+        } else {
+            user = await prisma.user.findUnique({
+                where: { username: login },
+            });
+        }
         if (!user) {
-            throw ApiError.BadRequest('Email не зарегистрирован');
+            throw ApiError.BadRequest('Данные для входа недействительны');
         }
         const passwordEquals = await bcrypt.compare(password, user.password);
         if (!passwordEquals) {
-            throw ApiError.BadRequest('Данные для входа не верны');
+            throw ApiError.BadRequest('Данные для входа недействительны');
         }
         // generate tokens and DTO
         const data = await this.generateData(user);
