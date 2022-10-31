@@ -16,21 +16,6 @@ class TokenService {
         };
     }
     async saveToken(userId, refreshToken) {
-        // const token = await prisma.token.findUnique({
-        //     where: {
-        //         userId
-        //     }
-        // })
-        // if (token) {
-        //     return await prisma.token.update({
-        //         where: {
-        //             userId
-        //         },
-        //         data: {
-        //             refreshToken
-        //         }
-        //     })
-        // }
         return await prisma.token.upsert({
             where: {
                 userId
@@ -43,6 +28,14 @@ class TokenService {
                 refreshToken
             }
         });
+    }
+    async removeToken(refreshToken) {
+        const token = await prisma.token.delete({
+            where: {
+                refreshToken
+            }
+        })
+        return token
     }
 }
 module.exports = new TokenService();

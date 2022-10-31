@@ -53,6 +53,32 @@ class UserService {
             }
         })
     }
+    async login(email, password) {
+        const user = await prisma.user.findUnique({
+            where: {
+                email
+            }
+        })
+        if (!user) {
+            throw ApiError.BadRequest('Email не зарегистрирован')
+        }
+        const passwordEquals = await bcrypt.compare(password, user.password);
+        if (!passwordEquals) {
+            throw ApiError.BadRequest('Данные для входа не верны')
+        }
+        const userDto = new UserDto(user);
+        const tokens = tokenService.generateTokens({...userDto});
+        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
+        return {
+            ...tokens,
+            user: userDto,
+        }
+    }
+    async logout(refreshToken) {
+        const token = await tokenService.removeToken(refreshToken);
+        return token;
+    }
 }
 
 module.exports = new UserService();
