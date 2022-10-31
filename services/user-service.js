@@ -79,6 +79,37 @@ class UserService {
         const token = await tokenService.removeToken(refreshToken);
         return token;
     }
+    async refresh(refreshToken) {
+        if (!refreshToken) {
+            throw ApiError.UnauthorizedUser();
+        }
+        const userData = tokenService.validateRefreshToken(refreshToken);
+        const tokenFromDb = await tokenService.findToken(refreshToken);
+        if (!userData || !tokenFromDb) {
+            throw ApiError.UnauthorizedUser();
+        }
+        const user = await prisma.user.findUnique({
+            where: { id: userData.id }
+        })
+        const userDto = new UserDto(user);
+        const tokens = tokenService.generateTokens({...userDto});
+        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
+        return {
+            ...tokens,
+            user: userDto,
+        }
+    }
+    async getUsers() {
+        const users = await prisma.user.findMany({
+            select: {
+                email: true,
+                id: true,
+                isActivated: true
+            }
+        })
+        return users
+    }
 }
 
 module.exports = new UserService();

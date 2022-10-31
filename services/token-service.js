@@ -37,5 +37,29 @@ class TokenService {
         })
         return token
     }
+    async findToken(refreshToken) {
+        const token = await prisma.token.findUnique({
+            where: {
+                refreshToken
+            }
+        })
+        return token
+    }
+    validateAccessToken(accessToken) {
+        try {
+            const decoded = jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+            return decoded;
+        } catch (error) {
+            return null;
+        }
+    }
+    validateRefreshToken(refreshToken) {
+        try {
+            const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+            return decoded;
+        } catch (error) {
+            return null;
+        }
+    }
 }
 module.exports = new TokenService();
