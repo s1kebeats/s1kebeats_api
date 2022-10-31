@@ -5,6 +5,7 @@ const uuid = require('uuid');
 const mailService = require('./mail-service');
 const tokenService = require('./token-service');
 const UserDto = require('../dtos/user-dto');
+const ApiError = require('../exceptions/api-error');
 
 class UserService {
     async register(email, password) {
@@ -12,7 +13,7 @@ class UserService {
             where: { email }
         })
         if (candidate) {
-            throw new Error(`Пользователь с почтовым адресом ${email} уже зарегистрирован.`)
+            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже зарегистрирован.`)
         }
         const hashedPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4()
@@ -23,7 +24,7 @@ class UserService {
                 activationLink
             },
         });
-        await mailService.sendActivationMail(email, activationLink);
+        await mailService.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
 
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto})
@@ -33,6 +34,24 @@ class UserService {
             ...tokens,
             user: userDto,
         }
+    }
+    async activate(activationLink) {
+        const user = await prisma.user.findUnique({
+            where: {
+                activationLink
+            }
+        })
+        if (!user) {
+            throw ApiError.BadRequest('Ссылка для активации неккоректна')
+        }
+        return await prisma.user.update({
+            where: {
+                activationLink
+            },
+            data: {
+                isActivated: true
+            }
+        })
     }
 }
 
