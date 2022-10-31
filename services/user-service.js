@@ -12,7 +12,6 @@ class UserService {
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({ ...userDto });
         await tokenService.saveToken(userDto.id, tokens.refreshToken);
-
         return {
             ...tokens,
             user: userDto,
@@ -36,11 +35,12 @@ class UserService {
                 activationLink,
             },
         });
+        // sending email with activation link
         await mailService.sendActivationMail(
             email,
             `${process.env.BASE_URL}/api/activate/${activationLink}`
         );
-
+        // generate tokens and DTO
         const data = await this.generateData(user);
         return data;
     }
@@ -75,6 +75,7 @@ class UserService {
         if (!passwordEquals) {
             throw ApiError.BadRequest('Данные для входа не верны');
         }
+        // generate tokens and DTO
         const data = await this.generateData(user);
         return data;
     }
@@ -86,7 +87,9 @@ class UserService {
         if (!refreshToken) {
             throw ApiError.UnauthorizedUser();
         }
+        // user data decoded from refresh token
         const userData = tokenService.validateRefreshToken(refreshToken);
+        // check if token is in database
         const tokenFromDb = await tokenService.findToken(refreshToken);
         if (!userData || !tokenFromDb) {
             throw ApiError.UnauthorizedUser();
@@ -94,6 +97,7 @@ class UserService {
         const user = await prisma.user.findUnique({
             where: { id: userData.id },
         });
+        // generate tokens and DTO
         const data = await this.generateData(user);
         return data;
     }

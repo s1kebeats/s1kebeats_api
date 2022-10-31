@@ -13,7 +13,9 @@ class UserController {
             }
             const { email, password } = req.body;
             const userData = await userService.register(email, password);
+            // setting refresh token httpOnly cookie
             res.cookie('refreshToken', userData.refreshToken, {
+                // 30 days
                 maxAge: 30 * 24 * 60 * 1000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -27,7 +29,9 @@ class UserController {
         try {
             const { email, password } = req.body;
             const userData = await userService.login(email, password);
+            // setting refresh token httpOnly cookie
             res.cookie('refreshToken', userData.refreshToken, {
+                // 30 days
                 maxAge: 30 * 24 * 60 * 1000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
@@ -60,7 +64,9 @@ class UserController {
         try {
             const { refreshToken } = req.cookies;
             const userData = await userService.refresh(refreshToken);
+            // updating refresh token cookie
             res.cookie('refreshToken', userData.refreshToken, {
+                // 30 days
                 maxAge: 30 * 24 * 60 * 1000,
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',

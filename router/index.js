@@ -7,6 +7,7 @@ const router = new Router();
 
 router.post(
     '/register',
+    // data validators
     body('email').isEmail(),
     body('password').isLength({ min: 8, max: 32 }),
     userController.register
