@@ -3,12 +3,14 @@ const { body } = require('express-validator');
 const authMiddleware = require('../middlewares/auth-middleware');
 
 const Router = require('express').Router;
-const router = new Router;
+const router = new Router();
 
-router.post('/register',
+router.post(
+    '/register',
     body('email').isEmail(),
     body('password').isLength({ min: 8, max: 32 }),
-    userController.register);
+    userController.register
+);
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
 router.get('/activate/:activationLink', userController.activate);

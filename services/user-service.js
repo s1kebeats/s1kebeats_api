@@ -10,31 +10,36 @@ const ApiError = require('../exceptions/api-error');
 class UserService {
     async generateData(user) {
         const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto})
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+        const tokens = tokenService.generateTokens({ ...userDto });
+        await tokenService.saveToken(userDto.id, tokens.refreshToken);
 
         return {
             ...tokens,
             user: userDto,
-        }
+        };
     }
     async register(email, password) {
         const candidate = await prisma.user.findUnique({
-            where: { email }
-        })
+            where: { email },
+        });
         if (candidate) {
-            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже зарегистрирован.`)
+            throw ApiError.BadRequest(
+                `Пользователь с почтовым адресом ${email} уже зарегистрирован.`
+            );
         }
         const hashedPassword = await bcrypt.hash(password, 3);
-        const activationLink = uuid.v4()
+        const activationLink = uuid.v4();
         const user = await prisma.user.create({
             data: {
                 email,
                 password: hashedPassword,
-                activationLink
+                activationLink,
             },
         });
-        await mailService.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
+        await mailService.sendActivationMail(
+            email,
+            `${process.env.BASE_URL}/api/activate/${activationLink}`
+        );
 
         const data = await this.generateData(user);
         return data;
@@ -42,33 +47,33 @@ class UserService {
     async activate(activationLink) {
         const user = await prisma.user.findUnique({
             where: {
-                activationLink
-            }
-        })
+                activationLink,
+            },
+        });
         if (!user) {
-            throw ApiError.BadRequest('Ссылка для активации неккоректна')
+            throw ApiError.BadRequest('Ссылка для активации неккоректна');
         }
         return await prisma.user.update({
             where: {
-                activationLink
+                activationLink,
             },
             data: {
-                isActivated: true
-            }
-        })
+                isActivated: true,
+            },
+        });
     }
     async login(email, password) {
         const user = await prisma.user.findUnique({
             where: {
-                email
-            }
-        })
+                email,
+            },
+        });
         if (!user) {
-            throw ApiError.BadRequest('Email не зарегистрирован')
+            throw ApiError.BadRequest('Email не зарегистрирован');
         }
         const passwordEquals = await bcrypt.compare(password, user.password);
         if (!passwordEquals) {
-            throw ApiError.BadRequest('Данные для входа не верны')
+            throw ApiError.BadRequest('Данные для входа не верны');
         }
         const data = await this.generateData(user);
         return data;
@@ -87,8 +92,8 @@ class UserService {
             throw ApiError.UnauthorizedUser();
         }
         const user = await prisma.user.findUnique({
-            where: { id: userData.id }
-        })
+            where: { id: userData.id },
+        });
         const data = await this.generateData(user);
         return data;
     }
@@ -97,10 +102,10 @@ class UserService {
             select: {
                 email: true,
                 id: true,
-                isActivated: true
-            }
-        })
-        return users
+                isActivated: true,
+            },
+        });
+        return users;
     }
 }
 

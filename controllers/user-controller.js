@@ -7,17 +7,20 @@ class UserController {
         try {
             const errors = validationResult(req);
             if (!errors.isEmpty()) {
-                return next(ApiError.BadRequest('Ошибка валидации', errors.array()))
+                return next(
+                    ApiError.BadRequest('Ошибка валидации', errors.array())
+                );
             }
             const { email, password } = req.body;
             const userData = await userService.register(email, password);
             res.cookie('refreshToken', userData.refreshToken, {
-                maxAge: 30*24*60*1000, httpOnly: true, 
+                maxAge: 30 * 24 * 60 * 1000,
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
             });
             return res.json(userData);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async login(req, res, next) {
@@ -25,12 +28,13 @@ class UserController {
             const { email, password } = req.body;
             const userData = await userService.login(email, password);
             res.cookie('refreshToken', userData.refreshToken, {
-                maxAge: 30*24*60*1000, httpOnly: true, 
+                maxAge: 30 * 24 * 60 * 1000,
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
             });
             return res.json(userData);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async logout(req, res, next) {
@@ -40,7 +44,7 @@ class UserController {
             res.clearCookie('resfreshToken');
             return res.json(token);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async activate(req, res, next) {
@@ -49,7 +53,7 @@ class UserController {
             await userService.activate(activationLink);
             return res.redirect(process.env.BASE_URL);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async refresh(req, res, next) {
@@ -57,12 +61,13 @@ class UserController {
             const { refreshToken } = req.cookies;
             const userData = await userService.refresh(refreshToken);
             res.cookie('refreshToken', userData.refreshToken, {
-                maxAge: 30*24*60*1000, httpOnly: true, 
+                maxAge: 30 * 24 * 60 * 1000,
+                httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
             });
             return res.json(userData);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
     async getUsers(req, res, next) {
@@ -70,7 +75,7 @@ class UserController {
             const users = await userService.getUsers();
             return res.json(users);
         } catch (error) {
-            next(error)
+            next(error);
         }
     }
 }
