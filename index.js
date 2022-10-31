@@ -1,6 +1,5 @@
 require('dotenv').config()
 const express = require('express');
-// const passport = require('./passport');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
 
@@ -24,9 +23,5 @@ const start = async () => {
         console.log(error)
     }
 }
-
-// app.get('/', passport.authenticate('jwt', { session: false }), function(req, res) {
-//     res.send('Hello World!');
-// })
 
 start();

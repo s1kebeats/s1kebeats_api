@@ -8,6 +8,16 @@ const UserDto = require('../dtos/user-dto');
 const ApiError = require('../exceptions/api-error');
 
 class UserService {
+    async generateData(user) {
+        const userDto = new UserDto(user);
+        const tokens = tokenService.generateTokens({...userDto})
+        await tokenService.saveToken(userDto.id, tokens.refreshToken)
+
+        return {
+            ...tokens,
+            user: userDto,
+        }
+    }
     async register(email, password) {
         const candidate = await prisma.user.findUnique({
             where: { email }
@@ -26,14 +36,8 @@ class UserService {
         });
         await mailService.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
 
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto})
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
-
-        return {
-            ...tokens,
-            user: userDto,
-        }
+        const data = await this.generateData(user);
+        return data;
     }
     async activate(activationLink) {
         const user = await prisma.user.findUnique({
@@ -66,14 +70,8 @@ class UserService {
         if (!passwordEquals) {
             throw ApiError.BadRequest('Данные для входа не верны')
         }
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto});
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
-
-        return {
-            ...tokens,
-            user: userDto,
-        }
+        const data = await this.generateData(user);
+        return data;
     }
     async logout(refreshToken) {
         const token = await tokenService.removeToken(refreshToken);
@@ -91,14 +89,8 @@ class UserService {
         const user = await prisma.user.findUnique({
             where: { id: userData.id }
         })
-        const userDto = new UserDto(user);
-        const tokens = tokenService.generateTokens({...userDto});
-        await tokenService.saveToken(userDto.id, tokens.refreshToken)
-
-        return {
-            ...tokens,
-            user: userDto,
-        }
+        const data = await this.generateData(user);
+        return data;
     }
     async getUsers() {
         const users = await prisma.user.findMany({
