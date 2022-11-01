@@ -8,7 +8,9 @@ router.post(
     '/register',
     // data validators
     body('email').isEmail(),
-    body('username').notEmpty().matches(/^[0-9a-zA-Z]+$/),
+    body('username')
+        .notEmpty()
+        .matches(/^[0-9a-zA-Z]+$/),
     body('password').isLength({ min: 8, max: 32 }),
     userController.register
 );

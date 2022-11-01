@@ -1,11 +1,11 @@
 const PrismaClient = require('@prisma/client').PrismaClient;
 const prisma = new PrismaClient();
-const authorSelect = require('../prisma-selects/author-select')
+const authorSelect = require('../prisma-selects/author-select');
 
 class AuthorService {
     async getAuthors() {
         const authors = await prisma.user.findMany({
-            select: authorSelect
+            select: authorSelect,
         });
         return authors;
     }
@@ -13,19 +13,19 @@ class AuthorService {
         const authors = await prisma.user.findMany({
             where: {
                 OR: [
-                  {
-                    username: {
-                      contains: query,
+                    {
+                        username: {
+                            contains: query,
+                        },
                     },
-                  },
-                  {
-                    displayedName: {
-                      contains: query,
+                    {
+                        displayedName: {
+                            contains: query,
+                        },
                     },
-                  },
                 ],
             },
-            select: authorSelect
+            select: authorSelect,
         });
         return authors;
     }

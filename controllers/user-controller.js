@@ -12,7 +12,11 @@ class UserController {
                 );
             }
             const { email, username, password } = req.body;
-            const userData = await userService.register(email, username, password);
+            const userData = await userService.register(
+                email,
+                username,
+                password
+            );
             // setting refresh token httpOnly cookie
             res.cookie('refreshToken', userData.refreshToken, {
                 // 30 days

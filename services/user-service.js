@@ -22,9 +22,7 @@ class UserService {
             where: { username },
         });
         if (candidate) {
-            throw ApiError.BadRequest(
-                `Имя пользователя ${username} занято`
-            );
+            throw ApiError.BadRequest(`Имя пользователя ${username} занято`);
         }
         candidate = await prisma.user.findUnique({
             where: { email },
@@ -75,7 +73,7 @@ class UserService {
         let user;
         if (login.includes('@')) {
             user = await prisma.user.findUnique({
-                where: { email: login }
+                where: { email: login },
             });
         } else {
             user = await prisma.user.findUnique({
