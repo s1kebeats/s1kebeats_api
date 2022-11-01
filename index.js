@@ -15,13 +15,13 @@ app.use('/api', router);
 app.use(errorMiddleware);
 
 const start = async () => {
-    try {
-        app.listen(process.env.PORT || 5000, () => {
-            console.log(`Listening on port ${process.env.PORT}`);
-        });
-    } catch (error) {
-        console.log(error);
-    }
+  try {
+    app.listen(process.env.PORT || 5000, () => {
+      console.log(`Listening on port ${process.env.PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
 };
 
 start();

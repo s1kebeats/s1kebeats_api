@@ -5,14 +5,14 @@ const Router = require('express').Router;
 const router = new Router();
 
 router.post(
-    '/register',
-    // data validators
-    body('email').isEmail(),
-    body('username')
-        .notEmpty()
-        .matches(/^[0-9a-zA-Z]+$/),
-    body('password').isLength({ min: 8, max: 32 }),
-    userController.register
+  '/register',
+  // data validators
+  body('email').isEmail(),
+  body('username')
+    .notEmpty()
+    .matches(/^[0-9a-zA-Z]+$/),
+  body('password').isLength({ min: 8, max: 32 }),
+  userController.register
 );
 router.post('/login', userController.login);
 router.post('/logout', userController.logout);
