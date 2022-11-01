@@ -76,19 +76,6 @@ class UserController {
             next(error);
         }
     }
-    async getUsers(req, res, next) {
-        try {
-            let users;
-            if (req.query.q) {
-                users = await userService.findUsers(req.query.q);
-            } else {
-                users = await userService.getUsers();
-            }
-            return res.json(users);
-        } catch (error) {
-            next(error);
-        }
-    }
 }
 
 module.exports = new UserController();

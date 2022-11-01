@@ -115,16 +115,6 @@ class UserService {
         const data = await this.generateData(user);
         return data;
     }
-    async getUsers() {
-        const users = await prisma.user.findMany({
-            select: {
-                email: true,
-                id: true,
-                isActivated: true,
-            },
-        });
-        return users;
-    }
 }
 
 module.exports = new UserService();
