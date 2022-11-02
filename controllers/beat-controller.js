@@ -1,4 +1,5 @@
 const beatService = require('../services/beat-service');
+const multer = require('multer');
 
 class AuthorController {
   async getBeats(req, res, next) {
@@ -24,7 +25,8 @@ class AuthorController {
   }
   async upload(req, res, next) {
     try {
-      return res.json('upload');
+      await multer();
+      return res.json(req.file);
     } catch (error) {}
   }
 }
