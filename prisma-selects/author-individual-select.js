@@ -16,4 +16,9 @@ module.exports = {
   youtubeLink: true,
   instagramLink: true,
   vkLink: true,
+  _count: {
+    select: {
+      beats: true,
+    },
+  },
 };
