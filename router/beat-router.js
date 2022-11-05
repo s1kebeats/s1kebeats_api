@@ -4,7 +4,7 @@ const fileUpload = require('../middlewares/file-upload-middleware');
 const Router = require('express').Router;
 const router = new Router();
 
-router.post('/upload', fileUpload, beatController.upload);
+router.post('/upload', fileUpload.single('file'), beatController.upload);
 router.get('/', beatController.getBeats);
 router.get('/:id', beatController.getIndividualBeat);
 

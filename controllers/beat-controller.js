@@ -24,10 +24,17 @@ class AuthorController {
     }
   }
   async upload(req, res, next) {
-    try {
-      await multer();
-      return res.json(req.file);
-    } catch (error) {}
+    res.json({
+      message: 'Uploaded!',
+      urls: req.files.map(function (file) {
+        return {
+          url: file.location,
+          name: file.key,
+          type: file.mimetype,
+          size: file.size,
+        };
+      }),
+    });
   }
 }
 
