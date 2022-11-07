@@ -23,45 +23,39 @@ const upload = multer({
   }),
   fileFilter: (req, file, cb) => {
     // file extension
-    const ext = path.extname(file.originalName);
-    switch (file.fieldname) {
-      // filter for image
-      case 'image':
-        if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-          cb(
-            ApiError.BadRequest('Отправьте изображение в формате PNG или JPEG')
-          );
-        } else {
-          cb(null, true)
-        }
-        break;
-      // filter for wave
-      case 'wave':
-        if (ext !== '.wav') {
-          cb(ApiError.BadRequest('Отправьте аудио в формате WAV'));
-        } else {
-          cb(null, true)
-        }
-        break;
-      // filter for mp3
-      case 'mp3':
-        if (ext !== '.mp3') {
-          cb(ApiError.BadRequest('Отправьте аудио в формате MP3'));
-        } else {
-          cb(null, true)
-        }
-        break;
-      // filter for stems archive
-      case 'stems':
-        if (ext !== '.rar' && ext !== '.zip') {
-          cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'));
-        } else {
-          cb(null, true)
-        }
-        break;
-      // incorrect body field error
-      default:
-        cb(ApiError.BadRequest(`Поля запроса неккоректны`));
+    const ext = path.extname(file.originalname);
+    // filter for image
+    if (file.fieldname == 'image') {
+      if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
+        cb(ApiError.BadRequest('Отправьте изображение в формате PNG или JPEG'));
+      } else {
+        cb(null, true);
+      }
+      return
+    }
+    if (file.fieldname == 'wave') {
+      if (ext !== '.wav') {
+        cb(ApiError.BadRequest('Отправьте аудио в формате WAV'));
+      } else {
+        cb(null, true);
+      }
+      return
+    }
+    if (file.fieldname == 'mp3') {
+      if (ext !== '.mp3') {
+        cb(ApiError.BadRequest('Отправьте аудио в формате MP3'));
+      } else {
+        cb(null, true);
+      }
+      return
+    }
+    if (file.fieldname == 'stems') {
+      if (ext !== '.rar' && ext !== '.zip') {
+        cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'));
+      } else {
+        cb(null, true);
+      }
+      return
     }
   },
 });
