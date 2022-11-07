@@ -26,14 +26,14 @@ class AuthorController {
   async upload(req, res, next) {
     res.json({
       message: 'Uploaded!',
-      urls: req.files.map(function (file) {
-        return {
-          url: file.location,
-          name: file.key,
-          type: file.mimetype,
-          size: file.size,
-        };
-      }),
+      // urls: req.files.map(function (file) {
+      //   return {
+      //     url: file.location,
+      //     name: file.key,
+      //     type: file.mimetype,
+      //     size: file.size,
+      //   };
+      // }),
     });
   }
 }
