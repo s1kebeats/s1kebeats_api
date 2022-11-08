@@ -12,50 +12,89 @@ aws.config.update({
 });
 
 const s3 = new aws.S3();
+
+const localStorage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: (req, file, cb) => {
+    cb(null, `${file.fieldname}/${nanoid(36)}`);
+  },
+});
+
 const upload = multer({
-  storage: multerS3({
-    s3: s3,
-    bucket: process.env.AWS_BUCKET_NAME,
-    key: (req, file, cb) => {
-      // aws nesting based on file name
-      cb(null, `${file.fieldname}/${nanoid(36)}`);
-    },
-  }),
+  // storage: multerS3({
+  //   s3: s3,
+  //   bucket: process.env.AWS_BUCKET_NAME,
+  //   key: (req, file, cb) => {
+  //     // aws nesting based on filename
+  //     cb(null, `${file.fieldname}/${nanoid(36)}`);
+  //   },
+  // }),
+  storage: localStorage,
+  limits: {
+    fileSize: 500 * 1024 * 1024,
+  },
   fileFilter: (req, file, cb) => {
     // file extension
     const ext = path.extname(file.originalname);
-    // filter for image
+    // const fileSize = parseInt(req.headers['content-length']);
+    // filters for file fields
     if (file.fieldname == 'image') {
       if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-        cb(ApiError.BadRequest('Отправьте изображение в формате PNG или JPEG'));
-      } else {
-        cb(null, true);
+        // cb(null, false);
+        cb(
+          ApiError.BadRequest('Отправьте изображение в формате PNG или JPEG'),
+          false
+        );
       }
-      return
+      // accept the file
+      cb(null, true);
+      return;
     }
     if (file.fieldname == 'wave') {
       if (ext !== '.wav') {
-        cb(ApiError.BadRequest('Отправьте аудио в формате WAV'));
-      } else {
-        cb(null, true);
+        // cb(null, false);
+        cb(ApiError.BadRequest('Отправьте аудио в формате WAV'), false);
       }
-      return
+      // if (fileSize <= 300 * 1024 * 1024) {
+      //   // accept the file
+      //   cb(null, true);
+      // } else {
+      //   cb(ApiError.BadRequest('Максимальный размер 300мб'));
+      // }
+      // accept the file
+      cb(null, true);
     }
     if (file.fieldname == 'mp3') {
       if (ext !== '.mp3') {
-        cb(ApiError.BadRequest('Отправьте аудио в формате MP3'));
-      } else {
-        cb(null, true);
+        // cb(null, false);
+        cb(ApiError.BadRequest('Отправьте аудио в формате MP3'), false);
       }
-      return
+      // if (fileSize <= 150 * 1024 * 1024) {
+      //   // accept the file
+      //   cb(null, true);
+      // } else {
+      //   cb(ApiError.BadRequest('Максимальный размер 150мб'));
+      // }
+      // accept the file
+      cb(null, true);
+      return;
     }
     if (file.fieldname == 'stems') {
       if (ext !== '.rar' && ext !== '.zip') {
-        cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'));
-      } else {
-        cb(null, true);
+        // cb(null, false);
+        cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'), false);
       }
-      return
+      // if (fileSize <= 500 * 1024 * 1024) {
+      //   // accept the file
+      //   cb(null, true);
+      // } else {
+      //   cb(ApiError.BadRequest('Максимальный размер 500мб'));
+      // }
+      // accept the file
+      cb(null, true);
+      return;
     }
   },
 });

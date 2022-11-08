@@ -23,18 +23,14 @@ class AuthorController {
       next(error);
     }
   }
-  async upload(req, res, next) {
-    res.json({
-      message: 'Uploaded!',
-      // urls: req.files.map(function (file) {
-      //   return {
-      //     url: file.location,
-      //     name: file.key,
-      //     type: file.mimetype,
-      //     size: file.size,
-      //   };
-      // }),
-    });
+  async upload(err, req, res, next) {
+    // file upload middleware errors serving
+    if (err) {
+      return next(err);
+    }
+    if (req.files) {
+      return res.json(req.files);
+    }
   }
 }
 
