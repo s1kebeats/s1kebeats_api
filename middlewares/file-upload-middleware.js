@@ -42,7 +42,6 @@ const upload = multer({
     // filters for file fields
     if (file.fieldname == 'image') {
       if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-        // cb(null, false);
         cb(
           ApiError.BadRequest('Отправьте изображение в формате PNG или JPEG'),
           false
@@ -54,7 +53,6 @@ const upload = multer({
     }
     if (file.fieldname == 'wave') {
       if (ext !== '.wav') {
-        // cb(null, false);
         cb(ApiError.BadRequest('Отправьте аудио в формате WAV'), false);
       }
       // if (fileSize <= 300 * 1024 * 1024) {
@@ -68,7 +66,6 @@ const upload = multer({
     }
     if (file.fieldname == 'mp3') {
       if (ext !== '.mp3') {
-        // cb(null, false);
         cb(ApiError.BadRequest('Отправьте аудио в формате MP3'), false);
       }
       // if (fileSize <= 150 * 1024 * 1024) {
@@ -83,8 +80,7 @@ const upload = multer({
     }
     if (file.fieldname == 'stems') {
       if (ext !== '.rar' && ext !== '.zip') {
-        // cb(null, false);
-        cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'), false);
+        return cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'), false);
       }
       // if (fileSize <= 500 * 1024 * 1024) {
       //   // accept the file
