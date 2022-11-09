@@ -83,38 +83,74 @@ class BeatService {
       related: relatedBeats,
     };
   }
+  // file validation function with extension and maxSize
+  validateFile(file, extensions, maxSize) {
+    // extensions validation
+    if (extensions) {
+      // get file extension
+      const ext = path.extname(file.name);
+      // multiple
+      if (Array.isArray(extensions)) {
+        if (!extensions.includes(ext)) {
+          throw ApiError.BadRequest(
+            `Отправьте файл в формате ${extensions.join('/')}`
+          );
+        }
+      } else {
+        // single
+        if (ext !== extensions) {
+          throw ApiError.BadRequest(`Отправьте файл в формате ${extensions}`);
+        }
+      }
+    }
+    // maxSize validation
+    if (maxSize) {
+      if (file.size > maxSize) {
+        throw ApiError.BadRequest(
+          `Максимальный размер файла ${maxSize / 1024 / 1024}мб`
+        );
+      }
+    }
+  }
+  validateBeat(beat) {
+    // required beat data check
+    if (!beat.wave || !beat.mp3) {
+      throw ApiError.BadRequest('Недостаточно информации');
+    }
+    // files validation
+    // wave check
+    this.validateFile(
+      beat.wave,
+      '.wav',
+      // 300mb
+      300 * 1024 * 1024
+    );
+
+    // mp3 check
+    this.validateFile(
+      beat.mp3,
+      '.mp3',
+      // 150mb
+      150 * 1024 * 1024
+    );
+
+    // image check
+    if (beat.image) {
+      this.validateFile(beat.image, ['.png', '.jpg', '.jpeg']);
+    }
+
+    // stems check
+    if (beat.stems) {
+      this.validateFile(
+        beat.stems,
+        ['.zip', '.rar'],
+        // 500mb
+        500 * 1024 * 1024
+      );
+    }
+  }
   async uploadBeat(beat) {
-    // // required beat data check
-    // if (!beat.wave || !beat.mp3) {
-    //   throw ApiError.BadRequest('Недостаточно информации');
-    // }
-    // // required files extension check
-    // // wave check
-    // let ext = path.extname(beat.wave.name);
-    // if (ext !== '.wav') {
-    //   throw ApiError.BadRequest('Отправьте аудио в формате wav');
-    // }
-    // // mp3 check
-    // ext = path.extname(beat.mp3.name);
-    // if (ext !== '.mp3') {
-    //   throw ApiError.BadRequest('Отправьте аудио в формате mp3');
-    // }
-    // // image check
-    // if (beat.image) {
-    //   ext = path.extname(beat.image.name);
-    //   if (ext !== '.png' && ext !== '.jpg' && ext !== '.jpeg') {
-    //     throw ApiError.BadRequest(
-    //       'Отправьте изображение в формате png или jpeg'
-    //     );
-    //   }
-    // }
-    // // stems check
-    // if (beat.stems) {
-    //   ext = path.extname(beat.stems.name);
-    //   if (ext !== '.zip' && ext !== '.rar') {
-    //     throw ApiError.BadRequest('Отправьте архив в формате zip или rar');
-    //   }
-    // }
+    // aws upload + prisma create
   }
 }
 

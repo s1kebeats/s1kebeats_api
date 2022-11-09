@@ -41,6 +41,7 @@ class AuthorController {
         wavePrice: req.body.wavePrice,
         stemsPrice: req.body.stemsPrice,
       };
+      beatService.validateBeat(beatCandidate)
       const beat = await beatService.uploadBeat(beatCandidate);
       return res.json(beat);
     } catch (error) {
