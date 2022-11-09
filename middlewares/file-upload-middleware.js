@@ -80,7 +80,10 @@ const upload = multer({
     }
     if (file.fieldname == 'stems') {
       if (ext !== '.rar' && ext !== '.zip') {
-        return cb(ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'), false);
+        return cb(
+          ApiError.BadRequest('Отправьте архив в формате ZIP или RAR'),
+          false
+        );
       }
       // if (fileSize <= 500 * 1024 * 1024) {
       //   // accept the file

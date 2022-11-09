@@ -1,5 +1,6 @@
+const ApiError = require('../exceptions/api-error');
 const beatService = require('../services/beat-service');
-const multer = require('multer');
+const { validationResult } = require('express-validator');
 
 class AuthorController {
   async getBeats(req, res, next) {
@@ -23,13 +24,27 @@ class AuthorController {
       next(error);
     }
   }
-  async upload(err, req, res, next) {
-    // file upload middleware errors serving
-    if (err) {
-      return next(err);
-    }
-    if (req.files) {
-      return res.json(req.files);
+  async upload(req, res, next) {
+    try {
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
+      }
+      const beatCandidate = {
+        name: req.body.name,
+        bpm: req.body.bpm,
+        description: req.body.description,
+        image: req.files.image,
+        wave: req.files.wave,
+        mp3: req.files.mp3,
+        stems: req.files.stems,
+        wavePrice: req.body.wavePrice,
+        stemsPrice: req.body.stemsPrice,
+      };
+      const beat = await beatService.uploadBeat(beatCandidate);
+      return res.json(beat);
+    } catch (error) {
+      next(error);
     }
   }
 }
