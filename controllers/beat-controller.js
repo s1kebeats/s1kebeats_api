@@ -32,16 +32,17 @@ class AuthorController {
       }
       const beatCandidate = {
         name: req.body.name,
-        bpm: req.body.bpm,
+        bpm: req.body.bpm ? +req.body.bpm : null,
         description: req.body.description,
         image: req.files.image,
         wave: req.files.wave,
         mp3: req.files.mp3,
         stems: req.files.stems,
-        wavePrice: req.body.wavePrice,
-        stemsPrice: req.body.stemsPrice,
+        wavePrice: +req.body.wavePrice,
+        stemsPrice: req.body.stemsPrice ? +req.body.stemsPrice : null,
+        userId: req.user.id,
       };
-      beatService.validateBeat(beatCandidate)
+      beatService.validateBeat(beatCandidate);
       const beat = await beatService.uploadBeat(beatCandidate);
       return res.json(beat);
     } catch (error) {

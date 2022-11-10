@@ -1,10 +1,10 @@
 const PrismaClient = require('@prisma/client').PrismaClient;
-const aws = require('aws-sdk');
 const path = require('path');
 const prisma = new PrismaClient();
 const beatSelect = require('../prisma-selects/beat-select');
 const beatIndividualSelect = require('../prisma-selects/beat-individual-select');
 const ApiError = require('../exceptions/api-error');
+const fileService = require('../services/file-service');
 
 class BeatService {
   async getBeats() {
@@ -140,7 +140,13 @@ class BeatService {
     }
 
     // stems check
-    if (beat.stems) {
+    if (beat.stems || beat.stemsPrice) {
+      if (!beat.stems) {
+        throw ApiError.BadRequest('Отправьте trackout архив');
+      }
+      if (!beat.stemsPrice) {
+        throw ApiError.BadRequest('Добавьте цену на trackout');
+      }
       this.validateFile(
         beat.stems,
         ['.zip', '.rar'],
@@ -149,8 +155,28 @@ class BeatService {
       );
     }
   }
+  async beatAwsUpload(beat) {
+    const fileData = {};
+    fileData.wave = await fileService.awsUpload(beat.wave, 'wave/');
+    fileData.mp3 = await fileService.awsUpload(beat.mp3, 'mp3/');
+    if (beat.image) {
+      fileData.image = await fileService.awsUpload(beat.image, 'image/');
+    }
+    if (beat.stems) {
+      fileData.stems = await fileService.awsUpload(beat.stems, 'stems/');
+    }
+    return fileData;
+  }
   async uploadBeat(beat) {
     // aws upload + prisma create
+    const fileData = await this.beatAwsUpload(beat);
+    const beatFromDb = await prisma.beat.create({
+      data: {
+        ...beat,
+        ...fileData,
+      },
+    });
+    return beatFromDb;
   }
 }
 

@@ -40,10 +40,13 @@ router.post(
   //     // }
   //     return true;
   //   }),
-  
-  // body('name').notEmpty(),
-  // body('wavePrice').notEmpty(),
-  // authMiddleware,
+
+  body('name').notEmpty().isLength({ max: 255 }),
+  body('wavePrice').notEmpty().isDecimal(),
+  body('stemsPrice').if(body('stemsPrice').exists()).isDecimal(),
+  body('bpm').if(body('bpm').exists()).isDecimal(),
+  body('description').if(body('description').exists()).isLength({ max: 255 }),
+  authMiddleware,
   beatController.upload
 );
 router.get('/', beatController.getBeats);

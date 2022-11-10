@@ -43,7 +43,7 @@ model User {
 model Beat {
   id          Int      @id @default(autoincrement())
   name        String
-  bpm         Int
+  bpm         Int?
   description String?
   createdAt   DateTime @default(now())
 

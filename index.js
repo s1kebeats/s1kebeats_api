@@ -10,7 +10,7 @@ const errorMiddleware = require('./middlewares/error-middleware');
 const app = express();
 
 app.use(fileUpload());
-app.use(express.json());
+app.use(express.json({ limit: '1000mb' }));
 app.use(
   cors({
     origin: 'http://example.com',
