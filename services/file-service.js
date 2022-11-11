@@ -1,6 +1,5 @@
 const aws = require('aws-sdk');
 const nanoid = require('nanoid');
-const ApiError = require('../exceptions/api-error');
 const s3 = new aws.S3({
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
@@ -17,10 +16,12 @@ class FileService {
     return s3.upload(params).promise();
   }
   async getMedia(key) {
-    const data = await s3.getObject({
-      Bucket: process.env.AWS_BUCKET_NAME,
-      Key: key,
-    });
+    const data = await s3.getObject(
+      {
+        Bucket: process.env.AWS_BUCKET_NAME,
+        Key: key,
+      }
+    );
     return data;
   }
 }
