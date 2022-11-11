@@ -16,12 +16,10 @@ class FileService {
     return s3.upload(params).promise();
   }
   async getMedia(key) {
-    const data = await s3.getObject(
-      {
-        Bucket: process.env.AWS_BUCKET_NAME,
-        Key: key,
-      }
-    );
+    const data = await s3.getObject({
+      Bucket: process.env.AWS_BUCKET_NAME,
+      Key: key,
+    });
     return data;
   }
 }

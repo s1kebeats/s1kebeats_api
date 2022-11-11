@@ -117,6 +117,12 @@ class BeatService {
     if (!beat.wave || !beat.mp3) {
       throw ApiError.BadRequest('Недостаточно информации');
     }
+
+    // tags check
+    if (beat.tags && !Array.isArray(beat.tags)) {
+      throw ApiError.BadRequest('Неверные теги');
+    }
+
     // files validation
     // wave check
     this.validateFile(

@@ -32,6 +32,7 @@ class AuthorController {
       }
       const beatCandidate = {
         ...req.body,
+        tags: JSON.parse(req.body.tags),
         wavePrice: +req.body.wavePrice,
         ...req.files,
         userId: req.user.id,
