@@ -13,7 +13,7 @@ class BeatService {
     });
     return beats;
   }
-  async findBeats({ tags, q, bpm, sort }) {
+  async findBeats({ tags = [], q, bpm, sort }) {
     const queryArgs = {
       orderBy: { [sort ? sort : 'id']: 'desc' },
       where: {},
@@ -156,16 +156,24 @@ class BeatService {
     }
   }
   async beatAwsUpload(beat) {
-    const fileData = {};
-    fileData.wave = await fileService.awsUpload(beat.wave, 'wave/');
-    fileData.mp3 = await fileService.awsUpload(beat.mp3, 'mp3/');
+    const fileData = [null, null, null, null];
+    fileData[0] = fileService.awsUpload(beat.wave, 'wave/');
+    fileData[1] = fileService.awsUpload(beat.mp3, 'mp3/');
     if (beat.image) {
-      fileData.image = await fileService.awsUpload(beat.image, 'image/');
+      fileData[2] = fileService.awsUpload(beat.image, 'image/');
     }
     if (beat.stems) {
-      fileData.stems = await fileService.awsUpload(beat.stems, 'stems/');
+      fileData[3] = fileService.awsUpload(beat.stems, 'stems/');
     }
-    return fileData;
+    const data = await Promise.all(fileData).then((values) => {
+      return {
+        wave: values[0].Key,
+        mp3: values[1].Key,
+        image: values[2] ? values[2].Key : null,
+        stems: values[3] ? values[3].Key : null,
+      };
+    });
+    return data;
   }
   async uploadBeat(beat) {
     // aws upload + prisma create

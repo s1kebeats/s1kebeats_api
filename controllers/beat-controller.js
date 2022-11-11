@@ -31,17 +31,19 @@ class AuthorController {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
       const beatCandidate = {
-        name: req.body.name,
-        bpm: req.body.bpm ? +req.body.bpm : null,
-        description: req.body.description,
-        image: req.files.image,
-        wave: req.files.wave,
-        mp3: req.files.mp3,
-        stems: req.files.stems,
+        ...req.body,
         wavePrice: +req.body.wavePrice,
-        stemsPrice: req.body.stemsPrice ? +req.body.stemsPrice : null,
+        ...req.files,
         userId: req.user.id,
       };
+      // convers strings to numbers
+      if (beatCandidate.bpm) {
+        beatCandidate.bpm = +beatCandidate.bpm;
+      }
+      if (beatCandidate.stemsPrice) {
+        beatCandidate.stemsPrice = +beatCandidate.stemsPrice;
+      }
+      // beat data validation
       beatService.validateBeat(beatCandidate);
       const beat = await beatService.uploadBeat(beatCandidate);
       return res.json(beat);

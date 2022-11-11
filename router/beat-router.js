@@ -40,11 +40,15 @@ router.post(
   //     // }
   //     return true;
   //   }),
-
+  // name required, 255 characters max
   body('name').notEmpty().isLength({ max: 255 }),
+  // wavePrice required, numeric
   body('wavePrice').notEmpty().isDecimal(),
+  // stemsPrice numeric
   body('stemsPrice').if(body('stemsPrice').exists()).isDecimal(),
+  // bpm numeric
   body('bpm').if(body('bpm').exists()).isDecimal(),
+  // description 255 characters max
   body('description').if(body('description').exists()).isLength({ max: 255 }),
   authMiddleware,
   beatController.upload
