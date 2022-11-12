@@ -1,17 +1,31 @@
-const ApiError = require('../exceptions/api-error');
-const tokenService = require('../services/token-service');
+import ApiError from '../exceptions/api-error';
+import tokenService from '../services/token-service';
+import { Request, Response, NextFunction } from 'express';
+import UserDto from '../dtos/user-dto';
 
-module.exports = async function (req, res, next) {
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: UserDto;
+  }
+}
+
+export default async function (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   try {
+    // request authorization header with access token
     const authHeader = req.headers.authorization;
     if (!authHeader) {
       return next(ApiError.UnauthorizedUser());
     }
+    // 'Bearer ...token' split
     const accessToken = authHeader.split(' ')[1];
     if (!accessToken) {
       return next(ApiError.UnauthorizedUser());
     }
-    const userData = tokenService.validateAccessToken(accessToken);
+    const userData = tokenService.validateAccessToken(accessToken) as UserDto;
     if (!userData) {
       return next(ApiError.UnauthorizedUser());
     }
@@ -20,4 +34,4 @@ module.exports = async function (req, res, next) {
   } catch (error) {
     return next(ApiError.UnauthorizedUser());
   }
-};
+}

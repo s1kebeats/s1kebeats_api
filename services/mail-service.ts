@@ -1,20 +1,23 @@
-const nodemailer = require('nodemailer');
+import nodemailer from 'nodemailer';
+import SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 class MailService {
+  transporter: nodemailer.Transporter;
   constructor() {
     // nodemailer config
-    this.transporter = nodemailer.createTransport({
+    const opts: SMTPTransport.Options = {
       host: process.env.SMTP_HOST,
-      port: process.env.SMTP_PORT,
+      port: +process.env.SMTP_PORT!,
       secure: true,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASSWORD,
       },
-    });
+    };
+    this.transporter = nodemailer.createTransport(opts);
   }
 
-  async sendActivationMail(to, link) {
+  async sendActivationMail(to: string, link: string) {
     await this.transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
@@ -29,4 +32,4 @@ class MailService {
   }
 }
 
-module.exports = new MailService();
+export default new MailService();

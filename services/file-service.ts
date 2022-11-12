@@ -10,7 +10,7 @@ const s3 = new aws.S3(awsConfig);
 
 class FileService {
   // upload a file to aws s3 bucket
-  async awsUpload(file: any, path: string) {
+  async awsUpload(file: any, path: string): Promise<aws.S3.Object> {
     const params: aws.S3.PutObjectRequest = {
       Bucket: process.env.AWS_BUCKET_NAME!,
       Key: path + nanoid(36),

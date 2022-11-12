@@ -1,14 +1,27 @@
-const ApiError = require('../exceptions/api-error');
-const beatService = require('../services/beat-service');
-const { validationResult } = require('express-validator');
+import ApiError from '../exceptions/api-error';
+import beatService, {
+  BeatIndividual,
+  BeatWithAuthorAndTags,
+} from '../services/beat-service';
+import { validationResult } from 'express-validator';
+import { Request, Response, NextFunction } from 'express';
+import UserDto from '../dtos/user-dto';
+// req.user
+declare module 'express-serve-static-core' {
+  interface Request {
+    user?: UserDto;
+  }
+}
 
-class AuthorController {
-  async getBeats(req, res, next) {
+class BeatController {
+  // find many beats
+  async getBeats(req: Request, res: Response, next: NextFunction) {
     try {
-      let beats;
+      let beats: BeatWithAuthorAndTags[];
       if (req.query) {
         beats = await beatService.findBeats(req.query);
       } else {
+        // get all beats
         beats = await beatService.getBeats();
       }
       return res.json(beats);
@@ -16,16 +29,21 @@ class AuthorController {
       next(error);
     }
   }
-  async getIndividualBeat(req, res, next) {
+  // get individual beat data
+  async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
-      const beat = await beatService.getBeatById(req.params.id);
+      const beat: BeatIndividual = await beatService.getBeatById(
+        +req.params.id
+      );
       return res.json(beat);
     } catch (error) {
       next(error);
     }
   }
-  async upload(req, res, next) {
+  // beat upload
+  async upload(req: Request, res: Response, next: NextFunction) {
     try {
+      // express validator errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
@@ -35,7 +53,7 @@ class AuthorController {
         tags: JSON.parse(req.body.tags),
         wavePrice: +req.body.wavePrice,
         ...req.files,
-        userId: req.user.id,
+        userId: req.user!.id,
       };
       // convers strings to numbers
       if (beatCandidate.bpm) {
@@ -54,4 +72,4 @@ class AuthorController {
   }
 }
 
-module.exports = new AuthorController();
+export default new BeatController();

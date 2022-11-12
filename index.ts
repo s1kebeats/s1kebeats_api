@@ -1,11 +1,12 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const cookieParser = require('cookie-parser');
-const fileUpload = require('express-fileupload');
+import dotenv from 'dotenv';
+import express from 'express';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import fileUpload from 'express-fileupload';
+import router from './router';
+import errorMiddleware from './middlewares/error-middleware';
 
-const router = require('./router/index');
-const errorMiddleware = require('./middlewares/error-middleware');
+dotenv.config();
 
 const app = express();
 
@@ -18,6 +19,7 @@ app.use(
 );
 app.use(cookieParser());
 app.use('/api', router);
+// error handler
 app.use(errorMiddleware);
 
 const start = async () => {

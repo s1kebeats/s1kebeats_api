@@ -1,24 +1,72 @@
-const PrismaClient = require('@prisma/client').PrismaClient;
-const path = require('path');
-const prisma = new PrismaClient();
-const beatSelect = require('../prisma-selects/beat-select');
-const beatIndividualSelect = require('../prisma-selects/beat-individual-select');
-const ApiError = require('../exceptions/api-error');
-const fileService = require('../services/file-service');
+import PrismaClient from '@prisma/client';
+import path from 'path';
+const prisma = new PrismaClient.PrismaClient();
+import aws from 'aws-sdk';
+import ApiError from '../exceptions/api-error';
+import fileService from './file-service';
+
+const beatWithAuthorAndTags =
+  PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
+    select: {
+      id: true,
+      name: true,
+      bpm: true,
+      user: {
+        select: {
+          username: true,
+          displayedName: true,
+        },
+      },
+      image: true,
+      mp3: true,
+      wavePrice: true,
+      tags: true,
+    },
+  });
+export type BeatWithAuthorAndTags = PrismaClient.Prisma.BeatGetPayload<
+  typeof beatWithAuthorAndTags
+>;
+export interface BeatIndividual extends BeatWithAuthorAndTags {
+  related: BeatWithAuthorAndTags[];
+}
+interface FileMock {
+  name: string;
+  size: number;
+}
+export interface BeatUploadInput
+  extends Omit<PrismaClient.Beat, 'image' | 'wave' | 'mp3' | 'stems'> {
+  tags: PrismaClient.Tag[];
+  image: FileMock;
+  wave: FileMock;
+  mp3: FileMock;
+  stems: FileMock;
+}
 
 class BeatService {
-  async getBeats() {
-    const beats = await prisma.beat.findMany({
-      select: beatSelect,
-    });
+  // get all beats
+  async getBeats(): Promise<BeatWithAuthorAndTags[]> {
+    const beats = await prisma.beat.findMany(beatWithAuthorAndTags);
     return beats;
   }
-  async findBeats({ tags = [], q, bpm, sort }) {
+  // find beats with query
+  async findBeats({
+    tags = [],
+    q,
+    bpm,
+    sort,
+  }: {
+    tags?: number[];
+    q?: string;
+    bpm?: string;
+    sort?: string;
+  }): Promise<BeatWithAuthorAndTags[]> {
+    const where: PrismaClient.Prisma.BeatWhereInput = {};
     const queryArgs = {
       orderBy: { [sort ? sort : 'id']: 'desc' },
-      where: {},
+      where: where,
+      ...beatWithAuthorAndTags,
     };
-
+    // query in beat name / author name
     if (q) {
       queryArgs.where = {
         OR: [
@@ -29,7 +77,7 @@ class BeatService {
             },
           },
           {
-            author: {
+            user: {
               OR: [
                 {
                   username: {
@@ -60,22 +108,27 @@ class BeatService {
     }
     if (bpm) {
       queryArgs.where.bpm = {
-        equals: bpm,
+        equals: +bpm,
       };
     }
 
     const beat = await prisma.beat.findMany(queryArgs);
     return beat;
   }
-  async getBeatById(id) {
-    const beat = await prisma.beat.findUnique({
+  async getBeatById(id: number): Promise<BeatIndividual> {
+    const beatFindUniqueArgs = {
       where: {
         id,
       },
-      select: beatIndividualSelect,
-    });
+      ...beatWithAuthorAndTags,
+    };
+    const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
+    if (!beat) {
+      throw ApiError.NotFound(`Бит не найден`);
+    }
+    // list if related beats (beats with same tags or author)
     const relatedBeats = await this.findBeats({
-      tags: beat.tags,
+      tags: beat.tags.map((item: PrismaClient.Tag) => item.id),
       q: beat.user.username,
     });
     return {
@@ -84,7 +137,11 @@ class BeatService {
     };
   }
   // file validation function with extension and maxSize
-  validateFile(file, extensions, maxSize) {
+  validateFile(
+    file: { name: string; size: number },
+    extensions?: string | string[],
+    maxSize?: number
+  ) {
     // extensions validation
     if (extensions) {
       // get file extension
@@ -112,7 +169,7 @@ class BeatService {
       }
     }
   }
-  validateBeat(beat) {
+  validateBeat(beat: BeatUploadInput) {
     // required beat data check
     if (!beat.wave || !beat.mp3) {
       throw ApiError.BadRequest('Недостаточно информации');
@@ -161,8 +218,13 @@ class BeatService {
       );
     }
   }
-  async beatAwsUpload(beat) {
-    const fileData = [null, null, null, null];
+  async beatAwsUpload(beat: BeatUploadInput): Promise<{
+    wave?: string;
+    mp3?: string;
+    image?: string;
+    stems?: string;
+  }> {
+    const fileData: any = [null, null, null, null];
     fileData[0] = fileService.awsUpload(beat.wave, 'wave/');
     fileData[1] = fileService.awsUpload(beat.mp3, 'mp3/');
     if (beat.image) {
@@ -171,27 +233,29 @@ class BeatService {
     if (beat.stems) {
       fileData[3] = fileService.awsUpload(beat.stems, 'stems/');
     }
-    const data = await Promise.all(fileData).then((values) => {
+    // async files upload
+    const data = await Promise.all(fileData).then((values: aws.S3.Object[]) => {
       return {
         wave: values[0].Key,
         mp3: values[1].Key,
-        image: values[2] ? values[2].Key : null,
-        stems: values[3] ? values[3].Key : null,
+        image: values[2] ? values[2].Key : undefined,
+        stems: values[3] ? values[3].Key : undefined,
       };
     });
     return data;
   }
-  async uploadBeat(beat) {
+  async uploadBeat(beat: BeatUploadInput) {
     // aws upload + prisma create
     const fileData = await this.beatAwsUpload(beat);
+    const beatData = {
+      ...beat,
+      ...fileData,
+    } as PrismaClient.Beat;
     const beatFromDb = await prisma.beat.create({
-      data: {
-        ...beat,
-        ...fileData,
-      },
+      data: beatData,
     });
     return beatFromDb;
   }
 }
 
-module.exports = new BeatService();
+export default new BeatService();

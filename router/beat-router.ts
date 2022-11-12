@@ -1,9 +1,8 @@
-const beatController = require('../controllers/beat-controller');
-const authMiddleware = require('../middlewares/auth-middleware');
-const { body } = require('express-validator');
-
-const Router = require('express').Router;
-const router = new Router();
+import beatController from '../controllers/beat-controller';
+import authMiddleware from '../middlewares/auth-middleware';
+import { body } from 'express-validator';
+import { Router } from 'express';
+const router = Router();
 
 router.post(
   '/upload',
