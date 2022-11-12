@@ -1,10 +1,12 @@
-module.exports = class UserDto {
-  email;
-  username;
-  id;
-  isActivated;
+import { User } from ".prisma/client";
 
-  constructor(model) {
+export default class UserDto {
+  email: string;
+  username: string;
+  id: number;
+  isActivated: boolean;
+
+  constructor(model: User) {
     this.email = model.email;
     this.username = model.username;
     this.id = model.id;

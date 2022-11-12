@@ -1,23 +1,25 @@
-const PrismaClient = require('@prisma/client').PrismaClient;
-const prisma = new PrismaClient();
-const bcrypt = require('bcrypt');
-const uuid = require('uuid');
-const mailService = require('./mail-service');
-const tokenService = require('./token-service');
-const UserDto = require('../dtos/user-dto');
-const ApiError = require('../exceptions/api-error');
+import PrismaClient from "@prisma/client"
+import bcrypt from "bcrypt"
+import uuid from "uuid"
+
+import UserDto from "../dtos/user-dto";
+import mailService from "./mail-service"
+import tokenService from "./token-service"
+import ApiError from "../exceptions/api-error"
+
+const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
-  async generateData(user) {
+  async generateData(user: PrismaClient.User) {
     const userDto = new UserDto(user);
-    const tokens = tokenService.generateTokens({ ...userDto });
+    const tokens = tokenService.generateTokens(userDto);
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
     return {
       ...tokens,
       user: userDto,
     };
   }
-  async register(email, username, password) {
+  async register(email: string, username: string, password: string) {
     let candidate = await prisma.user.findUnique({
       where: { username },
     });
