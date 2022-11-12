@@ -1,4 +1,4 @@
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client';
 
 const beatSelect: Prisma.BeatSelect = {
   id: true,
@@ -13,5 +13,5 @@ const beatSelect: Prisma.BeatSelect = {
   image: true,
   mp3: true,
   wavePrice: true,
-}
-export default beatSelect
+};
+export default beatSelect;

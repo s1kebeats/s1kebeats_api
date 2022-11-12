@@ -1,13 +1,16 @@
-import authorService from '../services/author-service'
+import authorService from '../services/author-service';
 import { Request, Response, NextFunction } from 'express';
 
 class AuthorController {
   async getAuthors(req: Request, res: Response, next: NextFunction) {
     try {
       let authors;
-      if (req.query.q) {
-        authors = await authorService.findAuthors(req.query.q);
+      const query = req.query.q as string;
+      if (query) {
+        // find author with query
+        authors = await authorService.findAuthors(query);
       } else {
+        // get all authors
         authors = await authorService.getAuthors();
       }
       return res.json(authors);
@@ -15,6 +18,7 @@ class AuthorController {
       next(error);
     }
   }
+  // get individual author data
   async getIndividualAuthor(req: Request, res: Response, next: NextFunction) {
     try {
       const author = await authorService.getAuthorByUsername(
@@ -27,4 +31,4 @@ class AuthorController {
   }
 }
 
-module.exports = new AuthorController();
+export default new AuthorController();

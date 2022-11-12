@@ -1,8 +1,8 @@
-import userRouter from './user-router'
-import authorRouter from './author-router'
-import beatRouter from './beat-router'
-import fileRouter from './file-router'
-import { Router } from 'express'
+import userRouter from './user-router';
+import authorRouter from './author-router';
+import beatRouter from './beat-router';
+import fileRouter from './file-router';
+import { Router } from 'express';
 
 const router = Router();
 

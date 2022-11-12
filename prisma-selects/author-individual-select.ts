@@ -1,5 +1,5 @@
 import beatSelect from './beat-select';
-import { Prisma } from '@prisma/client'
+import { Prisma } from '@prisma/client';
 
 const authorIndividualSelect: Prisma.UserSelect = {
   username: true,
@@ -22,5 +22,5 @@ const authorIndividualSelect: Prisma.UserSelect = {
       beats: true,
     },
   },
-}
+};
 export default authorIndividualSelect;
