@@ -9,7 +9,11 @@ class UserController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
-      const { email, username, password }: {email: string, username: string, password: string} = req.body;
+      const {
+        email,
+        username,
+        password,
+      }: { email: string; username: string; password: string } = req.body;
       const userData = await userService.register(email, username, password);
       // setting refresh token httpOnly cookie
       res.cookie('refreshToken', userData.refreshToken, {

@@ -1,4 +1,4 @@
-import { User } from ".prisma/client";
+import { User } from '.prisma/client';
 
 export default class UserDto {
   email: string;
@@ -12,4 +12,4 @@ export default class UserDto {
     this.id = model.id;
     this.isActivated = model.isActivated;
   }
-};
+}
