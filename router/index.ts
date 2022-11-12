@@ -1,14 +1,14 @@
-const userRouter = require('./user-router');
-const authorRouter = require('./author-router');
-const beatRouter = require('./beat-router');
-const fileRouter = require('./file-router');
+import userRouter from './user-router'
+import authorRouter from './author-router'
+import beatRouter from './beat-router'
+import fileRouter from './file-router'
+import { Router } from 'express'
 
-const Router = require('express').Router;
-const router = new Router();
+const router = Router();
 
 router.use('/', userRouter);
 router.use('/authors', authorRouter);
 router.use('/beats', beatRouter);
 router.use('/file', fileRouter);
 
-module.exports = router;
+export default router;

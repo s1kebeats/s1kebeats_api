@@ -1,4 +1,6 @@
-module.exports = {
+import { Prisma } from '@prisma/client'
+
+const beatSelect: Prisma.BeatSelect = {
   id: true,
   name: true,
   bpm: true,
@@ -11,4 +13,5 @@ module.exports = {
   image: true,
   mp3: true,
   wavePrice: true,
-};
+}
+export default beatSelect

@@ -1,6 +1,7 @@
-const beatSelect = require('./beat-select');
+import beatSelect from './beat-select';
+import { Prisma } from '@prisma/client'
 
-module.exports = {
+const authorIndividualSelect: Prisma.UserSelect = {
   username: true,
   createdAt: true,
   displayedName: true,
@@ -21,4 +22,5 @@ module.exports = {
       beats: true,
     },
   },
-};
+}
+export default authorIndividualSelect;

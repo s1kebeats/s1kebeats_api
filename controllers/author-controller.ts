@@ -1,7 +1,8 @@
-const authorService = require('../services/author-service');
+import authorService from '../services/author-service'
+import { Request, Response, NextFunction } from 'express';
 
 class AuthorController {
-  async getAuthors(req, res, next) {
+  async getAuthors(req: Request, res: Response, next: NextFunction) {
     try {
       let authors;
       if (req.query.q) {
@@ -14,7 +15,7 @@ class AuthorController {
       next(error);
     }
   }
-  async getIndividualAuthor(req, res, next) {
+  async getIndividualAuthor(req: Request, res: Response, next: NextFunction) {
     try {
       const author = await authorService.getAuthorByUsername(
         req.params.username

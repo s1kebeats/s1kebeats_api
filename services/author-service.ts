@@ -1,7 +1,8 @@
-const PrismaClient = require('@prisma/client').PrismaClient;
-const prisma = new PrismaClient();
-const authorSelect = require('../prisma-selects/author-select');
-const authorIndividualSelect = require('../prisma-selects/author-individual-select');
+import PrismaClient from '@prisma/client'
+import authorSelect from '../prisma-selects/author-select'
+import authorIndividualSelect from '../prisma-selects/author-individual-select'
+
+const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   async getAuthors() {

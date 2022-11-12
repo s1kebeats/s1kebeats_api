@@ -1,6 +1,7 @@
 import userController from '../controllers/user-controller';
 import { body } from 'express-validator';
 import { Router } from 'express';
+
 const router = Router();
 
 router.post(
