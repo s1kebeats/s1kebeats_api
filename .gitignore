@@ -1,4 +1,4 @@
 node_modules
-built
+build/*
 # Keep environment variables out of version control
 .env

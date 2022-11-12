@@ -22,4 +22,4 @@ router.post(
 router.get('/', beatController.getBeats);
 router.get('/:id', beatController.getIndividualBeat);
 
-module.exports = router;
+export default router;
