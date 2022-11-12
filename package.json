@@ -1,6 +1,7 @@
 {
   "scripts": {
-    "dev": "nodemon index.js",
+    "build": "tsc --project ./",
+    "dev": "nodemon ./built/index.js",
     "format": "prettier --write .",
     "lint": "eslint --fix ."
   },
@@ -23,9 +24,15 @@
     "uuid": "^9.0.0"
   },
   "devDependencies": {
+    "@types/express": "^4.17.14",
+    "@types/node": "^18.11.9",
+    "@typescript-eslint/eslint-plugin": "^5.42.1",
+    "@typescript-eslint/parser": "^5.42.1",
     "eslint": "^8.26.0",
     "eslint-config-prettier": "^8.5.0",
     "nodemon": "^2.0.20",
-    "prettier": "^2.7.1"
+    "prettier": "^2.7.1",
+    "ts-node": "^10.9.1",
+    "typescript": "^4.8.4"
   }
 }
