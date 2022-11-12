@@ -32,6 +32,7 @@ class TokenService {
     userId: number,
     refreshToken: string
   ): Promise<PrismaClient.Token> {
+    // update existing refresh token or create new token
     const tokenUpsertArgs: PrismaClient.Prisma.TokenUpsertArgs = {
       where: {
         userId,
@@ -47,6 +48,7 @@ class TokenService {
     const token = await prisma.token.upsert(tokenUpsertArgs);
     return token;
   }
+  // remove token for user logout
   async removeToken(refreshToken: string): Promise<PrismaClient.Token> {
     const tokenDeleteArgs: PrismaClient.Prisma.TokenDeleteArgs = {
       where: {
@@ -56,6 +58,7 @@ class TokenService {
     const token = await prisma.token.delete(tokenDeleteArgs);
     return token;
   }
+  // check for token existence
   async findToken(refreshToken: string): Promise<PrismaClient.Token | null> {
     const tokenFindUniqueArgs: PrismaClient.Prisma.TokenFindUniqueArgs = {
       where: {
@@ -65,12 +68,14 @@ class TokenService {
     const token = await prisma.token.findUnique(tokenFindUniqueArgs);
     return token;
   }
-  validateAccessToken(accessToken: string): string | null | JwtPayload {
+  // decode data from given tokens
+  validateAccessToken(accessToken: string): null | JwtPayload {
     try {
       const decoded = jsonwebtoken.verify(
         accessToken,
         process.env.JWT_ACCESS_SECRET!
-      );
+      ) as JwtPayload;
+      // return user data
       return decoded;
     } catch (error) {
       return null;
@@ -82,6 +87,7 @@ class TokenService {
         refreshToken,
         process.env.JWT_REFRESH_SECRET!
       ) as JwtPayload;
+      // return user data
       return decoded;
     } catch (error) {
       return null;
