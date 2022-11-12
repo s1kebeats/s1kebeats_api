@@ -6,7 +6,7 @@ const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   async getAuthors() {
-    const authors = await prisma.user.findMany({
+    const authors: PrismaClient.User[] | null = await prisma.user.findMany({
       select: authorSelect,
     });
     return authors;
