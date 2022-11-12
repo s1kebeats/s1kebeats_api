@@ -1,7 +1,12 @@
-import ApiError from "../exceptions/api-error";
-import { Request, Response, NextFunction } from "express"
+import ApiError from '../exceptions/api-error';
+import { Request, Response, NextFunction } from 'express';
 
-export default function (err: Error, req: Request, res: Response, next: NextFunction): Response {
+export default function (
+  err: Error,
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Response {
   console.log(err);
   // api error
   if (err instanceof ApiError) {
@@ -11,4 +16,4 @@ export default function (err: Error, req: Request, res: Response, next: NextFunc
   }
   // undexpected error
   return res.status(500).json({ message: 'Произошла непредвиденная ошибка' });
-};
+}

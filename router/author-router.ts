@@ -1,9 +1,8 @@
-const authorController = require('../controllers/author-controller');
-
-const Router = require('express').Router;
-const router = new Router();
+import authorController from '../controllers/author-controller';
+import { Router } from 'express';
+const router = Router();
 
 router.get('/', authorController.getAuthors);
 router.get('/:username', authorController.getIndividualAuthor);
 
-module.exports = router;
+export default router;
