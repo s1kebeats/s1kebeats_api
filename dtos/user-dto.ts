@@ -1,4 +1,4 @@
-import { User } from '.prisma/client';
+import { User } from '@prisma/client';
 
 export default class UserDto {
   email: string;

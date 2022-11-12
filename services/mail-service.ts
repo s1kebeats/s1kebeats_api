@@ -5,7 +5,7 @@ class MailService {
   transporter: nodemailer.Transporter;
   constructor() {
     // nodemailer config
-    const opts: SMTPTransport.Options = {
+    const opts = {
       host: process.env.SMTP_HOST,
       port: +process.env.SMTP_PORT!,
       secure: true,

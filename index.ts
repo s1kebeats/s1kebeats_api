@@ -3,7 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
-import router from './router';
+import router from './router/index';
 import errorMiddleware from './middlewares/error-middleware';
 
 dotenv.config();
