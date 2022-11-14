@@ -9,9 +9,9 @@ beforeEach(() => {
 })
 
 describe('register endpoint', () => {
-  test('post only', async () => {
-    const res = await request(app).get('/register');
-    assert.equal(res.statusCode, 404);
+  test('post only', () => {
+    return request(app).get('/register')
+    .then(res => assert.equal(res.statusCode, 404))
   });
 });
   
