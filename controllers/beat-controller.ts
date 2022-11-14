@@ -1,11 +1,11 @@
-import ApiError from '../exceptions/api-error';
+import ApiError from '../exceptions/api-error.js';
 import beatService, {
   BeatIndividual,
   BeatWithAuthorAndTags,
-} from '../services/beat-service';
+} from '../services/beat-service.js';
 import { validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
-import UserDto from '../dtos/user-dto';
+import UserDto from '../dtos/user-dto.js';
 // req.user
 declare module 'express-serve-static-core' {
   interface Request {

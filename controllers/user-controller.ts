@@ -1,6 +1,6 @@
-import userService from '../services/user-service';
+import userService from '../services/user-service.js';
 import { validationResult } from 'express-validator';
-import ApiError from '../exceptions/api-error';
+import ApiError from '../exceptions/api-error.js';
 import { Request, Response, NextFunction } from 'express';
 
 class UserController {

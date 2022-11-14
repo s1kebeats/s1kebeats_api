@@ -1,6 +1,6 @@
 import PrismaClient from '@prisma/client';
-import authorSelect from '../prisma-selects/author-select';
-import authorIndividualSelect from '../prisma-selects/author-individual-select';
+import authorSelect from '../prisma-selects/author-select.js';
+import authorIndividualSelect from '../prisma-selects/author-individual-select.js';
 
 const prisma = new PrismaClient.PrismaClient();
 

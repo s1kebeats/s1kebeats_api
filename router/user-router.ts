@@ -1,4 +1,4 @@
-import userController from '../controllers/user-controller';
+import userController from '../controllers/user-controller.js';
 import { body } from 'express-validator';
 import { Router } from 'express';
 

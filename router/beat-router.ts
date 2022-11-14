@@ -1,5 +1,5 @@
-import beatController from '../controllers/beat-controller';
-import authMiddleware from '../middlewares/auth-middleware';
+import beatController from '../controllers/beat-controller.js';
+import authMiddleware from '../middlewares/auth-middleware.js';
 import { body } from 'express-validator';
 import { Router } from 'express';
 const router = Router();

@@ -1,4 +1,4 @@
-import authorService from '../services/author-service';
+import authorService from '../services/author-service.js';
 import { Request, Response, NextFunction } from 'express';
 
 class AuthorController {

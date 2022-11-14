@@ -1,4 +1,4 @@
-import authorSelect from './author-select';
+import authorSelect from './author-select.js';
 import { Prisma } from '@prisma/client';
 
 const beatIndividualSelect: Prisma.BeatSelect = {

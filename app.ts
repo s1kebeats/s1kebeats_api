@@ -3,8 +3,8 @@ import express from 'express';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
-import router from './router/index';
-import errorMiddleware from './middlewares/error-middleware';
+import router from './router/index.js';
+import errorMiddleware from './middlewares/error-middleware.js';
 
 dotenv.config();
 
@@ -22,14 +22,4 @@ app.use('/api', router);
 // error handler
 app.use(errorMiddleware);
 
-const start = async () => {
-  try {
-    app.listen(process.env.PORT || 5000, () => {
-      console.log(`Listening on port ${process.env.PORT}`);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-};
-
-start();
+export default app;

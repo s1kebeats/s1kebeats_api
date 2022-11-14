@@ -1,7 +1,7 @@
-import userRouter from './user-router';
-import authorRouter from './author-router';
-import beatRouter from './beat-router';
-import fileRouter from './file-router';
+import userRouter from './user-router.js';
+import authorRouter from './author-router.js';
+import beatRouter from './beat-router.js';
+import fileRouter from './file-router.js';
 import { Router } from 'express';
 
 const router = Router();

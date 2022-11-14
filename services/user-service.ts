@@ -1,11 +1,11 @@
 import PrismaClient from '@prisma/client';
 import bcrypt from 'bcrypt';
-import uuid from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import UserDto from '../dtos/user-dto';
-import mailService from './mail-service';
-import tokenService from './token-service';
-import ApiError from '../exceptions/api-error';
+import UserDto from '../dtos/user-dto.js';
+import mailService from './mail-service.js';
+import tokenService from './token-service.js';
+import ApiError from '../exceptions/api-error.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -54,7 +54,7 @@ class UserService {
     // hash user password
     const hashedPassword: string = await bcrypt.hash(password, 3);
     // generate unique activation link
-    const activationLink: string = uuid.v4();
+    const activationLink: string = uuid();
     // create user data
     const userCreateArgs: PrismaClient.Prisma.UserCreateArgs = {
       data: {

@@ -2,8 +2,8 @@ import PrismaClient from '@prisma/client';
 import path from 'path';
 const prisma = new PrismaClient.PrismaClient();
 import aws from 'aws-sdk';
-import ApiError from '../exceptions/api-error';
-import fileService from './file-service';
+import ApiError from '../exceptions/api-error.js';
+import fileService from './file-service.js';
 
 const beatWithAuthorAndTags =
   PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({

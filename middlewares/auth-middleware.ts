@@ -1,7 +1,7 @@
-import ApiError from '../exceptions/api-error';
-import tokenService from '../services/token-service';
+import ApiError from '../exceptions/api-error.js';
+import tokenService from '../services/token-service.js';
 import { Request, Response, NextFunction } from 'express';
-import UserDto from '../dtos/user-dto';
+import UserDto from '../dtos/user-dto.js';
 
 declare module 'express-serve-static-core' {
   interface Request {
