@@ -1,6 +1,6 @@
 import PrismaClient from '@prisma/client';
 import bcrypt from 'bcrypt';
-import { v4 as uuid } from 'uuid';
+import { nanoid } from 'nanoid';
 
 import UserDto from '../dtos/user-dto.js';
 import mailService from './mail-service.js';
@@ -54,7 +54,7 @@ class UserService {
     // hash user password
     const hashedPassword: string = await bcrypt.hash(password, 3);
     // generate unique activation link
-    const activationLink: string = uuid();
+    const activationLink: string = nanoid(36);
     // create user data
     const userCreateArgs: PrismaClient.Prisma.UserCreateArgs = {
       data: {
@@ -67,10 +67,10 @@ class UserService {
     // create user in the database
     const user: PrismaClient.User = await prisma.user.create(userCreateArgs);
     // sending email with activation link
-    await mailService.sendActivationMail(
-      email,
-      `${process.env.BASE_URL}/api/activate/${activationLink}`
-    );
+    // await mailService.sendActivationMail(
+    //   email,
+    //   `${process.env.BASE_URL}/api/activate/${activationLink}`
+    // );
     // generate tokens and form user DTO
     const data = await this.generateData(user);
     return data;

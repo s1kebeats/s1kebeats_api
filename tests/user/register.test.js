@@ -54,7 +54,7 @@ describe('register endpoint', () => {
       .send({
         email: 'random@email.com',
         username: 'randomusername',
-        password: 'ra',
+        password: '1',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
@@ -76,6 +76,44 @@ describe('register endpoint', () => {
       .send({
         email: 'random@email.com',
         username: '__randomusername',
+        password: 'randompassword',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 400);
+  });
+  it('success', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'random@email.com',
+        username: 'randomusername',
+        password: 'randompassword',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 200);
+    assert.equal(typeof res.body.accessToken, 'string');
+    assert.equal(typeof res.body.refreshToken, 'string');
+    assert.equal(res.body.user.username, 'randomusername');
+    assert.equal(res.body.user.email, 'random@email.com');
+    assert.equal(res.body.user.isActivated, false);
+  });
+  it('used username', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'random@email.com',
+        username: 's1kebeats',
+        password: 'randompassword',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 400);
+  });
+  it('used email', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'adacenkoboos@gmail.com',
+        username: 'randomusername',
         password: 'randompassword',
       })
       .set('Content-Type', 'application/json');
