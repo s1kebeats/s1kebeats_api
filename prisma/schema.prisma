@@ -65,7 +65,7 @@ model Beat {
 
 model Tag {
   id    Int    @id @default(autoincrement())
-  name  String
+  name  String @unique
   beats Beat[]
 }
 

@@ -35,7 +35,10 @@ interface FileMock {
 }
 export interface BeatUploadInput
   extends Omit<PrismaClient.Beat, 'image' | 'wave' | 'mp3' | 'stems'> {
-  tags: PrismaClient.Tag[];
+  tags: {
+    connectOrCreate: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput;
+  };
+  // tags: { createMany: { data: PrismaClient.Tag[] } };
   image: FileMock;
   wave: FileMock;
   mp3: FileMock;
@@ -174,11 +177,10 @@ class BeatService {
     if (!beat.wave || !beat.mp3) {
       throw ApiError.BadRequest('Недостаточно информации');
     }
-
     // tags check
-    if (beat.tags && !Array.isArray(beat.tags)) {
-      throw ApiError.BadRequest('Неверные теги');
-    }
+    // if (beat.tags && !Array.isArray(beat.tags.connectOrCreate.create)) {
+    //   throw ApiError.BadRequest('Неверные теги');
+    // }
 
     // files validation
     // wave check
@@ -253,6 +255,9 @@ class BeatService {
     } as PrismaClient.Beat;
     const beatFromDb = await prisma.beat.create({
       data: beatData,
+      include: {
+        tags: true,
+      },
     });
     return beatFromDb;
   }

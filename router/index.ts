@@ -7,8 +7,8 @@ import { Router } from 'express';
 const router = Router();
 
 router.use('/', userRouter);
-router.use('/authors', authorRouter);
-router.use('/beats', beatRouter);
+router.use('/author', authorRouter);
+router.use('/beat', beatRouter);
 router.use('/file', fileRouter);
 
 export default router;

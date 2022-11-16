@@ -6,6 +6,7 @@ import beatService, {
 import { validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import UserDto from '../dtos/user-dto.js';
+import PrismaClient from '@prisma/client';
 // req.user
 declare module 'express-serve-static-core' {
   interface Request {
@@ -48,9 +49,18 @@ class BeatController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
+      const tags = JSON.parse(req.body.tags);
       const beatCandidate = {
         ...req.body,
-        tags: JSON.parse(req.body.tags),
+        tags: {
+          connectOrCreate: tags.map((tag: PrismaClient.Tag) => {
+            return {
+              where: { name: tag.name },
+              create: { name: tag.name },
+            };
+          }),
+          // JSON.parse(req.body.tags),
+        },
         wavePrice: +req.body.wavePrice,
         ...req.files,
         userId: req.user!.id,
