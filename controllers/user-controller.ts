@@ -33,6 +33,11 @@ class UserController {
   }
   async login(req: Request, res: Response, next: NextFunction) {
     try {
+      // expresss validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
+      }
       // login data
       const { login, password }: { login: string; password: string } = req.body;
       // login the user
@@ -52,6 +57,9 @@ class UserController {
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
       const { refreshToken }: { refreshToken: string } = req.cookies;
+      if (!refreshToken) {
+        return next(ApiError.UnauthorizedUser());
+      }
       const token = await userService.logout(refreshToken);
       // remove cookie with refresh token
       res.clearCookie('resfreshToken');

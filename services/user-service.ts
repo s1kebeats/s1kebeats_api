@@ -139,8 +139,12 @@ class UserService {
   }
   // logout
   async logout(refreshToken: string): Promise<PrismaClient.Token> {
+    let token = await tokenService.findToken(refreshToken);
+    if (!token) {
+      throw ApiError.UnauthorizedUser();
+    }
     // delete user's access and refresh tokens from database
-    const token = await tokenService.removeToken(refreshToken);
+    token = await tokenService.removeToken(refreshToken);
     return token;
   }
   // refresh access token

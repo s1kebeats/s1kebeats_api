@@ -7,15 +7,18 @@ const router = Router();
 router.post(
   '/upload',
   // name required, 255 characters max
-  body('name').notEmpty().isLength({ max: 255 }),
+  body('name').notEmpty().bail().isLength({ max: 255 }).bail(),
   // wavePrice required, numeric
-  body('wavePrice').notEmpty().isDecimal(),
+  body('wavePrice').notEmpty().bail().isDecimal().bail(),
   // stemsPrice numeric
-  body('stemsPrice').if(body('stemsPrice').exists()).isDecimal(),
+  body('stemsPrice').if(body('stemsPrice').exists()).isDecimal().bail(),
   // bpm numeric
-  body('bpm').if(body('bpm').exists()).isDecimal(),
+  body('bpm').if(body('bpm').exists()).isDecimal().bail(),
   // description 255 characters max
-  body('description').if(body('description').exists()).isLength({ max: 255 }),
+  body('description')
+    .if(body('description').exists())
+    .isLength({ max: 255 })
+    .bail(),
   authMiddleware,
   beatController.upload
 );
