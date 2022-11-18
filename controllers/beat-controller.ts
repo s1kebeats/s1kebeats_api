@@ -51,23 +51,33 @@ class BeatController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
-      const tags = JSON.parse(req.body.tags);
+      let tags:
+        | PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput
+        | undefined;
+      if (req.body.tags) {
+        tags = JSON.parse(req.body.tags);
+        if (!Array.isArray(tags)) {
+          return next(ApiError.BadRequest('Неправильные теги'));
+        }
+        tags.map((tag: PrismaClient.Tag) => {
+          return {
+            where: { name: tag.name },
+            create: { name: tag.name },
+          };
+        });
+      }
       const beatCandidate = {
         ...req.body,
-        tags: {
-          connectOrCreate: tags.map((tag: PrismaClient.Tag) => {
-            return {
-              where: { name: tag.name },
-              create: { name: tag.name },
-            };
-          }),
-          // JSON.parse(req.body.tags),
-        },
         wavePrice: +req.body.wavePrice,
         ...req.files,
         userId: req.user!.id,
       };
-      // convers strings to numbers
+      if (tags) {
+        beatCandidate.tags = {
+          connectOrCreate: tags,
+        };
+      }
+      // convert strings to numbers
       if (beatCandidate.bpm) {
         beatCandidate.bpm = +beatCandidate.bpm;
       }

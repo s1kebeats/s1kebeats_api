@@ -15,5 +15,6 @@ export default function (
       .json({ message: err.message, errors: err.errors });
   }
   // undexpected error
-  return res.status(500).json({ message: 'Произошла непредвиденная ошибка' });
+  return res.status(500).json({ message: err.message });
+  // return res.status(500).json({ message: 'Произошла непредвиденная ошибка' });
 }
