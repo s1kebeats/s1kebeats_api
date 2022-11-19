@@ -51,15 +51,13 @@ class BeatController {
       if (!errors.isEmpty()) {
         return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
       }
-      let tags:
-        | PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput
-        | undefined;
+      let tags;
       if (req.body.tags) {
         tags = JSON.parse(req.body.tags);
         if (!Array.isArray(tags)) {
           return next(ApiError.BadRequest('Неправильные теги'));
         }
-        tags.map((tag: PrismaClient.Tag) => {
+        tags = tags.map((tag: PrismaClient.Tag) => {
           return {
             where: { name: tag.name },
             create: { name: tag.name },
