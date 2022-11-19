@@ -4,7 +4,7 @@ import app from '../../build/app.js';
 
 describe('individual beat', () => {
   it('get only', async () => {
-    const res = await request(app).post('/api/beat/');
+    const res = await request(app).post('/api/beat/14');
     assert.equal(res.statusCode, 404);
   });
   it('not existing beat', async () => {

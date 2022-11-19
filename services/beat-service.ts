@@ -64,11 +64,19 @@ class BeatService {
     sort?: string;
   }): Promise<BeatWithAuthorAndTags[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
+    const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
+      id: 'desc',
+    };
     const queryArgs = {
-      orderBy: { [sort ? sort : 'id']: 'desc' },
+      orderBy: orderBy,
       where: where,
       ...beatWithAuthorAndTags,
     };
+    if (sort) {
+      queryArgs.orderBy = {
+        [sort.slice(1)]: sort[0] === '+' ? 'desc' : 'asc',
+      };
+    }
     // query in beat name / author name
     if (q) {
       queryArgs.where = {

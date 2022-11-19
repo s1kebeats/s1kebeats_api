@@ -19,8 +19,15 @@ class BeatController {
   async getBeats(req: Request, res: Response, next: NextFunction) {
     try {
       let beats: BeatWithAuthorAndTags[];
+      const query: { tags: number[] } = {
+        ...req.query,
+        tags: [],
+      };
+      if (req.query.tags) {
+        query.tags = (req.query.tags as string).split(',').map((item) => +item);
+      }
       if (req.query) {
-        beats = await beatService.findBeats(req.query);
+        beats = await beatService.findBeats(query);
       } else {
         // get all beats
         beats = await beatService.getBeats();
