@@ -136,7 +136,7 @@ class BeatService {
     });
     return {
       ...beat,
-      related: relatedBeats,
+      related: relatedBeats.filter((item) => item.id !== beat.id),
     };
   }
   // file validation function with extension and maxSize
