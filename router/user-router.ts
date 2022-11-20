@@ -13,20 +13,22 @@ router.post(
   body('username')
     .notEmpty()
     .bail()
+    // numbers and letters only
     .matches(/^[0-9a-zA-Z]+$/)
     .bail(),
-  body('password').isLength({ min: 8, max: 32 }).bail(),
+  body('password').isLength({ min: 8 }).bail(),
   userController.register
 );
 router.post(
   '/login',
   body('login').notEmpty().bail(),
-  body('password').isLength({ min: 8, max: 32 }).bail(),
+  body('password').notEmpty().bail(),
   userController.login
 );
 router.post(
   '/edit',
   authMiddleware,
+  // only users with activated email
   activatedMiddleware,
   body('displayedName')
     .if(body('displayedName').exists())

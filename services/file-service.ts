@@ -25,13 +25,13 @@ class FileService {
       if (Array.isArray(extensions)) {
         if (!extensions.includes(ext)) {
           throw ApiError.BadRequest(
-            `Отправьте файл в формате ${extensions.join('/')}`
+            `Send file in ${extensions.join('/')} format.`
           );
         }
       } else {
         // single
         if (ext !== extensions) {
-          throw ApiError.BadRequest(`Отправьте файл в формате ${extensions}`);
+          throw ApiError.BadRequest(`Send file in ${extensions} format.`);
         }
       }
     }

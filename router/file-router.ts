@@ -17,7 +17,7 @@ router.get(
         .createReadStream()
         .on('error', (error: AWSError) => {
           if (error.code === 'AccessDenied') {
-            next(ApiError.NotFound('Файл не найден'));
+            next(ApiError.NotFound('File was not found.'));
           }
         })
         .pipe(res);

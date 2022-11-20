@@ -55,12 +55,12 @@ class BeatService {
     tags = [],
     q,
     bpm,
-    sort,
+    order,
   }: {
     tags?: number[];
     q?: string;
     bpm?: string;
-    sort?: string;
+    order?: string;
   }): Promise<BeatWithAuthorAndTags[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
     const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
@@ -72,12 +72,12 @@ class BeatService {
       ...beatWithAuthorAndTags,
     };
 
-    if (sort) {
-      if (sort[0] !== 'H' && sort[0] !== 'L') {
-        throw ApiError.BadRequest('Неправильная сортировка');
+    if (order) {
+      if (order[0] !== 'H' && order[0] !== 'L') {
+        throw ApiError.BadRequest('Wrong order.');
       }
       queryArgs.orderBy = {
-        [sort.slice(1)]: sort[0] === 'H' ? 'desc' : 'asc',
+        [order.slice(1)]: order[0] === 'H' ? 'desc' : 'asc',
       };
     }
     // query in beat name / author name
@@ -134,13 +134,14 @@ class BeatService {
       where: {
         id,
       },
+      // individual beat select
       ...beatWithAuthorAndTags,
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
     if (!beat) {
-      throw ApiError.NotFound(`Бит не найден`);
+      throw ApiError.NotFound(`Beat was not found.`);
     }
-    // list if related beats (beats with same tags or author)
+    // related beats (beats with same tags or author)
     const relatedBeats = await this.findBeats({
       tags: beat.tags.map((item: PrismaClient.Tag) => item.id),
       q: beat.user.username,
@@ -153,13 +154,8 @@ class BeatService {
   validateBeat(beat: BeatUploadInput) {
     // required beat data check
     if (!beat.wave || !beat.mp3) {
-      throw ApiError.BadRequest('Недостаточно информации');
+      throw ApiError.BadRequest('Not enough data.');
     }
-    // tags check
-    // if (beat.tags && !Array.isArray(beat.tags.connectOrCreate.create)) {
-    //   throw ApiError.BadRequest('Неверные теги');
-    // }
-
     // files validation
     // wave check
     fileService.validateFile(
@@ -185,10 +181,10 @@ class BeatService {
     // stems check
     if (beat.stems || beat.stemsPrice) {
       if (!beat.stems) {
-        throw ApiError.BadRequest('Отправьте trackout архив');
+        throw ApiError.BadRequest('No trackout archive.');
       }
       if (!beat.stemsPrice) {
-        throw ApiError.BadRequest('Добавьте цену на trackout');
+        throw ApiError.BadRequest('No trackout price.');
       }
       fileService.validateFile(
         beat.stems,
@@ -225,7 +221,7 @@ class BeatService {
     return data;
   }
   async uploadBeat(beat: BeatUploadInput) {
-    // aws upload + prisma create
+    // aws upload
     const fileData = await this.beatAwsUpload(beat);
     const beatData = {
       ...beat,

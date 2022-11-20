@@ -17,11 +17,10 @@ class UserService {
   ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
     // remove confidentional information from user data
     const userDto = new UserDto(user);
-    // generate access and refresh tokens
+    // generate tokens
     const tokens = tokenService.generateTokens(userDto);
-    // save the tokens to the database
+    // save resfresh token in DB
     await tokenService.saveToken(userDto.id, tokens.refreshToken);
-    // return data
     return {
       ...tokens,
       user: userDto,
@@ -41,18 +40,16 @@ class UserService {
       userCandidateFindUniqueArgs
     );
     if (candidate) {
-      throw ApiError.BadRequest(`Имя пользователя ${username} занято`);
+      throw ApiError.BadRequest(`Username "${username}" is already taken.`);
     }
     userCandidateFindUniqueArgs = {
       where: { email },
     };
     candidate = await prisma.user.findUnique(userCandidateFindUniqueArgs);
     if (candidate) {
-      throw ApiError.BadRequest(
-        `Пользователь с почтовым адресом ${email} уже зарегистрирован`
-      );
+      throw ApiError.BadRequest(`Email "${email}" is already registered.`);
     }
-    // hash user password
+    // hash password
     const hashedPassword: string = await bcrypt.hash(password, 3);
     // generate unique activation link
     const activationLink: string = nanoid(36);
@@ -65,14 +62,14 @@ class UserService {
         activationLink,
       },
     };
-    // create user in the database
+    // create user
     const user: PrismaClient.User = await prisma.user.create(userCreateArgs);
-    // sending email with activation link
-    // await mailService.sendActivationMail(
-    //   email,
-    //   `${process.env.BASE_URL}/api/activate/${activationLink}`
-    // );
-    // generate tokens and form user DTO
+    // send email with activation link
+    await mailService.sendActivationMail(
+      email,
+      `${process.env.BASE_URL}/api/activate/${activationLink}`
+    );
+    // create tokens and user DTO
     const data = await this.generateData(user);
     return data;
   }
@@ -88,7 +85,7 @@ class UserService {
       userFindUniqueArgs
     );
     if (!user) {
-      throw ApiError.BadRequest('Ссылка для активации неккоректна');
+      throw ApiError.BadRequest('Wrong activation link.');
     }
     // update user isActivated state to true
     const userUpdateArgs: PrismaClient.Prisma.UserUpdateArgs = {
@@ -124,17 +121,17 @@ class UserService {
     }
     // if user wasn't found
     if (!user) {
-      throw ApiError.BadRequest('Данные для входа недействительны');
+      throw ApiError.BadRequest('Wrong login credentials.');
     }
-    // password compare
+    // compare passwords
     const passwordEquals: boolean = await bcrypt.compare(
       password,
       user.password
     );
     if (!passwordEquals) {
-      throw ApiError.BadRequest('Данные для входа недействительны');
+      throw ApiError.BadRequest('Wrong login credentials.');
     }
-    // generate tokens and DTO
+    // create tokens and user DTO
     const data = await this.generateData(user);
     return data;
   }
@@ -144,7 +141,7 @@ class UserService {
     if (!token) {
       throw ApiError.UnauthorizedUser();
     }
-    // delete user's access and refresh tokens from database
+    // delete refresh token from db
     token = await tokenService.removeToken(refreshToken);
     return token;
   }
@@ -176,6 +173,7 @@ class UserService {
       'displayedName' | 'about' | 'youtube' | 'vk' | 'instagram'
     >
   ) {
+    // image aws upload
     if (payload.image) {
       const awsImage = await fileService.awsUpload(payload.image, 'image/');
       payload.image = awsImage.Key!;

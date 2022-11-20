@@ -19,14 +19,17 @@ class BeatController {
   async getBeats(req: Request, res: Response, next: NextFunction) {
     try {
       let beats: BeatWithAuthorAndTags[];
-      const query: { tags: number[] } = {
-        ...req.query,
-        tags: [],
-      };
-      if (req.query.tags) {
-        query.tags = (req.query.tags as string).split(',').map((item) => +item);
-      }
       if (req.query) {
+        const query: { tags: number[] } = {
+          ...req.query,
+          tags: [],
+        };
+        // ids string to array of ids
+        if (req.query.tags) {
+          query.tags = (req.query.tags as string)
+            .split(',')
+            .map((item) => +item);
+        }
         beats = await beatService.findBeats(query);
       } else {
         // get all beats
@@ -40,9 +43,13 @@ class BeatController {
   // get individual beat data
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
+      if (req.params.id === 'upload') {
+        // /api/beat/upload path
+        return next(ApiError.NotFound('POST only'));
+      }
       const id = +req.params.id;
       if (!id) {
-        return next(ApiError.NotFound('POST only'));
+        return next(ApiError.BadRequest('Wrong id.'));
       }
       const beat: BeatIndividual = await beatService.getBeatById(id);
       return res.json(beat);
@@ -56,15 +63,21 @@ class BeatController {
       // express validator errors
       const errors = validationResult(req);
       if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
       }
       let tags;
       if (req.body.tags) {
         tags = JSON.parse(req.body.tags);
         if (!Array.isArray(tags)) {
-          return next(ApiError.BadRequest('Неправильные теги'));
+          return next(ApiError.BadRequest('Wrong tags.'));
         }
+        // prisma client ConnectOrCreate syntax
         tags = tags.map((tag: PrismaClient.Tag) => {
+          if (!tag.name) {
+            return next(ApiError.BadRequest('Wrong tags.'));
+          }
           return {
             where: { name: tag.name },
             create: { name: tag.name },

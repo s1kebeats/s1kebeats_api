@@ -2,10 +2,13 @@ import beatController from '../controllers/beat-controller.js';
 import authMiddleware from '../middlewares/auth-middleware.js';
 import { body } from 'express-validator';
 import { Router } from 'express';
+import activatedMiddleware from '../middlewares/activated-middleware.js';
 const router = Router();
 
 router.post(
   '/upload',
+  authMiddleware,
+  activatedMiddleware,
   // name required, 255 characters max
   body('name').notEmpty().bail().isLength({ max: 255 }).bail(),
   // wavePrice required, numeric
@@ -19,7 +22,6 @@ router.post(
     .if(body('description').exists())
     .isLength({ max: 255 })
     .bail(),
-  authMiddleware,
   beatController.upload
 );
 router.get('/', beatController.getBeats);

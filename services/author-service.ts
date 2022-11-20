@@ -46,7 +46,7 @@ class AuthorService {
     };
     const author = await prisma.user.findUnique(authorFindUniqueArgs);
     if (!author) {
-      throw ApiError.NotFound(`Автор не найден`);
+      throw ApiError.NotFound(`Author was not found.`);
     }
     return author;
   }

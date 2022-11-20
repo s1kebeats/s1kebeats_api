@@ -31,7 +31,7 @@ describe('edit endpoint', () => {
     const res = await request(app)
       .post('/api/edit')
       .set('Authorization', 'Bearer ' + accessToken)
-      .attach('image', 'tests/files/outtahere_122BPM_Gunna.wav')
+      .attach('image', 'tests/files/outtahere_122BPM_Gunna.wav');
     assert.equal(res.statusCode, 400);
   });
   it('success', async () => {
@@ -43,7 +43,7 @@ describe('edit endpoint', () => {
     const res = await request(app)
       .post('/api/edit')
       .set('Authorization', 'Bearer ' + accessToken)
-      .field('about', 'big biy youngin from krasnoyarsk')
+      .field('about', 'big biy youngin from krasnoyarsk');
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.about, 'big biy youngin from krasnoyarsk');
   });
