@@ -35,9 +35,9 @@ model User {
   about         String?
   image         String   @default("")
 
-  youtubeLink   String?
-  vkLink        String?
-  instagramLink String?
+  youtube   String?
+  vk        String?
+  instagram String?
 }
 
 model Beat {

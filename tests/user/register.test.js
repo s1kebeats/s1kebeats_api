@@ -81,22 +81,22 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('success', async () => {
-    const res = await request(app)
-      .post('/api/register')
-      .send({
-        email: 'random@email.com',
-        username: 'randomusername',
-        password: 'randompassword',
-      })
-      .set('Content-Type', 'application/json');
-    assert.equal(res.statusCode, 200);
-    assert.equal(typeof res.body.accessToken, 'string');
-    assert.equal(typeof res.body.refreshToken, 'string');
-    assert.equal(res.body.user.username, 'randomusername');
-    assert.equal(res.body.user.email, 'random@email.com');
-    assert.equal(res.body.user.isActivated, false);
-  });
+  // it('success', async () => {
+  //   const res = await request(app)
+  //     .post('/api/register')
+  //     .send({
+  //       email: 'random@email.com',
+  //       username: 'randomusername',
+  //       password: 'randompassword',
+  //     })
+  //     .set('Content-Type', 'application/json');
+  //   assert.equal(res.statusCode, 200);
+  //   assert.equal(typeof res.body.accessToken, 'string');
+  //   assert.equal(typeof res.body.refreshToken, 'string');
+  //   assert.equal(res.body.user.username, 'randomusername');
+  //   assert.equal(res.body.user.email, 'random@email.com');
+  //   assert.equal(res.body.user.isActivated, false);
+  // });
   it('used username', async () => {
     const res = await request(app)
       .post('/api/register')

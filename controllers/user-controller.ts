@@ -2,6 +2,7 @@ import userService from '../services/user-service.js';
 import { validationResult } from 'express-validator';
 import ApiError from '../exceptions/api-error.js';
 import { Request, Response, NextFunction } from 'express';
+import fileService from '../services/file-service.js';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -92,6 +93,27 @@ class UserController {
         secure: process.env.NODE_ENV === 'production',
       });
       return res.json(userData);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async edit(req: Request, res: Response, next: NextFunction) {
+    try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(ApiError.BadRequest('Ошибка валидации', errors.array()));
+      }
+      const payload = {
+        ...req.body,
+        ...req.files,
+        id: req.user!.id,
+      };
+      if (payload.image) {
+        fileService.validateFile(payload.image, ['.png', '.jpg', '.jpeg']);
+      }
+      const user = await userService.edit(payload);
+      return res.json(user);
     } catch (error) {
       next(error);
     }

@@ -6,6 +6,7 @@ import UserDto from '../dtos/user-dto.js';
 import mailService from './mail-service.js';
 import tokenService from './token-service.js';
 import ApiError from '../exceptions/api-error.js';
+import fileService from './file-service.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -168,6 +169,31 @@ class UserService {
     // re-generate tokens and DTO
     const data = await this.generateData(user!);
     return data;
+  }
+  async edit(
+    payload: { image: any | string; id: number } & Pick<
+      PrismaClient.Prisma.UserUpdateInput,
+      'displayedName' | 'about' | 'youtube' | 'vk' | 'instagram'
+    >
+  ) {
+    if (payload.image) {
+      const awsImage = await fileService.awsUpload(payload.image, 'image/');
+      payload.image = awsImage.Key!;
+    }
+    const user = await prisma.user.update({
+      where: {
+        id: payload.id,
+      },
+      data: {
+        image: payload.image,
+        displayedName: payload.displayedName,
+        about: payload.about,
+        vk: payload.vk,
+        youtube: payload.youtube,
+        instagram: payload.instagram,
+      },
+    });
+    return user;
   }
 }
 

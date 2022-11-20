@@ -1,5 +1,4 @@
 import PrismaClient from '@prisma/client';
-import path from 'path';
 const prisma = new PrismaClient.PrismaClient();
 import aws from 'aws-sdk';
 import ApiError from '../exceptions/api-error.js';
@@ -65,16 +64,20 @@ class BeatService {
   }): Promise<BeatWithAuthorAndTags[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
     const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
-      id: 'desc',
+      id: 'asc',
     };
     const queryArgs = {
       orderBy: orderBy,
       where: where,
       ...beatWithAuthorAndTags,
     };
+
     if (sort) {
+      if (sort[0] !== 'H' && sort[0] !== 'L') {
+        throw ApiError.BadRequest('Неправильная сортировка');
+      }
       queryArgs.orderBy = {
-        [sort.slice(1)]: sort[0] === '+' ? 'desc' : 'asc',
+        [sort.slice(1)]: sort[0] === 'H' ? 'desc' : 'asc',
       };
     }
     // query in beat name / author name
@@ -147,39 +150,6 @@ class BeatService {
       related: relatedBeats.filter((item) => item.id !== beat.id),
     };
   }
-  // file validation function with extension and maxSize
-  validateFile(
-    file: { name: string; size: number },
-    extensions?: string | string[],
-    maxSize?: number
-  ) {
-    // extensions validation
-    if (extensions) {
-      // get file extension
-      const ext = path.extname(file.name);
-      // multiple
-      if (Array.isArray(extensions)) {
-        if (!extensions.includes(ext)) {
-          throw ApiError.BadRequest(
-            `Отправьте файл в формате ${extensions.join('/')}`
-          );
-        }
-      } else {
-        // single
-        if (ext !== extensions) {
-          throw ApiError.BadRequest(`Отправьте файл в формате ${extensions}`);
-        }
-      }
-    }
-    // maxSize validation
-    if (maxSize) {
-      if (file.size > maxSize) {
-        throw ApiError.BadRequest(
-          `Максимальный размер файла ${maxSize / 1024 / 1024}мб`
-        );
-      }
-    }
-  }
   validateBeat(beat: BeatUploadInput) {
     // required beat data check
     if (!beat.wave || !beat.mp3) {
@@ -192,7 +162,7 @@ class BeatService {
 
     // files validation
     // wave check
-    this.validateFile(
+    fileService.validateFile(
       beat.wave,
       '.wav',
       // 300mb
@@ -200,7 +170,7 @@ class BeatService {
     );
 
     // mp3 check
-    this.validateFile(
+    fileService.validateFile(
       beat.mp3,
       '.mp3',
       // 150mb
@@ -209,7 +179,7 @@ class BeatService {
 
     // image check
     if (beat.image) {
-      this.validateFile(beat.image, ['.png', '.jpg', '.jpeg']);
+      fileService.validateFile(beat.image, ['.png', '.jpg', '.jpeg']);
     }
 
     // stems check
@@ -220,7 +190,7 @@ class BeatService {
       if (!beat.stemsPrice) {
         throw ApiError.BadRequest('Добавьте цену на trackout');
       }
-      this.validateFile(
+      fileService.validateFile(
         beat.stems,
         ['.zip', '.rar'],
         // 500mb

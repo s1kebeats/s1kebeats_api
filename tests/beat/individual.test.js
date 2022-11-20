@@ -12,7 +12,7 @@ describe('individual beat', () => {
     assert.equal(res.statusCode, 404);
   });
   it('existing beat', async () => {
-    const res = await request(app).get('/api/beat/14');
+    const res = await request(app).get('/api/beat/21');
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.name, 'Chaze');
     assert.equal(res.body.user.username, 's1kebeats');

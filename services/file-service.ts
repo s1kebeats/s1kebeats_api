@@ -1,5 +1,7 @@
 import aws from 'aws-sdk';
 import { nanoid } from 'nanoid';
+import path from 'path';
+import ApiError from '../exceptions/api-error.js';
 
 const awsConfig: aws.S3.ClientConfiguration = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -9,6 +11,39 @@ const awsConfig: aws.S3.ClientConfiguration = {
 const s3 = new aws.S3(awsConfig);
 
 class FileService {
+  // file validation function with extension and maxSize
+  validateFile(
+    file: { name: string; size: number },
+    extensions?: string | string[],
+    maxSize?: number
+  ) {
+    // extensions validation
+    if (extensions) {
+      // get file extension
+      const ext = path.extname(file.name);
+      // multiple
+      if (Array.isArray(extensions)) {
+        if (!extensions.includes(ext)) {
+          throw ApiError.BadRequest(
+            `Отправьте файл в формате ${extensions.join('/')}`
+          );
+        }
+      } else {
+        // single
+        if (ext !== extensions) {
+          throw ApiError.BadRequest(`Отправьте файл в формате ${extensions}`);
+        }
+      }
+    }
+    // maxSize validation
+    if (maxSize) {
+      if (file.size > maxSize) {
+        throw ApiError.BadRequest(
+          `Максимальный размер файла ${maxSize / 1024 / 1024}мб`
+        );
+      }
+    }
+  }
   // upload a file to aws s3 bucket
   async awsUpload(file: any, path: string): Promise<aws.S3.Object> {
     const params: aws.S3.PutObjectRequest = {

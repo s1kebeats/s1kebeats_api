@@ -17,4 +17,7 @@ export default class ApiError extends Error {
   static NotFound(message: string, errors: any[] = []): ApiError {
     return new ApiError(404, message, errors);
   }
+  static NotActivatedUser(): ApiError {
+    return new ApiError(401, 'Аккаунт не активирован');
+  }
 }

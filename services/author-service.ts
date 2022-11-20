@@ -1,6 +1,7 @@
 import PrismaClient from '@prisma/client';
 import authorSelect from '../prisma-selects/author-select.js';
 import authorIndividualSelect from '../prisma-selects/author-individual-select.js';
+import ApiError from '../exceptions/api-error.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -44,6 +45,9 @@ class AuthorService {
       select: authorIndividualSelect,
     };
     const author = await prisma.user.findUnique(authorFindUniqueArgs);
+    if (!author) {
+      throw ApiError.NotFound(`Автор не найден`);
+    }
     return author;
   }
 }

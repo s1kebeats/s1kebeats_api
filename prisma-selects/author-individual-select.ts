@@ -9,14 +9,20 @@ const authorIndividualSelect: Prisma.UserSelect = {
   image: true,
   beats: {
     select: {
-      ...beatSelect,
-      user: false,
-      plays: true,
+      ...(new beatSelect({
+        user: false,
+        plays: true,
+      }) as Prisma.BeatSelect),
+      // _count: {
+      //   select: {
+      //     plays: true,
+      //   }
+      // }
     },
   },
-  youtubeLink: true,
-  instagramLink: true,
-  vkLink: true,
+  youtube: true,
+  instagram: true,
+  vk: true,
   _count: {
     select: {
       beats: true,
