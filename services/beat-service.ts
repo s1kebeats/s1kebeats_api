@@ -4,6 +4,40 @@ import aws from 'aws-sdk';
 import ApiError from '../exceptions/api-error.js';
 import fileService from './file-service.js';
 
+const beatWithAuthorTagsComments =
+  PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
+    select: {
+      id: true,
+      name: true,
+      bpm: true,
+      user: {
+        select: {
+          username: true,
+          displayedName: true,
+        },
+      },
+      comments: {
+        take: 10,
+        select: {
+          content: true,
+          user: {
+            select: {
+              username: true,
+              displayedName: true,
+              image: true,
+            },
+          },
+        },
+      },
+      image: true,
+      mp3: true,
+      wavePrice: true,
+      tags: true,
+    },
+  });
+export type BeatWithAuthorTagsComments = PrismaClient.Prisma.BeatGetPayload<
+  typeof beatWithAuthorTagsComments
+>;
 const beatWithAuthorAndTags =
   PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
     select: {
@@ -25,7 +59,7 @@ const beatWithAuthorAndTags =
 export type BeatWithAuthorAndTags = PrismaClient.Prisma.BeatGetPayload<
   typeof beatWithAuthorAndTags
 >;
-export interface BeatIndividual extends BeatWithAuthorAndTags {
+export interface BeatIndividual extends BeatWithAuthorTagsComments {
   related: BeatWithAuthorAndTags[];
 }
 interface FileMock {
@@ -37,7 +71,6 @@ export interface BeatUploadInput
   tags: {
     connectOrCreate: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput;
   };
-  // tags: { createMany: { data: PrismaClient.Tag[] } };
   image: FileMock;
   wave: FileMock;
   mp3: FileMock;
@@ -46,28 +79,37 @@ export interface BeatUploadInput
 
 class BeatService {
   // get all beats
-  async getBeats(): Promise<BeatWithAuthorAndTags[]> {
-    const beats = await prisma.beat.findMany(beatWithAuthorAndTags);
+  async getBeats(viewed = 0): Promise<BeatWithAuthorAndTags[]> {
+    const beats = await prisma.beat.findMany({
+      ...beatWithAuthorAndTags,
+      skip: viewed,
+      take: 10,
+    });
     return beats;
   }
   // find beats with query
-  async findBeats({
-    tags = [],
-    q,
-    bpm,
-    order,
-  }: {
-    tags?: number[];
-    q?: string;
-    bpm?: string;
-    order?: string;
-  }): Promise<BeatWithAuthorAndTags[]> {
+  async findBeats(
+    {
+      tags = [],
+      q,
+      bpm,
+      order,
+    }: {
+      tags?: number[];
+      q?: string;
+      bpm?: string;
+      order?: string;
+    },
+    viewed = 0
+  ): Promise<BeatWithAuthorAndTags[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
     const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
       id: 'asc',
     };
     const queryArgs = {
       orderBy: orderBy,
+      skip: viewed,
+      take: 10,
       where: where,
       ...beatWithAuthorAndTags,
     };
@@ -126,16 +168,16 @@ class BeatService {
       };
     }
 
-    const beat = await prisma.beat.findMany(queryArgs);
-    return beat;
+    const beats = await prisma.beat.findMany(queryArgs);
+    return beats;
   }
-  async getBeatById(id: number): Promise<BeatIndividual> {
+  async getIndividualBeat(id: number): Promise<BeatIndividual> {
     const beatFindUniqueArgs = {
       where: {
         id,
       },
       // individual beat select
-      ...beatWithAuthorAndTags,
+      ...beatWithAuthorTagsComments,
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
     if (!beat) {
@@ -150,6 +192,17 @@ class BeatService {
       ...beat,
       related: relatedBeats.filter((item) => item.id !== beat.id),
     };
+  }
+  async getBeatById(id: number): Promise<PrismaClient.Beat> {
+    const beat = await prisma.beat.findUnique({
+      where: {
+        id,
+      },
+    });
+    if (!beat) {
+      throw ApiError.NotFound(`Beat was not found.`);
+    }
+    return beat;
   }
   validateBeat(beat: BeatUploadInput) {
     // required beat data check

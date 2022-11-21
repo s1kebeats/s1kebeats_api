@@ -7,6 +7,7 @@ import { validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import UserDto from '../dtos/user-dto.js';
 import PrismaClient from '@prisma/client';
+import commentService from '../services/comment-service.js';
 // req.user
 declare module 'express-serve-static-core' {
   interface Request {
@@ -18,8 +19,15 @@ class BeatController {
   // find many beats
   async getBeats(req: Request, res: Response, next: NextFunction) {
     try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
       let beats: BeatWithAuthorAndTags[];
-      if (req.query) {
+      if (Object.keys(req.query).length !== 0) {
         const query: { tags: number[] } = {
           ...req.query,
           tags: [],
@@ -30,12 +38,20 @@ class BeatController {
             .split(',')
             .map((item) => +item);
         }
-        beats = await beatService.findBeats(query);
+        beats = await beatService.findBeats(
+          query,
+          req.body.viewed ? +req.body.viewed : 0
+        );
       } else {
         // get all beats
-        beats = await beatService.getBeats();
+        beats = await beatService.getBeats(
+          req.body.viewed ? +req.body.viewed : 0
+        );
       }
-      return res.json(beats);
+      return res.json({
+        beats,
+        viewed: +req.body.viewed + beats.length,
+      });
     } catch (error) {
       next(error);
     }
@@ -43,15 +59,19 @@ class BeatController {
   // get individual beat data
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
       if (req.params.id === 'upload') {
         // /api/beat/upload path
         return next(ApiError.NotFound('POST only'));
       }
       const id = +req.params.id;
-      if (!id) {
-        return next(ApiError.BadRequest('Wrong id.'));
-      }
-      const beat: BeatIndividual = await beatService.getBeatById(id);
+      const beat: BeatIndividual = await beatService.getIndividualBeat(id);
       return res.json(beat);
     } catch (error) {
       next(error);
@@ -106,6 +126,29 @@ class BeatController {
       beatService.validateBeat(beatCandidate);
       const beat = await beatService.uploadBeat(beatCandidate);
       return res.json(beat);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async comment(req: Request, res: Response, next: NextFunction) {
+    try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
+      const id = +req.params.id;
+      // has error throw inside, if beat doesn't exist
+      const beat = await beatService.getBeatById(id);
+      const commentCandidate: Omit<PrismaClient.Comment, 'id' | 'createdAt'> = {
+        userId: req.user!.id,
+        beatId: beat.id,
+        content: req.body.content,
+      };
+      const comment = await commentService.uploadComment(commentCandidate);
+      return res.json(comment);
     } catch (error) {
       next(error);
     }

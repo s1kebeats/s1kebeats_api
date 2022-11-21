@@ -2,30 +2,28 @@ import request from 'supertest';
 import assert from 'assert';
 import app from '../../build/app.js';
 
-describe('login endpoint', () => {
-  it('post only', async () => {
+describe('User login', () => {
+  it('Only POST', async () => {
     const res = await request(app).get('/api/login');
     assert.equal(res.statusCode, 404);
   });
-  it('no login', async () => {
+  it('No login', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
         password: 'randompassword',
       })
-      .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('no password', async () => {
+  it('No password', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
         login: 'random@email.com',
       })
-      .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('login with username', async () => {
+  it('Login with username', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
@@ -38,6 +36,7 @@ describe('login endpoint', () => {
     assert.equal(typeof res.body.refreshToken, 'string');
     assert.equal(res.body.user.username, 's1kebeats');
     assert.equal(res.body.user.email, 'adacenkoboos@gmail.com');
+    // refresh token cookie check
     assert.equal(
       res.headers['set-cookie'][0].includes(
         'refreshToken=' + res.body.refreshToken
@@ -46,7 +45,7 @@ describe('login endpoint', () => {
     );
     assert.equal(res.headers['set-cookie'][0].includes('HttpOnly'), true);
   });
-  it('login with email', async () => {
+  it('Login with email', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
@@ -59,14 +58,14 @@ describe('login endpoint', () => {
     assert.equal(typeof res.body.refreshToken, 'string');
     assert.equal(res.body.user.username, 's1kebeats');
     assert.equal(res.body.user.email, 'adacenkoboos@gmail.com');
-    // assert.equal(res.headers['set-cookie'][0].split(';')[0].split('=')[1], res.body.refreshToken)
+    // refresh token cookie check
     assert.equal(
       res.headers['set-cookie'][0].includes(res.body.refreshToken),
       true
     );
     assert.equal(res.headers['set-cookie'][0].includes('HttpOnly'), true);
   });
-  it('wrong password', async () => {
+  it('Wrong password', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
@@ -76,7 +75,7 @@ describe('login endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong login', async () => {
+  it('Wrong login', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({

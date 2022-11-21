@@ -1,6 +1,6 @@
 import beatController from '../controllers/beat-controller.js';
 import authMiddleware from '../middlewares/auth-middleware.js';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { Router } from 'express';
 import activatedMiddleware from '../middlewares/activated-middleware.js';
 const router = Router();
@@ -24,7 +24,23 @@ router.post(
     .bail(),
   beatController.upload
 );
-router.get('/', beatController.getBeats);
-router.get('/:id', beatController.getIndividualBeat);
+router.get(
+  '/',
+  body('viewed').if(body('viewed').exists()).isDecimal().bail(),
+  beatController.getBeats
+);
+router.get(
+  '/:id',
+  param('id').isDecimal().bail(),
+  beatController.getIndividualBeat
+);
+router.post(
+  '/:id/comment',
+  authMiddleware,
+  activatedMiddleware,
+  param('id').isDecimal().bail(),
+  body('content').notEmpty().isLength({ max: 255 }).bail(),
+  beatController.comment
+);
 
 export default router;

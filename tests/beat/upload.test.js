@@ -2,12 +2,12 @@ import request from 'supertest';
 import assert from 'assert';
 import app from '../../build/app.js';
 
-describe('beat upload', () => {
-  it('post only', async () => {
+describe('Beat upload', () => {
+  it('Only POST', async () => {
     const res = await request(app).get('/api/beat/upload');
     assert.equal(res.statusCode, 404);
   });
-  it('no name', async () => {
+  it('No beat name', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -21,7 +21,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('no wavePrice', async () => {
+  it('No beat wavePrice', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -35,7 +35,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('no wave', async () => {
+  it('No beat wave', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -49,7 +49,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('no mp3', async () => {
+  it('No beat mp3', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -95,7 +95,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong stems archive extension', async () => {
+  it('Wrong stems archive extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -112,7 +112,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong wave extension', async () => {
+  it('Wrong wave extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -127,7 +127,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong mp3 extension', async () => {
+  it('Wrong mp3 extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -142,7 +142,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/test.rar');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong image extension', async () => {
+  it('Wrong image extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -158,7 +158,7 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong tags', async () => {
+  it('Wrong tags', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
       password: 'sbeats2005',
@@ -174,25 +174,31 @@ describe('beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 400);
   });
-  it('not authorized', async () => {
+  it('Not authorized', async () => {
     const res = await request(app)
       .post('/api/beat/upload')
       .field('wavePrice', 2099)
       .field('name', 'outtahere')
-      .field(
-        'tags',
-        `[
-        {"name": "s1kebeats"},
-        {"name": "gunna"},
-        {"name": "wheezy"}
-      ]`
-      )
-      .attach('image', 'tests/files/test.jpg')
       .attach('wave', 'tests/files/outtahere_122BPM_Gunna.wav')
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 401);
   });
-  // it('success', async () => {
+  it('Authorized, but not activated', async () => {
+    const login = await request(app).post('/api/login').send({
+      login: 'notActivated',
+      password: 'notActivated',
+    });
+    const accessToken = login.body.accessToken;
+    const res = await request(app)
+      .post('/api/beat/upload')
+      .set('Authorization', 'Bearer ' + accessToken)
+      .field('wavePrice', 2099)
+      .field('name', 'outtahere')
+      .attach('wave', 'tests/files/outtahere_122BPM_Gunna.wav')
+      .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
+    assert.equal(res.statusCode, 401);
+  })
+    // it('Success', async () => {
   //   const login = await request(app).post('/api/login').send({
   //     login: 's1kebeats',
   //     password: 'sbeats2005',
