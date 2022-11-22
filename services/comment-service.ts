@@ -12,7 +12,7 @@ class CommentService {
     });
     return comment;
   }
-  async getComments(beatId: number, viewed: number) {
+  async getComments(beatId: number, viewed = 0) {
     const comments = await prisma.comment.findMany({
       where: {
         beatId,

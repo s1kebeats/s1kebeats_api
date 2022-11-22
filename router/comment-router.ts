@@ -25,7 +25,7 @@ router.get(
       const beat = await beatService.getBeatById(id);
       const comments = await commentService.getComments(
         beat.id,
-        +req.body.viewed
+        req.body.viewed ? +req.body.viewed : 0
       );
       return res.json({
         comments,

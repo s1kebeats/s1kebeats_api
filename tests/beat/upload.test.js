@@ -197,8 +197,8 @@ describe('Beat upload', () => {
       .attach('wave', 'tests/files/outtahere_122BPM_Gunna.wav')
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 401);
-  })
-    // it('Success', async () => {
+  });
+  // it('Success', async () => {
   //   const login = await request(app).post('/api/login').send({
   //     login: 's1kebeats',
   //     password: 'sbeats2005',

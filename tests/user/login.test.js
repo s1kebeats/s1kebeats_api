@@ -8,19 +8,15 @@ describe('User login', () => {
     assert.equal(res.statusCode, 404);
   });
   it('No login', async () => {
-    const res = await request(app)
-      .post('/api/login')
-      .send({
-        password: 'randompassword',
-      })
+    const res = await request(app).post('/api/login').send({
+      password: 'randompassword',
+    });
     assert.equal(res.statusCode, 400);
   });
   it('No password', async () => {
-    const res = await request(app)
-      .post('/api/login')
-      .send({
-        login: 'random@email.com',
-      })
+    const res = await request(app).post('/api/login').send({
+      login: 'random@email.com',
+    });
     assert.equal(res.statusCode, 400);
   });
   it('Login with username', async () => {
