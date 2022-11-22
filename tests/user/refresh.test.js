@@ -2,25 +2,25 @@ import request from 'supertest';
 import assert from 'assert';
 import app from '../../build/app.js';
 
-describe('resfresh endpoint', () => {
-  it('get only', async () => {
+describe('Refresh user tokens', () => {
+  it('Only GET', async () => {
     const res = await request(app).post('/api/refresh');
     assert.equal(res.statusCode, 404);
   });
-  it('no cookie', async () => {
+  it('No refhreshToken cookie', async () => {
     const res = await request(app)
       .get('/api/refresh')
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 401);
   });
-  it('wrong cookie', async () => {
+  it('Wrong refhreshToken cookie', async () => {
     const res = await request(app)
       .get('/api/refresh')
       .set('Cookie', ['refreshToken=randomToken'])
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 401);
   });
-  it('refresh', async () => {
+  it('Success', async () => {
     const login = await request(app)
       .post('/api/login')
       .send({
@@ -28,7 +28,6 @@ describe('resfresh endpoint', () => {
         password: 'sbeats2005',
       })
       .set('Content-Type', 'application/json');
-
     const refresh = await request(app)
       .get('/api/refresh')
       .set('Cookie', ['refreshToken=' + login.body.refreshToken])

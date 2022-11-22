@@ -2,12 +2,12 @@ import request from 'supertest';
 import assert from 'assert';
 import app from '../../build/app.js';
 
-describe('register endpoint', () => {
-  it('post only', async () => {
+describe('User registration', () => {
+  it('Only POST', async () => {
     const res = await request(app).get('/api/register');
     assert.equal(res.statusCode, 404);
   });
-  it('no email', async () => {
+  it('No email', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -17,7 +17,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('no username', async () => {
+  it('No username', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -27,7 +27,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('no password', async () => {
+  it('No password', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -37,7 +37,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('wrong email', async () => {
+  it('Wrong email', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -48,7 +48,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('short password', async () => {
+  it('Too short password', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -59,18 +59,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('long password', async () => {
-    const res = await request(app)
-      .post('/api/register')
-      .send({
-        email: 'random@email.com',
-        username: 'randomusername',
-        password: 'g' * 33,
-      })
-      .set('Content-Type', 'application/json');
-    assert.equal(res.statusCode, 400);
-  });
-  it('wrong username', async () => {
+  it('Username with banned characters', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -81,7 +70,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  // it('success', async () => {
+  // it('Success', async () => {
   //   const res = await request(app)
   //     .post('/api/register')
   //     .send({
@@ -97,7 +86,7 @@ describe('register endpoint', () => {
   //   assert.equal(res.body.user.email, 'random@email.com');
   //   assert.equal(res.body.user.isActivated, false);
   // });
-  it('used username', async () => {
+  it('Already used username', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -108,7 +97,7 @@ describe('register endpoint', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('used email', async () => {
+  it('Already used email', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({

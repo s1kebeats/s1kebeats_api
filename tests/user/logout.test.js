@@ -32,5 +32,8 @@ describe('User logout', () => {
       .set('Cookie', ['refreshToken=' + refreshToken])
     assert.equal(logout.statusCode, 200);
     assert.equal(logout.body.refreshToken, refreshToken);
+    // token should be deleted from database
+    const refreshWithDeletedToken = await request(app).get('/api/refresh').set('Cookie', ['refreshToken=' + refreshToken])
+    assert.equal(refreshWithDeletedToken.statusCode, 401)
   });
 });
