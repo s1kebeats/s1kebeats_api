@@ -5,7 +5,7 @@ class AuthorController {
   async getAuthors(req: Request, res: Response, next: NextFunction) {
     try {
       let authors;
-      if (Object.keys(req.query).length !== 0) {
+      if (Object.keys(req.query).length) {
         // find author with query
         authors = await authorService.findAuthors(req.query.q as string);
       } else {

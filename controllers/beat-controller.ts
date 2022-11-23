@@ -27,7 +27,7 @@ class BeatController {
         );
       }
       let beats: BeatWithAuthorAndTags[];
-      if (Object.keys(req.query).length !== 0) {
+      if (Object.keys(req.query).length) {
         const query: { tags: number[] } = {
           ...req.query,
           tags: [],
