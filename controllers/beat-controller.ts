@@ -66,10 +66,6 @@ class BeatController {
           ApiError.BadRequest('Data validation error.', errors.array())
         );
       }
-      if (req.params.id === 'upload') {
-        // /api/beat/upload path
-        return next(ApiError.NotFound('POST only'));
-      }
       const id = +req.params.id;
       const beat: BeatIndividual = await beatService.getIndividualBeat(id);
       return res.json(beat);

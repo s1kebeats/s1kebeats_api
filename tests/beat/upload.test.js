@@ -5,7 +5,8 @@ import app from '../../build/app.js';
 describe('Beat upload', () => {
   it('Only POST', async () => {
     const res = await request(app).get('/api/beat/upload');
-    assert.equal(res.statusCode, 404);
+    // 400 because of Id param validator on the individual beat path
+    assert.equal(res.statusCode, 400);
   });
   it('No beat name', async () => {
     const login = await request(app).post('/api/login').send({
