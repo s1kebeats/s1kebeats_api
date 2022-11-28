@@ -8,6 +8,7 @@ import { Request, Response, NextFunction } from 'express';
 import UserDto from '../dtos/user-dto.js';
 import PrismaClient from '@prisma/client';
 import commentService from '../services/comment-service.js';
+import likeService from '../services/like-service.js';
 // req.user
 declare module 'express-serve-static-core' {
   interface Request {
@@ -145,6 +146,37 @@ class BeatController {
       };
       const comment = await commentService.uploadComment(commentCandidate);
       return res.json(comment);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async likeToggle(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Has built in 404 Throw
+      const beat = await beatService.getBeatById(+req.params.id);
+      const beatId = beat.id;
+      const userId = req.user!.id;
+      let like: PrismaClient.Like | null;
+      like = await likeService.getLikeByIdentifier(beatId, userId);
+      if (like) {
+        // delete the like from db
+        like = await likeService.deleteLike(beatId, userId);
+      } else {
+        // create like
+        like = await likeService.createLike(beatId, userId);
+      }
+      return res.json(like);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async delete(req: Request, res: Response, next: NextFunction) {
+    try {
+      // Has built in 404 Throw
+      let beat: PrismaClient.Beat | null;
+      beat = await beatService.getBeatById(+req.params.id);
+      beat = await beatService.deleteBeat(+req.params.id);
+      return res.json(beat);
     } catch (error) {
       next(error);
     }

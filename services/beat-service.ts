@@ -33,6 +33,11 @@ const beatWithAuthorTagsComments =
       mp3: true,
       wavePrice: true,
       tags: true,
+      _count: {
+        select: {
+          likes: true,
+        },
+      },
     },
   });
 export type BeatWithAuthorTagsComments = PrismaClient.Prisma.BeatGetPayload<
@@ -287,6 +292,17 @@ class BeatService {
       },
     });
     return beatFromDb;
+  }
+  async deleteBeat(id: number) {
+    // delete media file from AWS S3
+
+    // delete beat from db
+    const beat = await prisma.beat.delete({
+      where: {
+        id,
+      },
+    });
+    return beat;
   }
 }
 

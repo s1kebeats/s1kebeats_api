@@ -86,4 +86,5 @@ model Like {
   beat      Beat     @relation(fields: [beatId], references: [id])
   beatId    Int
   createdAt DateTime @default(now())
+  @@unique([userId, beatId], name: "likeIdentifier")
 }

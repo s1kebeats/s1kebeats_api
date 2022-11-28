@@ -42,5 +42,19 @@ router.post(
   body('content').notEmpty().isLength({ max: 255 }).bail(),
   beatController.comment
 );
+router.post(
+  '/:id/like',
+  authMiddleware,
+  activatedMiddleware,
+  param('id').isDecimal().bail(),
+  beatController.likeToggle
+);
+router.post(
+  '/:id/delete',
+  authMiddleware,
+  activatedMiddleware,
+  param('id').isDecimal().bail(),
+  beatController.delete
+);
 
 export default router;
