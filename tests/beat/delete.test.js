@@ -44,17 +44,17 @@ describe('Beat deletion', () => {
       .set('Authorization', 'Bearer ' + accessToken);
     assert.equal(res.statusCode, 404);
   });
-//   it('Success', async () => {
-//     const login = await request(app).post('/api/login').send({
-//       login: 's1kebeats',
-//       password: 'sbeats2005',
-//     });
-//     const accessToken = login.body.accessToken;
-//     const res = await request(app)
-//       .post('/api/beat/30/delete')
-//       .set('Authorization', 'Bearer ' + accessToken);
-//     assert.equal(res.statusCode, 200);
-//     const wave = await request(app).get(`/api/file/${res.body.wave}`);
-//     assert.equal(wave.statusCode, 404);
-//   });
+  //   it('Success', async () => {
+  //     const login = await request(app).post('/api/login').send({
+  //       login: 's1kebeats',
+  //       password: 'sbeats2005',
+  //     });
+  //     const accessToken = login.body.accessToken;
+  //     const res = await request(app)
+  //       .post('/api/beat/30/delete')
+  //       .set('Authorization', 'Bearer ' + accessToken);
+  //     assert.equal(res.statusCode, 200);
+  //     const wave = await request(app).get(`/api/file/${res.body.wave}`);
+  //     assert.equal(wave.statusCode, 404);
+  //   });
 });

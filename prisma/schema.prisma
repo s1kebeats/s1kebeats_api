@@ -71,9 +71,9 @@ model Tag {
 
 model Comment {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  beat      Beat     @relation(fields: [beatId], references: [id])
+  beat      Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
   beatId    Int
   content   String
   createdAt DateTime @default(now())
@@ -81,9 +81,9 @@ model Comment {
 
 model Like {
   id        Int      @id @default(autoincrement())
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId    Int
-  beat      Beat     @relation(fields: [beatId], references: [id])
+  beat      Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
   beatId    Int
   createdAt DateTime @default(now())
   @@unique([userId, beatId], name: "likeIdentifier")

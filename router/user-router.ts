@@ -46,5 +46,6 @@ router.post(
 router.post('/logout', userController.logout);
 router.get('/activate/:activationLink', userController.activate);
 router.get('/refresh', userController.refresh);
+// router.post('/deleteAccount', authMiddleware, userController.delete);
 
 export default router;

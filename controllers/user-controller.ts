@@ -126,6 +126,13 @@ class UserController {
       next(error);
     }
   }
+  // async delete(req: Request, res: Response, next: NextFunction) {
+  //   try {
+
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // }
 }
 
 export default new UserController();
