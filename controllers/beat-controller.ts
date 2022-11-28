@@ -173,9 +173,11 @@ class BeatController {
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
       // Has built in 404 Throw
-      let beat: PrismaClient.Beat | null;
-      beat = await beatService.getBeatById(+req.params.id);
-      beat = await beatService.deleteBeat(+req.params.id);
+      const beat = await beatService.getBeatById(+req.params.id);
+      if (req.user!.id !== beat.userId) {
+        return next(ApiError.UnauthorizedUser());
+      }
+      await beatService.deleteBeat(beat);
       return res.json(beat);
     } catch (error) {
       next(error);

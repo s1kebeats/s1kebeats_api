@@ -65,10 +65,10 @@ class UserService {
     // create user
     const user: PrismaClient.User = await prisma.user.create(userCreateArgs);
     // send email with activation link
-    await mailService.sendActivationMail(
-      email,
-      `${process.env.BASE_URL}/api/activate/${activationLink}`
-    );
+    // await mailService.sendActivationMail(
+    //   email,
+    //   `${process.env.BASE_URL}/api/activate/${activationLink}`
+    // );
     // create tokens and user DTO
     const data = await this.generateData(user);
     return data;

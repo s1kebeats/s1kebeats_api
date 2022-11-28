@@ -53,6 +53,13 @@ class FileService {
     };
     return s3.upload(params).promise();
   }
+  async deleteObject(key: string) {
+    const params: aws.S3.DeleteObjectRequest = {
+      Key: key,
+      Bucket: process.env.AWS_BUCKET_NAME!,
+    };
+    return s3.deleteObject(params).promise();
+  }
   // get a file from aws s3 bucket and send it to the client
   async getMedia(
     key: string

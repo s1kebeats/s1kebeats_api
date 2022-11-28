@@ -278,6 +278,19 @@ class BeatService {
     });
     return data;
   }
+  async beatAwsDelete(beat: PrismaClient.Beat) {
+    const fileData: any = [null, null, null, null];
+    fileData[0] = fileService.deleteObject(beat.wave);
+    fileData[1] = fileService.deleteObject(beat.mp3);
+    if (beat.image) {
+      fileData[2] = fileService.deleteObject(beat.image);
+    }
+    if (beat.stems) {
+      fileData[3] = fileService.deleteObject(beat.stems);
+    }
+    // async files deletion
+    return await Promise.all(fileData);
+  }
   async uploadBeat(beat: BeatUploadInput) {
     // aws upload
     const fileData = await this.beatAwsUpload(beat);
@@ -293,16 +306,15 @@ class BeatService {
     });
     return beatFromDb;
   }
-  async deleteBeat(id: number) {
-    // delete media file from AWS S3
-
+  async deleteBeat(beat: PrismaClient.Beat) {
+    // delete media files from AWS S3
+    await this.beatAwsDelete(beat);
     // delete beat from db
-    const beat = await prisma.beat.delete({
+    await prisma.beat.delete({
       where: {
-        id,
+        id: beat.id,
       },
     });
-    return beat;
   }
 }
 
