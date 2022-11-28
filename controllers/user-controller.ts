@@ -3,6 +3,7 @@ import { validationResult } from 'express-validator';
 import ApiError from '../exceptions/api-error.js';
 import { Request, Response, NextFunction } from 'express';
 import fileService from '../services/file-service.js';
+import { UploadedFile } from 'express-fileupload';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -110,17 +111,31 @@ class UserController {
           ApiError.BadRequest('Data validation error.', errors.array())
         );
       }
-      // req payload
-      const payload = {
-        ...req.body,
-        ...req.files,
-        id: req.user!.id,
-      };
+      const {
+        displayedName,
+        about,
+        vk,
+        youtube,
+        instagram,
+      }: { [key: string]: string } = req.body;
+      const userId = req.user!.id;
       // image validation
-      if (payload.image) {
-        fileService.validateFile(payload.image, ['.png', '.jpg', '.jpeg']);
+      if (req.files && req.files.image) {
+        fileService.validateFile(req.files.image as UploadedFile, [
+          '.png',
+          '.jpg',
+          '.jpeg',
+        ]);
       }
-      const user = await userService.edit(payload);
+      const user = await userService.edit(
+        userId,
+        displayedName,
+        about,
+        vk,
+        youtube,
+        instagram,
+        req.files ? (req.files.image as UploadedFile) : undefined
+      );
       return res.json(user);
     } catch (error) {
       next(error);

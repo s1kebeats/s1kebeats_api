@@ -1,5 +1,5 @@
 import PrismaClient from '@prisma/client';
-import authorSelect from '../prisma-selects/author-select.js';
+import authorSelect, { AuthorDto } from '../prisma-selects/author-select.js';
 import authorIndividualSelect from '../prisma-selects/author-individual-select.js';
 import ApiError from '../exceptions/api-error.js';
 
@@ -7,14 +7,14 @@ const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   // returns all authors
-  async getAuthors() {
+  async getAuthors(): Promise<AuthorDto[]> {
     const authors = await prisma.user.findMany({
-      select: authorSelect,
+      ...authorSelect,
     });
     return authors;
   }
   // find author by query (username or displayedName)
-  async findAuthors(query: string): Promise<PrismaClient.User[]> {
+  async findAuthors(query: string): Promise<AuthorDto[]> {
     const authorFindManyArgs: PrismaClient.Prisma.UserFindManyArgs = {
       where: {
         OR: [
@@ -30,7 +30,7 @@ class AuthorService {
           },
         ],
       },
-      select: authorSelect,
+      ...authorSelect,
     };
     const authors = await prisma.user.findMany(authorFindManyArgs);
     return authors;

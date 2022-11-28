@@ -22,6 +22,18 @@ class CommentService {
     });
     return comments;
   }
+  async getCommentById(commentId: number) {
+    const comment = await prisma.comment.findUnique({
+      where: { id: commentId },
+    });
+    return comment;
+  }
+  async deleteComment(commentId: number) {
+    const comment = await prisma.comment.delete({
+      where: { id: commentId },
+    });
+    return comment;
+  }
 }
 
 export default new CommentService();

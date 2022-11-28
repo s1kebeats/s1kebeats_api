@@ -7,11 +7,12 @@ import mailService from './mail-service.js';
 import tokenService from './token-service.js';
 import ApiError from '../exceptions/api-error.js';
 import fileService from './file-service.js';
+import { UploadedFile } from 'express-fileupload';
 
 const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
-  // tokens and login/register response generator
+  // tokens and login/register dto generator
   async generateData(
     user: PrismaClient.User
   ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
@@ -168,29 +169,34 @@ class UserService {
     return data;
   }
   async edit(
-    payload: { image: any | string; id: number } & Pick<
-      PrismaClient.Prisma.UserUpdateInput,
-      'displayedName' | 'about' | 'youtube' | 'vk' | 'instagram'
-    >
+    userId: number,
+    displayedName?: string,
+    about?: string,
+    vk?: string,
+    youtube?: string,
+    instagram?: string,
+    image?: UploadedFile
   ) {
     // image aws upload
-    if (payload.image) {
-      const awsImage = await fileService.awsUpload(payload.image, 'image/');
-      payload.image = awsImage.Key!;
+    let awsImage: string | undefined;
+    if (image) {
+      const awsImageObject = await fileService.awsUpload(image, 'image/');
+      awsImage = awsImageObject.Key;
     }
-    const user = await prisma.user.update({
+    const userUpdateArgs: PrismaClient.Prisma.UserUpdateArgs = {
       where: {
-        id: payload.id,
+        id: userId,
       },
       data: {
-        image: payload.image,
-        displayedName: payload.displayedName,
-        about: payload.about,
-        vk: payload.vk,
-        youtube: payload.youtube,
-        instagram: payload.instagram,
+        image: awsImage,
+        displayedName,
+        about,
+        vk,
+        youtube,
+        instagram,
       },
-    });
+    };
+    const user = await prisma.user.update(userUpdateArgs);
     return user;
   }
 }

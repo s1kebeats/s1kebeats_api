@@ -1,4 +1,5 @@
 import aws from 'aws-sdk';
+import { UploadedFile } from 'express-fileupload';
 import { nanoid } from 'nanoid';
 import path from 'path';
 import ApiError from '../exceptions/api-error.js';
@@ -13,7 +14,7 @@ const s3 = new aws.S3(awsConfig);
 class FileService {
   // file validation function with extension and maxSize
   validateFile(
-    file: { name: string; size: number },
+    file: UploadedFile,
     extensions?: string | string[],
     maxSize?: number
   ) {
@@ -39,13 +40,13 @@ class FileService {
     if (maxSize) {
       if (file.size > maxSize) {
         throw ApiError.BadRequest(
-          `Максимальный размер файла ${maxSize / 1024 / 1024}мб`
+          `Max file size is ${maxSize / 1024 / 1024}mb.`
         );
       }
     }
   }
   // upload a file to aws s3 bucket
-  async awsUpload(file: any, path: string): Promise<aws.S3.Object> {
+  async awsUpload(file: UploadedFile, path: string): Promise<aws.S3.Object> {
     const params: aws.S3.PutObjectRequest = {
       Bucket: process.env.AWS_BUCKET_NAME!,
       Key: path + nanoid(36),

@@ -1,8 +1,12 @@
-import { Prisma } from '@prisma/client';
-
-const authorSelect: Prisma.UserSelect = {
-  username: true,
-  displayedName: true,
-  image: true,
-};
-export default authorSelect;
+import PrismaClient from '@prisma/client';
+const authorDto = PrismaClient.Prisma.validator<PrismaClient.Prisma.UserArgs>()({
+  select: {
+    username: true,
+    displayedName: true,
+    image: true,
+  }
+})
+export type AuthorDto = PrismaClient.Prisma.UserGetPayload<
+  typeof authorDto
+>;
+export default authorDto;

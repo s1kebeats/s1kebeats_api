@@ -8,7 +8,6 @@ const router = Router();
 
 router.post(
   '/register',
-  // data validators
   body('email').isEmail().bail(),
   body('username')
     .notEmpty()

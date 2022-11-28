@@ -36,5 +36,32 @@ router.get(
     }
   }
 );
+router.post(
+  '/delete/:id',
+  param('id').isDecimal().bail(),
+  async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
+      const commentId = +req.params.id;
+      let comment = await commentService.getCommentById(commentId);
+      if (!comment) {
+        return next(ApiError.NotFound('Comment was not found.'));
+      }
+      if (commentId !== req.user!.id) {
+        return next(ApiError.UnauthorizedUser());
+      }
+      comment = await commentService.deleteComment(commentId);
+      return res.json(comment);
+    } catch (error) {
+      next(error);
+    }
+  }
+);
 
 export default router;
