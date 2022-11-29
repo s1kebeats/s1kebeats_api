@@ -13,9 +13,7 @@ describe('Tags retrieval', () => {
     assert.equal(res.body.tags.length, 9);
   });
   it('Viewed: 10', async () => {
-    const res = await request(app).get('/api/tag').send({
-      viewed: 10,
-    });
+    const res = await request(app).get('/api/tag/?viewed=10');
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.tags.length, 0);
   });

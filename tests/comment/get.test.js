@@ -59,11 +59,8 @@ describe('Get comments', () => {
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
-      .get('/api/comment/21')
-      .set('Authorization', 'Bearer ' + accessToken)
-      .send({
-        viewed: 'randomText',
-      });
+      .get('/api/comment/21/?viewed=text')
+      .set('Authorization', 'Bearer ' + accessToken);
     assert.equal(res.statusCode, 400);
   });
   it('Success: viewed = 10', async () => {
@@ -73,11 +70,8 @@ describe('Get comments', () => {
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
-      .get('/api/comment/21')
-      .set('Authorization', 'Bearer ' + accessToken)
-      .send({
-        viewed: 10,
-      });
+      .get('/api/comment/21/?viewed=10')
+      .set('Authorization', 'Bearer ' + accessToken);
     assert.equal(res.statusCode, 200);
     // Less than 10 comments in database, viewed=10 skips all fo them
     assert.equal(res.body.comments.length, 0);

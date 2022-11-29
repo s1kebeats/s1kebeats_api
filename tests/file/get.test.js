@@ -11,10 +11,10 @@ describe('Getting media from S3', () => {
     const res = await request(app).get('/api/file/random/file');
     assert.equal(res.statusCode, 404);
   });
-  // it('Success', async () => {
-  //   const res = await request(app).get(
-  //     '/api/file/image/cNuUc7iZy6SGxd8JaheO9tRQDKLLRIdDuUCJ'
-  //   );
-  //   assert.equal(res.statusCode, 200);
-  // });
+  it('Success', async () => {
+    const res = await request(app).get(
+      '/api/file/image/F4naIXHO6RcWDhbsEf1mVpmYd2Ls5uMgNUYd'
+    );
+    assert.equal(res.statusCode, 200);
+  });
 });

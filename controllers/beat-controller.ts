@@ -113,7 +113,9 @@ class BeatController {
         userId: req.user!.id,
       };
       if (connectOrCreateTags) {
-        beatCandidate.tags.connectOrCreate = connectOrCreateTags;
+        beatCandidate.tags = {
+          connectOrCreate: connectOrCreateTags,
+        };
       }
       // convert strings to numbers
       if (beatCandidate.bpm) {
