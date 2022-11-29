@@ -1,5 +1,5 @@
 import PrismaClient from '@prisma/client';
-const beatSelect =
+const beatForAuthorSelect =
   PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
     select: {
       id: true,
@@ -9,14 +9,9 @@ const beatSelect =
       mp3: true,
       wavePrice: true,
       tags: true,
-      user: {
-        select: {
-          id: true,
-          username: true,
-          displayedName: true,
-        },
-      },
     },
   });
-export type Beat = PrismaClient.Prisma.BeatGetPayload<typeof beatSelect>;
-export default beatSelect;
+export type BeatForAuthor = PrismaClient.Prisma.BeatGetPayload<
+  typeof beatForAuthorSelect
+>;
+export default beatForAuthorSelect;

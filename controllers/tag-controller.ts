@@ -9,14 +9,18 @@ class TagController {
       if (req.query.name) {
         tags = await tagService.findTags(
           req.query.name as string,
-          req.body.viewed ? +req.body.viewed : 0
+          req.query.viewed ? +req.query.viewed : 0
         );
       } else {
-        tags = await tagService.getTags(req.body.viewed ? +req.body.viewed : 0);
+        tags = await tagService.getTags(
+          req.query.viewed ? +req.query.viewed : 0
+        );
       }
       return res.json({
         tags,
-        viewed: +req.body.viewed + tags!.length,
+        viewed: req.query.viewed
+          ? +req.query.viewed + tags.length
+          : tags.length,
       });
     } catch (error) {
       next(error);

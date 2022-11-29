@@ -1,6 +1,6 @@
 import beatController from '../controllers/beat-controller.js';
 import authMiddleware from '../middlewares/auth-middleware.js';
-import { body, param } from 'express-validator';
+import { body, param, query } from 'express-validator';
 import { Router } from 'express';
 import activatedMiddleware from '../middlewares/activated-middleware.js';
 const router = Router();
@@ -26,7 +26,7 @@ router.post(
 );
 router.get(
   '/',
-  body('viewed').if(body('viewed').exists()).isDecimal().bail(),
+  query('viewed').if(query('viewed').exists()).isDecimal().bail(),
   beatController.getBeats
 );
 router.get(

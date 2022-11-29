@@ -1,92 +1,35 @@
 import PrismaClient from '@prisma/client';
 const prisma = new PrismaClient.PrismaClient();
 import aws from 'aws-sdk';
+import { UploadedFile } from 'express-fileupload';
 import ApiError from '../exceptions/api-error.js';
+import beatIndividualSelect, {
+  BeatIndividual,
+} from '../prisma-selects/beat-individual-select.js';
+import beatSelect, { Beat } from '../prisma-selects/beat-select.js';
 import fileService from './file-service.js';
 
-const beatWithAuthorTagsComments =
-  PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
-    select: {
-      id: true,
-      name: true,
-      bpm: true,
-      user: {
-        select: {
-          username: true,
-          displayedName: true,
-        },
-      },
-      comments: {
-        take: 10,
-        select: {
-          content: true,
-          user: {
-            select: {
-              username: true,
-              displayedName: true,
-              image: true,
-            },
-          },
-        },
-      },
-      image: true,
-      mp3: true,
-      wavePrice: true,
-      tags: true,
-      _count: {
-        select: {
-          likes: true,
-        },
-      },
-    },
-  });
-export type BeatWithAuthorTagsComments = PrismaClient.Prisma.BeatGetPayload<
-  typeof beatWithAuthorTagsComments
->;
-const beatWithAuthorAndTags =
-  PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
-    select: {
-      id: true,
-      name: true,
-      bpm: true,
-      user: {
-        select: {
-          username: true,
-          displayedName: true,
-        },
-      },
-      image: true,
-      mp3: true,
-      wavePrice: true,
-      tags: true,
-    },
-  });
-export type BeatWithAuthorAndTags = PrismaClient.Prisma.BeatGetPayload<
-  typeof beatWithAuthorAndTags
->;
-export interface BeatIndividual extends BeatWithAuthorTagsComments {
-  related: BeatWithAuthorAndTags[];
-}
-interface FileMock {
-  name: string;
-  size: number;
+export interface BeatIndividualWithRelated extends BeatIndividual {
+  related: Beat[];
 }
 export interface BeatUploadInput
   extends Omit<PrismaClient.Beat, 'image' | 'wave' | 'mp3' | 'stems'> {
+  [x: string]: any;
+  beatCandidate: any;
   tags: {
-    connectOrCreate: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput;
+    connectOrCreate: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[];
   };
-  image: FileMock;
-  wave: FileMock;
-  mp3: FileMock;
-  stems: FileMock;
+  image: UploadedFile;
+  wave: UploadedFile;
+  mp3: UploadedFile;
+  stems: UploadedFile;
 }
 
 class BeatService {
   // get all beats
-  async getBeats(viewed = 0): Promise<BeatWithAuthorAndTags[]> {
+  async getBeats(viewed = 0): Promise<Beat[]> {
     const beats = await prisma.beat.findMany({
-      ...beatWithAuthorAndTags,
+      ...beatSelect,
       skip: viewed,
       take: 10,
     });
@@ -99,14 +42,9 @@ class BeatService {
       q,
       bpm,
       order,
-    }: {
-      tags?: number[];
-      q?: string;
-      bpm?: string;
-      order?: string;
-    },
+    }: { q?: string; bpm?: string; order?: string; tags?: number[] },
     viewed = 0
-  ): Promise<BeatWithAuthorAndTags[]> {
+  ): Promise<Beat[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
     const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
       id: 'asc',
@@ -116,7 +54,7 @@ class BeatService {
       skip: viewed,
       take: 10,
       where: where,
-      ...beatWithAuthorAndTags,
+      ...beatSelect,
     };
 
     if (order) {
@@ -176,13 +114,12 @@ class BeatService {
     const beats = await prisma.beat.findMany(queryArgs);
     return beats;
   }
-  async getIndividualBeat(id: number): Promise<BeatIndividual> {
+  async getIndividualBeat(id: number): Promise<BeatIndividualWithRelated> {
     const beatFindUniqueArgs = {
       where: {
         id,
       },
-      // individual beat select
-      ...beatWithAuthorTagsComments,
+      ...beatIndividualSelect,
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
     if (!beat) {
@@ -291,7 +228,7 @@ class BeatService {
     // async files deletion
     return await Promise.all(fileData);
   }
-  async uploadBeat(beat: BeatUploadInput) {
+  async uploadBeat(beat: BeatUploadInput): Promise<PrismaClient.Beat> {
     // aws upload
     const fileData = await this.beatAwsUpload(beat);
     const beatData = {

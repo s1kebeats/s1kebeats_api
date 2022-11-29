@@ -3,10 +3,7 @@ import PrismaClient from '@prisma/client';
 const prisma = new PrismaClient.PrismaClient();
 
 class TagService {
-  async findTags(
-    name: string,
-    viewed: number
-  ): Promise<PrismaClient.Tag[] | null> {
+  async findTags(name: string, viewed: number): Promise<PrismaClient.Tag[]> {
     const tags = await prisma.tag.findMany({
       where: {
         name: {

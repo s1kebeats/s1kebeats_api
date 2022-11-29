@@ -1,14 +1,13 @@
 import ApiError from '../exceptions/api-error.js';
-import beatService, {
-  BeatIndividual,
-  BeatWithAuthorAndTags,
-} from '../services/beat-service.js';
+import beatService, { BeatUploadInput } from '../services/beat-service.js';
 import { validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import UserDto from '../dtos/user-dto.js';
 import PrismaClient from '@prisma/client';
 import commentService from '../services/comment-service.js';
 import likeService from '../services/like-service.js';
+import { Beat } from '../prisma-selects/beat-select.js';
+import { BeatIndividual } from '../prisma-selects/beat-individual-select.js';
 // req.user
 declare module 'express-serve-static-core' {
   interface Request {
@@ -27,11 +26,10 @@ class BeatController {
           ApiError.BadRequest('Data validation error.', errors.array())
         );
       }
-      let beats: BeatWithAuthorAndTags[];
+      let beats: Beat[];
       if (Object.keys(req.query).length) {
-        const query: { tags: number[] } = {
-          ...req.query,
-          tags: [],
+        const query: { [key: string]: string | number[] } = {
+          ...(req.query as { [key: string]: string }),
         };
         // ids string to array of ids
         if (req.query.tags) {
@@ -41,17 +39,19 @@ class BeatController {
         }
         beats = await beatService.findBeats(
           query,
-          req.body.viewed ? +req.body.viewed : 0
+          req.query.viewed ? +req.query.viewed : 0
         );
       } else {
         // get all beats
         beats = await beatService.getBeats(
-          req.body.viewed ? +req.body.viewed : 0
+          req.query.viewed ? +req.query.viewed : 0
         );
       }
       return res.json({
         beats,
-        viewed: +req.body.viewed + beats.length,
+        viewed: req.query.viewed
+          ? +req.query.viewed + beats.length
+          : beats.length,
       });
     } catch (error) {
       next(error);
@@ -84,33 +84,36 @@ class BeatController {
           ApiError.BadRequest('Data validation error.', errors.array())
         );
       }
-      let tags;
+      let tags: PrismaClient.Tag[];
+      let connectOrCreateTags:
+        | PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[]
+        | undefined;
       if (req.body.tags) {
         tags = JSON.parse(req.body.tags);
         if (!Array.isArray(tags)) {
           return next(ApiError.BadRequest('Wrong tags.'));
         }
-        // prisma client ConnectOrCreate syntax
-        tags = tags.map((tag: PrismaClient.Tag) => {
+        tags.forEach((tag: PrismaClient.Tag) => {
           if (!tag.name) {
             return next(ApiError.BadRequest('Wrong tags.'));
           }
+        });
+        // prisma client ConnectOrCreate syntax
+        connectOrCreateTags = tags.map((tag: PrismaClient.Tag) => {
           return {
             where: { name: tag.name },
             create: { name: tag.name },
           };
         });
       }
-      const beatCandidate = {
+      const beatCandidate: BeatUploadInput = {
         ...req.body,
         wavePrice: +req.body.wavePrice,
         ...req.files,
         userId: req.user!.id,
       };
-      if (tags) {
-        beatCandidate.tags = {
-          connectOrCreate: tags,
-        };
+      if (connectOrCreateTags) {
+        beatCandidate.tags.connectOrCreate = connectOrCreateTags;
       }
       // convert strings to numbers
       if (beatCandidate.bpm) {
@@ -139,7 +142,7 @@ class BeatController {
       const id = +req.params.id;
       // has error throw inside, if beat doesn't exist
       const beat = await beatService.getBeatById(id);
-      const commentCandidate: Omit<PrismaClient.Comment, 'id' | 'createdAt'> = {
+      const commentCandidate: PrismaClient.Prisma.CommentCreateManyInput = {
         userId: req.user!.id,
         beatId: beat.id,
         content: req.body.content,

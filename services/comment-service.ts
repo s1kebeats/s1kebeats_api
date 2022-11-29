@@ -3,7 +3,7 @@ const prisma = new PrismaClient.PrismaClient();
 
 class CommentService {
   async uploadComment(
-    commentPayload: Omit<PrismaClient.Comment, 'id' | 'createdAt'>
+    commentPayload: PrismaClient.Prisma.CommentCreateManyInput
   ) {
     const comment = await prisma.comment.create({
       data: {

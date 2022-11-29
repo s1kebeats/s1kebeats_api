@@ -1,21 +1,23 @@
 import PrismaClient from '@prisma/client';
-import authorSelect, { AuthorDto } from '../prisma-selects/author-select.js';
-import authorIndividualSelect from '../prisma-selects/author-individual-select.js';
+import authorSelect, { Author } from '../prisma-selects/author-select.js';
+import authorIndividualSelect, {
+  AuthorIndividual,
+} from '../prisma-selects/author-individual-select.js';
 import ApiError from '../exceptions/api-error.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   // returns all authors
-  async getAuthors(): Promise<AuthorDto[]> {
+  async getAuthors(): Promise<Author[]> {
     const authors = await prisma.user.findMany({
       ...authorSelect,
     });
     return authors;
   }
   // find author by query (username or displayedName)
-  async findAuthors(query: string): Promise<AuthorDto[]> {
-    const authorFindManyArgs: PrismaClient.Prisma.UserFindManyArgs = {
+  async findAuthors(query: string): Promise<Author[]> {
+    const authorFindManyArgs = {
       where: {
         OR: [
           {
@@ -35,14 +37,13 @@ class AuthorService {
     const authors = await prisma.user.findMany(authorFindManyArgs);
     return authors;
   }
-  async getAuthorByUsername(
-    username: string
-  ): Promise<PrismaClient.User | null> {
-    const authorFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs = {
+  // individual author data
+  async getAuthorByUsername(username: string): Promise<AuthorIndividual> {
+    const authorFindUniqueArgs = {
       where: {
         username,
       },
-      select: authorIndividualSelect,
+      ...authorIndividualSelect,
     };
     const author = await prisma.user.findUnique(authorFindUniqueArgs);
     if (!author) {
