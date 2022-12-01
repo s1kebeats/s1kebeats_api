@@ -1,6 +1,7 @@
 import PrismaClient from '@prisma/client';
 import bcrypt from 'bcrypt';
 import { nanoid } from 'nanoid';
+import sharp from 'sharp';
 
 import UserDto from '../dtos/user-dto.js';
 import mailService from './mail-service.js';
@@ -8,6 +9,7 @@ import tokenService from './token-service.js';
 import ApiError from '../exceptions/api-error.js';
 import fileService from './file-service.js';
 import { UploadedFile } from 'express-fileupload';
+import authorIndividualSelect from '../prisma-selects/author-individual-select.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -180,6 +182,8 @@ class UserService {
     // image aws upload
     let awsImage: string | undefined;
     if (image) {
+      // image optimization
+      image.data = await sharp(image.data).webp({ quality: 50 }).toBuffer();
       const awsImageObject = await fileService.awsUpload(image, 'image/');
       awsImage = awsImageObject.Key;
     }
@@ -195,6 +199,7 @@ class UserService {
         youtube,
         instagram,
       },
+      ...authorIndividualSelect,
     };
     const user = await prisma.user.update(userUpdateArgs);
     return user;

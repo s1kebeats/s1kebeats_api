@@ -2,6 +2,7 @@ import PrismaClient from '@prisma/client';
 const prisma = new PrismaClient.PrismaClient();
 import aws from 'aws-sdk';
 import { UploadedFile } from 'express-fileupload';
+import sharp from 'sharp';
 import ApiError from '../exceptions/api-error.js';
 import beatIndividualSelect, {
   BeatIndividual,
@@ -199,6 +200,10 @@ class BeatService {
     fileData[0] = fileService.awsUpload(beat.wave, 'wave/');
     fileData[1] = fileService.awsUpload(beat.mp3, 'mp3/');
     if (beat.image) {
+      // image optimization
+      beat.image.data = await sharp(beat.image.data)
+        .webp({ quality: 50 })
+        .toBuffer();
       fileData[2] = fileService.awsUpload(beat.image, 'image/');
     }
     if (beat.stems) {
