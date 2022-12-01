@@ -4,10 +4,12 @@
     "dev": "npm run format && npm run build && nodemon ./build/server.js",
     "format": "prettier --write .",
     "lint": "eslint --fix .",
-    "test": "npx mocha ./tests/**/*.test.js"
+    "test": "npx mocha ./tests/**/*.test.js",
+    "migrate": "npx prisma migrate dev",
+    "studio": "npx prisma studio -p 4444"
   },
   "dependencies": {
-    "@prisma/client": "^4.5.0",
+    "@prisma/client": "^4.7.0",
     "@types/express-serve-static-core": "^4.17.31",
     "aws-sdk": "^2.1248.0",
     "bcrypt": "^5.1.0",
@@ -22,7 +24,6 @@
     "nodemailer": "^6.8.0",
     "passport": "^0.6.0",
     "passport-jwt": "^4.0.0",
-    "prisma": "^4.5.0",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
@@ -44,6 +45,7 @@
     "mocha": "^10.1.0",
     "nodemon": "^2.0.20",
     "prettier": "^2.7.1",
+    "prisma": "^4.7.0",
     "superagent": "^8.0.3",
     "supertest": "^6.3.1",
     "ts-node": "^10.9.1",
