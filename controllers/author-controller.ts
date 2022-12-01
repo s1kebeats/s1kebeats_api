@@ -10,10 +10,15 @@ class AuthorController {
       let authors: Author[] | undefined;
       if (req.query.q) {
         // find authors with query
-        authors = await authorService.findAuthors(req.query.q as string);
+        authors = await authorService.findAuthors(
+          req.query.q as string,
+          req.query.viewed ? +req.query.viewed : 0
+        );
       } else {
         // get all authors
-        authors = await authorService.getAuthors();
+        authors = await authorService.getAuthors(
+          req.query.viewed ? +req.query.viewed : 0
+        );
       }
       return res.json(authors);
     } catch (error) {
