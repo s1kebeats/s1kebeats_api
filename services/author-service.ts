@@ -9,14 +9,16 @@ const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   // returns all authors
-  async getAuthors(): Promise<Author[]> {
+  async getAuthors(viewed = 0): Promise<Author[]> {
     const authors = await prisma.user.findMany({
       ...authorSelect,
+      take: 10,
+      skip: viewed,
     });
     return authors;
   }
   // find author by query (username or displayedName)
-  async findAuthors(query: string): Promise<Author[]> {
+  async findAuthors(query: string, viewed = 0): Promise<Author[]> {
     const authorFindManyArgs = {
       where: {
         OR: [
@@ -33,6 +35,8 @@ class AuthorService {
         ],
       },
       ...authorSelect,
+      take: 10,
+      skip: viewed,
     };
     const authors = await prisma.user.findMany(authorFindManyArgs);
     return authors;

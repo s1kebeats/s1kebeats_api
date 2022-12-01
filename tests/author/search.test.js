@@ -32,4 +32,9 @@ describe('Authors filtering', () => {
     assert.equal(res.body.length, 1);
     assert.equal(res.body[0].username, 'jpbeatz');
   });
+  it('Viewed: 10', async () => {
+    const res = await request(app).get('/api/author/?viewed=10');
+    assert.equal(res.statusCode, 200);
+    assert.equal(res.body.length, 0);
+  });
 });
