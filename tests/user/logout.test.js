@@ -20,12 +20,12 @@ describe('User logout', () => {
   it('Success', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const refreshToken = login.body.refreshToken;
+    console.log(refreshToken)
     const logout = await request(app)
       .post('/api/logout')
-      // setting cookie by hand, but it is automatical when using real client
       .set('Cookie', ['refreshToken=' + refreshToken]);
     assert.equal(logout.statusCode, 200);
     assert.equal(logout.body.refreshToken, refreshToken);

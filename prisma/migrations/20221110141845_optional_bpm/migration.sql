@@ -1,2 +1,0 @@
--- AlterTable
-ALTER TABLE "Beat" ALTER COLUMN "bpm" DROP NOT NULL;

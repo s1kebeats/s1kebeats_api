@@ -33,8 +33,6 @@ router.post(
 router.post(
   '/edit',
   authMiddleware,
-  // only users with activated email
-  activatedMiddleware,
   body('displayedName')
     .if(body('displayedName').exists())
     .isLength({ max: 255 })
