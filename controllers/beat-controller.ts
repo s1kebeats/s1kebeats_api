@@ -157,6 +157,13 @@ class BeatController {
   }
   async likeToggle(req: Request, res: Response, next: NextFunction) {
     try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
       // Has built in 404 Throw
       const beat = await beatService.getBeatById(+req.params.id);
       const beatId = beat.id;
@@ -177,6 +184,13 @@ class BeatController {
   }
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
       // Has built in 404 Throw
       const beat = await beatService.getBeatById(+req.params.id);
       if (req.user!.id !== beat.userId) {
@@ -184,6 +198,69 @@ class BeatController {
       }
       await beatService.deleteBeat(beat);
       return res.json(beat);
+    } catch (error) {
+      next(error);
+    }
+  }
+  async edit(req: Request, res: Response, next: NextFunction) {
+    try {
+      // express validator errors
+      const errors = validationResult(req);
+      if (!errors.isEmpty()) {
+        return next(
+          ApiError.BadRequest('Data validation error.', errors.array())
+        );
+      }
+      // Has built in 404 Throw
+      const beatOriginal = await beatService.getBeatById(+req.params.id);
+      if (req.user!.id !== beatOriginal.userId) {
+        return next(ApiError.UnauthorizedUser());
+      }
+      let tags: PrismaClient.Tag[];
+      let connectOrCreateTags:
+        | PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[]
+        | undefined;
+      if (req.body.tags) {
+        tags = JSON.parse(req.body.tags);
+        if (!Array.isArray(tags)) {
+          return next(ApiError.BadRequest('Wrong tags.'));
+        }
+        tags.forEach((tag: PrismaClient.Tag) => {
+          if (!tag.name) {
+            return next(ApiError.BadRequest('Wrong tags.'));
+          }
+        });
+        // prisma client ConnectOrCreate syntax
+        connectOrCreateTags = tags.map((tag: PrismaClient.Tag) => {
+          return {
+            where: { name: tag.name },
+            create: { name: tag.name },
+          };
+        });
+      }
+      const dataToEdit: BeatUploadInput = {
+        ...req.body,
+        ...req.files,
+      };
+      if (connectOrCreateTags) {
+        dataToEdit.tags = {
+          connectOrCreate: connectOrCreateTags,
+        };
+      }
+      // convert strings to numbers
+      if (dataToEdit.bpm) {
+        dataToEdit.bpm = +dataToEdit.bpm;
+      }
+      if (dataToEdit.stemsPrice) {
+        dataToEdit.stemsPrice = +dataToEdit.stemsPrice;
+      }
+      if (dataToEdit.wavePrice) {
+        dataToEdit.wavePrice = +dataToEdit.wavePrice;
+      }
+      // beat data validation
+      beatService.validateBeatEdit(dataToEdit);
+      const beatEdited = await beatService.editBeat(beatOriginal, dataToEdit);
+      return res.json(beatEdited);
     } catch (error) {
       next(error);
     }

@@ -5,34 +5,22 @@ import app from '../../build/app.js';
 // Beat for tests: { id: 21 }
 describe('Beat commenting', () => {
   it('Only POST', async () => {
-    const res = await request(app).get('/api/beat/21/comment');
+    const res = await request(app).get('/api/beat/1/comment');
     assert.equal(res.statusCode, 404);
   });
   it('Not authorized', async () => {
-    const res = await request(app).post('/api/beat/21/comment');
-    assert.equal(res.statusCode, 401);
-  });
-  it('Authorized, but not activated', async () => {
-    const login = await request(app).post('/api/login').send({
-      // Not activated user, created for tests
-      login: 'notActivated',
-      password: 'notActivated',
-    });
-    const accessToken = login.body.accessToken;
-    const res = await request(app)
-      .post('/api/beat/21/comment')
-      .set('Authorization', 'Bearer ' + accessToken);
+    const res = await request(app).post('/api/beat/1/comment');
     assert.equal(res.statusCode, 401);
   });
   it('No comment content', async () => {
     const login = await request(app).post('/api/login').send({
       // Activated user, created for tests
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
-      .post('/api/beat/21/comment')
+      .post('/api/beat/1/comment')
       .set('Authorization', 'Bearer ' + accessToken);
     assert.equal(res.statusCode, 400);
   });
@@ -40,7 +28,7 @@ describe('Beat commenting', () => {
     const login = await request(app).post('/api/login').send({
       // Activated user, created for tests
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -56,7 +44,7 @@ describe('Beat commenting', () => {
     const login = await request(app).post('/api/login').send({
       // Activated user, created for tests
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -71,16 +59,16 @@ describe('Beat commenting', () => {
     const login = await request(app).post('/api/login').send({
       // Activated user, created for tests
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
-      .post('/api/beat/21/comment')
+      .post('/api/beat/1/comment')
       .send({
-        content: 'Comment content',
+        content: 'First comment',
       })
       .set('Authorization', 'Bearer ' + accessToken);
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.content, 'Comment content');
+    assert.equal(res.body.content, 'First comment');
   });
 });

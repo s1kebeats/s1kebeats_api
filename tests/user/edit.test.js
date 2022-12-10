@@ -11,21 +11,10 @@ describe('User data editing', () => {
     const res = await request(app).post('/api/edit');
     assert.equal(res.statusCode, 401);
   });
-  it('Authorized, but not activated', async () => {
-    const login = await request(app).post('/api/login').send({
-      login: 'notActivated',
-      password: 'notActivated',
-    });
-    const accessToken = login.body.accessToken;
-    const res = await request(app)
-      .post('/api/edit')
-      .set('Authorization', 'Bearer ' + accessToken);
-    assert.equal(res.statusCode, 401);
-  });
   it('Wrong image', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -37,7 +26,7 @@ describe('User data editing', () => {
   it('Success', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)

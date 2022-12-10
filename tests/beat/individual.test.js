@@ -14,15 +14,14 @@ describe('Get individual beat data', () => {
     assert.equal(res.statusCode, 404);
   });
   it('Success', async () => {
-    const res = await request(app).get('/api/beat/21');
+    const res = await request(app).get('/api/beat/1');
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.name, 'Chaze');
+    assert.equal(res.body.name, 'outtahere');
     assert.equal(res.body.user.username, 's1kebeats');
     // Related beats shouldn't contain beat that user is getting
     assert.equal(
       res.body.related.map((item) => item.id).includes(res.body.id),
       false
     );
-    assert.equal(res.body.comments[0].content, 'Comment content');
   });
 });

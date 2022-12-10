@@ -15,8 +15,6 @@ export interface BeatIndividualWithRelated extends BeatIndividual {
 }
 export interface BeatUploadInput
   extends Omit<PrismaClient.Beat, 'image' | 'wave' | 'mp3' | 'stems'> {
-  [x: string]: any;
-  beatCandidate: any;
   tags: {
     connectOrCreate: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[];
   };
@@ -190,6 +188,40 @@ class BeatService {
       );
     }
   }
+  validateBeatEdit(beat: BeatUploadInput) {
+    // files validation
+    // wave check
+    if (beat.wave) {
+      fileService.validateFile(
+        beat.wave,
+        '.wav',
+        // 300mb
+        300 * 1024 * 1024
+      );
+    }
+    // mp3 check
+    if (beat.mp3) {
+      fileService.validateFile(
+        beat.mp3,
+        '.mp3',
+        // 150mb
+        150 * 1024 * 1024
+      );
+    }
+    // image check
+    if (beat.image) {
+      fileService.validateFile(beat.image, ['.png', '.jpg', '.jpeg']);
+    }
+    // stems check
+    if (beat.stems) {
+      fileService.validateFile(
+        beat.stems,
+        ['.zip', '.rar'],
+        // 500mb
+        500 * 1024 * 1024
+      );
+    }
+  }
   async beatAwsUpload(beat: BeatUploadInput): Promise<{
     wave?: string;
     mp3?: string;
@@ -220,6 +252,48 @@ class BeatService {
     });
     return data;
   }
+  async beatAwsEdit(
+    beatOriginal: PrismaClient.Beat,
+    dataToEdit: BeatUploadInput
+  ): Promise<{
+    wave?: string;
+    mp3?: string;
+    image?: string;
+    stems?: string;
+  }> {
+    const fileData: any = [null, null, null, null];
+    if (dataToEdit.wave) {
+      fileService.deleteObject(beatOriginal.wave);
+      fileData[0] = fileService.awsUpload(dataToEdit.wave, 'wave/');
+    }
+    if (dataToEdit.mp3) {
+      fileService.deleteObject(beatOriginal.mp3);
+      fileData[1] = fileService.awsUpload(dataToEdit.mp3, 'mp3/');
+    }
+    if (dataToEdit.image) {
+      if (beatOriginal.image) {
+        fileService.deleteObject(beatOriginal.image);
+      }
+      fileData[2] = fileService.awsUpload(dataToEdit.mp3, 'image/');
+    }
+    if (dataToEdit.stems) {
+      if (beatOriginal.stems) {
+        fileService.deleteObject(beatOriginal.stems);
+      }
+      fileData[3] = fileService.awsUpload(dataToEdit.mp3, 'stems/');
+    }
+    const dataUploaded = await Promise.all(fileData).then(
+      (values: aws.S3.Object[]) => {
+        return {
+          wave: values[0] ? values[0].Key : undefined,
+          mp3: values[1] ? values[1].Key : undefined,
+          image: values[2] ? values[2].Key : undefined,
+          stems: values[3] ? values[3].Key : undefined,
+        };
+      }
+    );
+    return dataUploaded;
+  }
   async beatAwsDelete(beat: PrismaClient.Beat) {
     const fileData: any = [null, null, null, null];
     fileData[0] = fileService.deleteObject(beat.wave);
@@ -247,6 +321,26 @@ class BeatService {
       },
     });
     return beatFromDb;
+  }
+  async editBeat(
+    beatOriginal: PrismaClient.Beat,
+    dataToEdit: BeatUploadInput
+  ): Promise<PrismaClient.Beat> {
+    const fileData = await this.beatAwsEdit(beatOriginal, dataToEdit);
+    const beatData = {
+      ...dataToEdit,
+      ...fileData,
+    } as PrismaClient.Beat;
+    const beatUpdated = await prisma.beat.update({
+      where: {
+        id: beatOriginal.id,
+      },
+      data: beatData,
+      include: {
+        tags: true,
+      },
+    });
+    return beatUpdated;
   }
   async deleteBeat(beat: PrismaClient.Beat) {
     // delete media files from AWS S3

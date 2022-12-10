@@ -23,7 +23,7 @@ describe('User logout', () => {
       password: 'Sbeats2005',
     });
     const refreshToken = login.body.refreshToken;
-    console.log(refreshToken)
+    console.log(refreshToken);
     const logout = await request(app)
       .post('/api/logout')
       .set('Cookie', ['refreshToken=' + refreshToken]);
