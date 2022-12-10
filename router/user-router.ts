@@ -15,7 +15,13 @@ router.post(
     // numbers and letters only
     .matches(/^[0-9a-zA-Z]+$/)
     .bail(),
-  body('password').isLength({ min: 8 }).bail(),
+  body('password')
+    .isLength({ min: 8 })
+    .bail()
+    .matches(/\d/)
+    .bail()
+    .matches(/[A-Z]/)
+    .bail(),
   userController.register
 );
 router.post(

@@ -59,6 +59,28 @@ describe('User registration', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
+  it('Password without number', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'random@email.com',
+        username: 'randomusername',
+        password: 'abcdefgHI',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 400);
+  });
+  it('Password without capital letter', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'random@email.com',
+        username: 'randomusername',
+        password: 'abcdefg1111',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 400);
+  });
   it('Username with banned characters', async () => {
     const res = await request(app)
       .post('/api/register')
@@ -76,7 +98,7 @@ describe('User registration', () => {
   //     .send({
   //       email: 'random@email.com',
   //       username: 'randomusername',
-  //       password: 'randompassword',
+  //       password: 'RandomPassword1',
   //     })
   //     .set('Content-Type', 'application/json');
   //   assert.equal(res.statusCode, 200);
@@ -92,7 +114,7 @@ describe('User registration', () => {
       .send({
         email: 'random@email.com',
         username: 's1kebeats',
-        password: 'randompassword',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
@@ -103,7 +125,7 @@ describe('User registration', () => {
       .send({
         email: 'adacenkoboos@gmail.com',
         username: 'randomusername',
-        password: 'randompassword',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
