@@ -6,7 +6,7 @@
 **Body fields:**
 **username**: string
 **email**: string
-**password**: string
+**password**: string, contains at least one capital letter, at least one digit, at least 8 chars long
 
 - /api/login- User login
 
