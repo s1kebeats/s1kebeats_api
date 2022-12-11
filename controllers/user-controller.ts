@@ -81,7 +81,7 @@ class UserController {
       const { activationLink } = req.params;
       await userService.activate(activationLink);
       // redirect to the main page
-      return res.json('Account activated.');
+      return res.json('success');
     } catch (error) {
       next(error);
     }
@@ -137,7 +137,7 @@ class UserController {
         instagram,
         req.files ? (req.files.image as UploadedFile) : undefined
       );
-      return res.json(user);
+      return res.json('success');
     } catch (error) {
       next(error);
     }
