@@ -35,27 +35,21 @@ class UserService {
     username: string,
     password: string
   ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
-    // check user email and username for uniqueness
-    let userCandidateFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs = {
-      where: { username },
-    };
-    let candidate: PrismaClient.User | null = await prisma.user.findUnique(
+    // check username for uniqueness
+    const userCandidateFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs =
+      {
+        where: { username },
+      };
+    const candidate: PrismaClient.User | null = await prisma.user.findUnique(
       userCandidateFindUniqueArgs
     );
     if (candidate) {
       throw ApiError.BadRequest(`Username "${username}" is already taken.`);
     }
-    userCandidateFindUniqueArgs = {
-      where: { email },
-    };
-    candidate = await prisma.user.findUnique(userCandidateFindUniqueArgs);
-    if (candidate) {
-      throw ApiError.BadRequest(`Email "${email}" is already registered.`);
-    }
     // hash password
     const hashedPassword: string = await bcrypt.hash(password, 3);
     // generate unique activation link
-    const activationLink: string = nanoid(36);
+    const activationLink: string = nanoid(64);
     // create user data
     const userCreateArgs: PrismaClient.Prisma.UserCreateArgs = {
       data: {
@@ -104,24 +98,14 @@ class UserService {
   }
   // login user
   async login(
-    login: string,
+    username: string,
     password: string
   ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
     let user: PrismaClient.User | null;
-    // check if login is an email
-    if (login.includes('@')) {
-      // find user with given email
-      const userFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs = {
-        where: { email: login },
-      };
-      user = await prisma.user.findUnique(userFindUniqueArgs);
-    } else {
-      // login is an username, find user with given username
-      const userFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs = {
-        where: { username: login },
-      };
-      user = await prisma.user.findUnique(userFindUniqueArgs);
-    }
+    const userFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs = {
+      where: { username },
+    };
+    user = await prisma.user.findUnique(userFindUniqueArgs);
     // if user wasn't found
     if (!user) {
       throw ApiError.BadRequest('Wrong login credentials.');

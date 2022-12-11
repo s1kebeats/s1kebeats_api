@@ -25,7 +25,7 @@ router.post(
 );
 router.post(
   '/login',
-  body('login').notEmpty().bail(),
+  body('username').notEmpty().bail(),
   body('password').notEmpty().bail(),
   userController.login
 );

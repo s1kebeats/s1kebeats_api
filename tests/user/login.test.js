@@ -7,7 +7,7 @@ describe('User login', () => {
     const res = await request(app).get('/api/login');
     assert.equal(res.statusCode, 404);
   });
-  it('No login', async () => {
+  it('No username', async () => {
     const res = await request(app).post('/api/login').send({
       password: 'randompassword',
     });
@@ -15,22 +15,22 @@ describe('User login', () => {
   });
   it('No password', async () => {
     const res = await request(app).post('/api/login').send({
-      login: 'random@email.com',
+      username: 'random@email.com',
     });
     assert.equal(res.statusCode, 400);
   });
   it('Not activated user', async () => {
     const res = await request(app).post('/api/login').send({
-      login: 'notActivated',
+      username: 'notActivated',
       password: 'notActivated1',
     });
     assert.equal(res.statusCode, 400);
   });
-  it('Login with username', async () => {
+  it('Success', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
-        login: 's1kebeats',
+        username: 's1kebeats',
         password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
@@ -48,26 +48,6 @@ describe('User login', () => {
     );
     assert.equal(res.headers['set-cookie'][0].includes('HttpOnly'), true);
   });
-  it('Login with email', async () => {
-    const res = await request(app)
-      .post('/api/login')
-      .send({
-        login: 'adacenkoboos@gmail.com',
-        password: 'Sbeats2005',
-      })
-      .set('Content-Type', 'application/json');
-    assert.equal(res.statusCode, 200);
-    assert.equal(typeof res.body.accessToken, 'string');
-    assert.equal(typeof res.body.refreshToken, 'string');
-    assert.equal(res.body.user.username, 's1kebeats');
-    assert.equal(res.body.user.email, 'adacenkoboos@gmail.com');
-    // refresh token cookie check
-    assert.equal(
-      res.headers['set-cookie'][0].includes(res.body.refreshToken),
-      true
-    );
-    assert.equal(res.headers['set-cookie'][0].includes('HttpOnly'), true);
-  });
   it('Wrong password', async () => {
     const res = await request(app)
       .post('/api/login')
@@ -78,11 +58,11 @@ describe('User login', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('Wrong login', async () => {
+  it('Wrong username', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
-        login: 'randonusername',
+        username: 'randonusername',
         password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
