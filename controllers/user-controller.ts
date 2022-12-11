@@ -45,9 +45,10 @@ class UserController {
         );
       }
       // login data
-      const { login, password }: { login: string; password: string } = req.body;
+      const { username, password }: { username: string; password: string } =
+        req.body;
       // login the user
-      const userData = await userService.login(login, password);
+      const userData = await userService.login(username, password);
       // set refresh token httpOnly cookie
       res.cookie('refreshToken', userData.refreshToken, {
         // 30 days
