@@ -274,13 +274,13 @@ class BeatService {
       if (beatOriginal.image) {
         fileService.deleteObject(beatOriginal.image);
       }
-      fileData[2] = fileService.awsUpload(dataToEdit.mp3, 'image/');
+      fileData[2] = fileService.awsUpload(dataToEdit.image, 'image/');
     }
     if (dataToEdit.stems) {
       if (beatOriginal.stems) {
         fileService.deleteObject(beatOriginal.stems);
       }
-      fileData[3] = fileService.awsUpload(dataToEdit.mp3, 'stems/');
+      fileData[3] = fileService.awsUpload(dataToEdit.stems, 'stems/');
     }
     const dataUploaded = await Promise.all(fileData).then(
       (values: aws.S3.Object[]) => {

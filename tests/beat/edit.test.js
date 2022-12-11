@@ -51,11 +51,11 @@ describe('Beat editing', () => {
       .set('Authorization', 'Bearer ' + accessToken)
       .attach('image', 'tests/files/test.jpg');
     assert.equal(res.statusCode, 200);
-    // const beat = await request(app).get('/api/beat/1');
-    // assert.equal(beat.body.image, res.body.image);
-    // const oldImage = await request(app).get(`/api/file/${notEditedBeat.body.image}`)
-    // assert.equal(oldImage.statusCode, 404)
-    // const newImage = await request(app).get(`/api/file/${res.body.image}`)
-    // assert.equal(newImage.statusCode, 200)
-  });
+    const beat = await request(app).get('/api/beat/1');
+    assert.equal(beat.body.image, res.body.image);
+    const oldImage = await request(app).get(`/api/file/${notEditedBeat.body.image}`)
+    assert.equal(oldImage.statusCode, 404)
+    const newImage = await request(app).get(`/api/file/${res.body.image}`)
+    assert.equal(newImage.statusCode, 200)
+  }).timeout(120000);
 });
