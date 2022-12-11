@@ -126,6 +126,9 @@ class UserService {
     if (!user) {
       throw ApiError.BadRequest('Wrong login credentials.');
     }
+    if (!user.isActivated) {
+      throw ApiError.BadRequest('Email is not activated.');
+    }
     // compare passwords
     const passwordEquals: boolean = await bcrypt.compare(
       password,

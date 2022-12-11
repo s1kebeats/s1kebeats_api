@@ -25,7 +25,7 @@ describe('Refresh user tokens', () => {
       .post('/api/login')
       .send({
         login: 's1kebeats',
-        password: 'sbeats2005',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     const refresh = await request(app)

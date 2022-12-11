@@ -59,7 +59,7 @@ describe('User registration', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  it('Password without number', async () => {
+  it('Password without digit', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
@@ -92,39 +92,28 @@ describe('User registration', () => {
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);
   });
-  // it('Success', async () => {
-  //   const res = await request(app)
-  //     .post('/api/register')
-  //     .send({
-  //       email: 'random@email.com',
-  //       username: 'randomusername',
-  //       password: 'RandomPassword1',
-  //     })
-  //     .set('Content-Type', 'application/json');
-  //   assert.equal(res.statusCode, 200);
-  //   assert.equal(typeof res.body.accessToken, 'string');
-  //   assert.equal(typeof res.body.refreshToken, 'string');
-  //   assert.equal(res.body.user.username, 'randomusername');
-  //   assert.equal(res.body.user.email, 'random@email.com');
-  //   assert.equal(res.body.user.isActivated, false);
-  // });
+  it('Success', async () => {
+    const res = await request(app)
+      .post('/api/register')
+      .send({
+        email: 'adacenkoboos@gmail.com',
+        username: 's1kebeats',
+        password: 'Sbeats2005',
+      })
+      .set('Content-Type', 'application/json');
+    assert.equal(res.statusCode, 200);
+    assert.equal(typeof res.body.accessToken, 'string');
+    assert.equal(typeof res.body.refreshToken, 'string');
+    assert.equal(res.body.user.username, 's1kebeats');
+    assert.equal(res.body.user.email, 'adacenkoboos@gmail.com');
+    assert.equal(res.body.user.isActivated, false);
+  });
   it('Already used username', async () => {
     const res = await request(app)
       .post('/api/register')
       .send({
         email: 'random@email.com',
         username: 's1kebeats',
-        password: 'Sbeats2005',
-      })
-      .set('Content-Type', 'application/json');
-    assert.equal(res.statusCode, 400);
-  });
-  it('Already used email', async () => {
-    const res = await request(app)
-      .post('/api/register')
-      .send({
-        email: 'adacenkoboos@gmail.com',
-        username: 'randomusername',
         password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');

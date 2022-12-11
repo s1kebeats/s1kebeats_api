@@ -19,12 +19,19 @@ describe('User login', () => {
     });
     assert.equal(res.statusCode, 400);
   });
+  it('Not activated user', async () => {
+    const res = await request(app).post('/api/login').send({
+      login: 'notActivated',
+      password: 'notActivated1',
+    });
+    assert.equal(res.statusCode, 400);
+  });
   it('Login with username', async () => {
     const res = await request(app)
       .post('/api/login')
       .send({
         login: 's1kebeats',
-        password: 'sbeats2005',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 200);
@@ -46,7 +53,7 @@ describe('User login', () => {
       .post('/api/login')
       .send({
         login: 'adacenkoboos@gmail.com',
-        password: 'sbeats2005',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 200);
@@ -76,7 +83,7 @@ describe('User login', () => {
       .post('/api/login')
       .send({
         login: 'randonusername',
-        password: 'sbeats2005',
+        password: 'Sbeats2005',
       })
       .set('Content-Type', 'application/json');
     assert.equal(res.statusCode, 400);

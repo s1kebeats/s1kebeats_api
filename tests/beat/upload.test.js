@@ -11,7 +11,7 @@ describe('Beat upload', () => {
   it('No beat name', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -25,7 +25,7 @@ describe('Beat upload', () => {
   it('No beat wavePrice', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -39,7 +39,7 @@ describe('Beat upload', () => {
   it('No beat wave', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -53,7 +53,7 @@ describe('Beat upload', () => {
   it('No beat mp3', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -67,7 +67,7 @@ describe('Beat upload', () => {
   it('stemsPrice without stems archive', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -83,7 +83,7 @@ describe('Beat upload', () => {
   it('stems archive without stemsPrice', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -99,7 +99,7 @@ describe('Beat upload', () => {
   it('Wrong stems archive extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -116,7 +116,7 @@ describe('Beat upload', () => {
   it('Wrong wave extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -131,7 +131,7 @@ describe('Beat upload', () => {
   it('Wrong mp3 extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -146,7 +146,7 @@ describe('Beat upload', () => {
   it('Wrong image extension', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -162,7 +162,7 @@ describe('Beat upload', () => {
   it('Wrong tags', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -184,25 +184,10 @@ describe('Beat upload', () => {
       .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
     assert.equal(res.statusCode, 401);
   });
-  it('Authorized, but not activated', async () => {
-    const login = await request(app).post('/api/login').send({
-      login: 'notActivated',
-      password: 'notActivated',
-    });
-    const accessToken = login.body.accessToken;
-    const res = await request(app)
-      .post('/api/beat/upload')
-      .set('Authorization', 'Bearer ' + accessToken)
-      .field('wavePrice', 2099)
-      .field('name', 'outtahere')
-      .attach('wave', 'tests/files/outtahere_122BPM_Gunna.wav')
-      .attach('mp3', 'tests/files/outtahere_122BPM_Gunna.mp3');
-    assert.equal(res.statusCode, 401);
-  });
   it('Success', async () => {
     const login = await request(app).post('/api/login').send({
       login: 's1kebeats',
-      password: 'sbeats2005',
+      password: 'Sbeats2005',
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
