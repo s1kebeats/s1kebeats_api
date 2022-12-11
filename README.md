@@ -4,11 +4,11 @@
 - /api/register - User registration
 
 **Body fields:**
-**username**: string
+**username**: string, unique
 **email**: string
 **password**: string, contains at least one capital letter, at least one digit, at least 8 chars long
 
-- /api/login- User login
+- /api/login- User login, **Needs activated email**
 
 **Body fields:**
 **login**: string; username or email
@@ -57,6 +57,21 @@
 **stems**: .rar/.zip archive
 **description**: string
 **image**: .png/.jpeg/.jpg image
+
+- /api/beat/`:id`/edit - Beat editing
+
+**Form-data fields:**
+
+**Optional:**
+**bpm**: decimal string
+**stemsPrice**: decimal string
+**stems**: .rar/.zip archive
+**description**: string
+**image**: .png/.jpeg/.jpg image
+**name**: string
+**wavePrice**: decimal string
+**wave**: .wav audio file
+**mp3**: .mp3 audio file
 
 - /api/beat/- Beats search
 
