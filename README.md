@@ -11,7 +11,7 @@
 - /api/login- User login, **Needs activated email**
 
 **Body fields:**
-**login**: string; username or email
+**username**: string
 **password**: string
 
 - /api/activate/`:ActivationLink` - User's account activation
