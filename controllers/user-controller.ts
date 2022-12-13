@@ -22,15 +22,8 @@ class UserController {
         password,
       }: { email: string; username: string; password: string } = req.body;
       // register the user
-      const user = await userService.register(email, username, password);
-      // set refresh token httpOnly cookie
-      res.cookie('refreshToken', user.refreshToken, {
-        // 30 days
-        maxAge: 30 * 24 * 60 * 1000,
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-      });
-      return res.json(user);
+      await userService.register(email, username, password);
+      return res.json('success');
     } catch (error) {
       next(error);
     }

@@ -24,7 +24,7 @@ describe('User login', () => {
       username: 'notActivated',
       password: 'notActivated1',
     });
-    assert.equal(res.statusCode, 400);
+    assert.equal(res.statusCode, 403);
   });
   it('Success', async () => {
     const res = await request(app)

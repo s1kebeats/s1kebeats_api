@@ -34,7 +34,7 @@ class UserService {
     email: string,
     username: string,
     password: string
-  ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
+  ): Promise<void> {
     // check username for uniqueness
     const userCandidateFindUniqueArgs: PrismaClient.Prisma.UserFindUniqueArgs =
       {
@@ -60,15 +60,12 @@ class UserService {
       },
     };
     // create user
-    const user: PrismaClient.User = await prisma.user.create(userCreateArgs);
+    await prisma.user.create(userCreateArgs);
     // send email with activation link
     await mailService.sendActivationMail(
       email,
       `${process.env.BASE_URL}/api/activate/${activationLink}`
     );
-    // create tokens and user DTO
-    const data = await this.generateData(user);
-    return data;
   }
   // account activation
   async activate(activationLink: string): Promise<PrismaClient.User> {
@@ -108,10 +105,10 @@ class UserService {
     user = await prisma.user.findUnique(userFindUniqueArgs);
     // if user wasn't found
     if (!user) {
-      throw ApiError.BadRequest('Wrong login credentials.');
+      throw ApiError.UnauthorizedUser();
     }
     if (!user.isActivated) {
-      throw ApiError.BadRequest('Email is not activated.');
+      throw ApiError.NotActivatedEmail();
     }
     // compare passwords
     const passwordEquals: boolean = await bcrypt.compare(
@@ -119,7 +116,7 @@ class UserService {
       user.password
     );
     if (!passwordEquals) {
-      throw ApiError.BadRequest('Wrong login credentials.');
+      throw ApiError.UnauthorizedUser();
     }
     // create tokens and user DTO
     const data = await this.generateData(user);
