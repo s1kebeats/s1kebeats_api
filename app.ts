@@ -13,10 +13,12 @@ const app = express();
 app.use(fileUpload());
 app.use(express.json({ limit: '1000mb' }));
 app.use(cookieParser());
-app.use(cors({
+app.use(
+  cors({
     credentials: true,
-    origin: process.env.CLIENT_URL
-}));
+    origin: process.env.CLIENT_URL,
+  })
+);
 app.use('/api', router);
 // errors middleware
 app.use(errorMiddleware);

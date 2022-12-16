@@ -52,7 +52,7 @@ model Beat {
   comments Comment[]
   likes    Like[]
 
-  user       User    @relation(fields: [userId], references: [id])
+  user       User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId     Int
   downloads  Int     @default(0)
   plays      Int     @default(0)
