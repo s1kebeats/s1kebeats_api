@@ -5,11 +5,13 @@ export default class UserDto {
   username: string;
   id: number;
   isActivated: boolean;
+  image: string;
 
   constructor(model: User) {
     this.email = model.email;
     this.username = model.username;
     this.id = model.id;
     this.isActivated = model.isActivated;
+    this.image = model.image;
   }
 }
