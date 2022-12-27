@@ -5,6 +5,7 @@ import cookieParser from 'cookie-parser';
 import fileUpload from 'express-fileupload';
 import router from './router/index.js';
 import errorMiddleware from './middlewares/error-middleware.js';
+
 // env variables
 dotenv.config();
 
@@ -14,13 +15,16 @@ app.use(fileUpload());
 app.use(express.json({ limit: '1000mb' }));
 app.use(cookieParser());
 app.use(
-  cors({
-    credentials: true,
-    origin: process.env.CLIENT_URL,
-  })
+    cors({
+        credentials: true,
+        // nuxt server url
+        origin: process.env.CLIENT_URL,
+    })
 );
+
+// router
 app.use('/api', router);
-// errors middleware
+
 app.use(errorMiddleware);
 
 export default app;
