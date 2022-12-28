@@ -1,8 +1,6 @@
 import userService from '../services/user-service.js';
 import ApiError from '../exceptions/api-error.js';
 import { Request, Response, NextFunction } from 'express';
-import mediaService from '../services/media-service.js';
-import { UploadedFile } from 'express-fileupload';
 import PrismaClient from '@prisma/client';
 
 class UserController {
@@ -75,7 +73,7 @@ class UserController {
         try {
             const { refreshToken }: { refreshToken: string } = req.cookies;
             if (!refreshToken) {
-              return next(ApiError.UnauthorizedUser());
+                return next(ApiError.UnauthorizedUser());
             }
             const userData = await userService.refresh(refreshToken);
             // update refresh token cookie

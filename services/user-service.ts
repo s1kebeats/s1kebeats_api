@@ -7,14 +7,13 @@ import UserDto from '../dtos/user-dto.js';
 import mailService from './mail-service.js';
 import tokenService from './token-service.js';
 import ApiError from '../exceptions/api-error.js';
+import AuthResponse from '../models/AuthResponse.js';
 
 const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
     // tokens and login/register dto generator
-    async generateData(
-        user: PrismaClient.User
-    ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
+    async generateData(user: PrismaClient.User): Promise<AuthResponse> {
         // remove confidentional information from user data
         const userDto = new UserDto(user);
         // generate tokens
@@ -87,10 +86,7 @@ class UserService {
         await prisma.user.update(userUpdateArgs);
     }
 
-    async login(
-        username: string,
-        password: string
-    ): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
+    async login(username: string, password: string): Promise<AuthResponse> {
         let user: PrismaClient.User | null;
         user = await prisma.user.findUnique({
             where: { username },
@@ -123,7 +119,7 @@ class UserService {
         await tokenService.removeToken(refreshToken);
     }
 
-    async refresh(refreshToken: string): Promise<{ accessToken: string; refreshToken: string; user: UserDto }> {
+    async refresh(refreshToken: string): Promise<AuthResponse> {
         // user data decoded from refresh token
         const userData = tokenService.validateRefreshToken(refreshToken);
         // check if token is in database

@@ -19,16 +19,6 @@ class BeatController {
     // find many beats
     async getBeats(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             let beats: Beat[];
             if (Object.keys(req.query).length) {
                 const query: { [key: string]: string | number[] } = {
@@ -60,19 +50,10 @@ class BeatController {
             next(error);
         }
     }
+
     // get individual beat data
     async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             const id = +req.params.id;
             const beat: BeatIndividual = await beatService.getIndividualBeat(
                 id
@@ -82,19 +63,10 @@ class BeatController {
             next(error);
         }
     }
+
     // beat upload
     async upload(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             let tags: PrismaClient.Tag[];
             let connectOrCreateTags:
                 | PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[]
@@ -141,18 +113,9 @@ class BeatController {
             next(error);
         }
     }
+
     async comment(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             const id = +req.params.id;
             // has error throw inside, if beat doesn't exist
             const beat = await beatService.getBeatById(id);
@@ -170,18 +133,9 @@ class BeatController {
             next(error);
         }
     }
+
     async likeToggle(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             // Has built in 404 Throw
             const beat = await beatService.getBeatById(+req.params.id);
             const beatId = beat.id;
@@ -200,41 +154,23 @@ class BeatController {
             next(error);
         }
     }
+
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             // Has built in 404 Throw
             const beat = await beatService.getBeatById(+req.params.id);
             if (req.user!.id !== beat.userId) {
                 return next(ApiError.UnauthorizedUser());
             }
             await beatService.deleteBeat(beat);
-            return res.json(beat);
+            return res.json('success');
         } catch (error) {
             next(error);
         }
     }
+
     async edit(req: Request, res: Response, next: NextFunction) {
         try {
-            // express validator errors
-            const errors = validationResult(req);
-            if (!errors.isEmpty()) {
-                return next(
-                    ApiError.BadRequest(
-                        'Data validation error.',
-                        errors.array()
-                    )
-                );
-            }
             // Has built in 404 Throw
             const beatOriginal = await beatService.getBeatById(+req.params.id);
             if (req.user!.id !== beatOriginal.userId) {

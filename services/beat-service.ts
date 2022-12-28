@@ -1,7 +1,6 @@
 import PrismaClient from '@prisma/client';
 const prisma = new PrismaClient.PrismaClient();
 import aws from 'aws-sdk';
-import { UploadedFile } from 'express-fileupload';
 
 import ApiError from '../exceptions/api-error.js';
 import beatIndividualSelect, {
@@ -29,6 +28,7 @@ class BeatService {
         });
         return beats;
     }
+
     // find beats with query
     async findBeats(
         {
@@ -108,6 +108,7 @@ class BeatService {
         const beats = await prisma.beat.findMany(queryArgs);
         return beats;
     }
+
     async getIndividualBeat(id: number): Promise<BeatIndividualWithRelated> {
         const beatFindUniqueArgs = {
             where: {
@@ -129,6 +130,7 @@ class BeatService {
             related: relatedBeats.filter((item) => item.id !== beat.id),
         };
     }
+
     async getBeatById(id: number): Promise<PrismaClient.Beat> {
         const beat = await prisma.beat.findUnique({
             where: {
@@ -183,40 +185,40 @@ class BeatService {
     //     );
     //   }
     // }
-    validateBeatEdit(beat: BeatUploadInput) {
-        // files validation
-        // wave check
-        if (beat.wave) {
-            mediaService.validate(
-                beat.wave,
-                '.wav',
-                // 300mb
-                300 * 1024 * 1024
-            );
-        }
-        // mp3 check
-        if (beat.mp3) {
-            mediaService.validate(
-                beat.mp3,
-                '.mp3',
-                // 150mb
-                150 * 1024 * 1024
-            );
-        }
-        // image check
-        if (beat.image) {
-            mediaService.validate(beat.image, ['.png', '.jpg', '.jpeg']);
-        }
-        // stems check
-        if (beat.stems) {
-            mediaService.validate(
-                beat.stems,
-                ['.zip', '.rar'],
-                // 500mb
-                500 * 1024 * 1024
-            );
-        }
-    }
+    // validateBeatEdit(beat: BeatUploadInput) {
+    //     // files validation
+    //     // wave check
+    //     if (beat.wave) {
+    //         mediaService.validate(
+    //             beat.wave,
+    //             '.wav',
+    //             // 300mb
+    //             300 * 1024 * 1024
+    //         );
+    //     }
+    //     // mp3 check
+    //     if (beat.mp3) {
+    //         mediaService.validate(
+    //             beat.mp3,
+    //             '.mp3',
+    //             // 150mb
+    //             150 * 1024 * 1024
+    //         );
+    //     }
+    //     // image check
+    //     if (beat.image) {
+    //         mediaService.validate(beat.image, ['.png', '.jpg', '.jpeg']);
+    //     }
+    //     // stems check
+    //     if (beat.stems) {
+    //         mediaService.validate(
+    //             beat.stems,
+    //             ['.zip', '.rar'],
+    //             // 500mb
+    //             500 * 1024 * 1024
+    //         );
+    //     }
+    // }
     // async beatAwsUpload(beat: BeatUploadInput): Promise<{
     //   wave?: string;
     //   mp3?: string;
@@ -289,6 +291,7 @@ class BeatService {
         );
         return dataUploaded;
     }
+
     async beatAwsDelete(beat: PrismaClient.Beat) {
         const fileData: any = [null, null, null, null];
         fileData[0] = mediaService.deleteObject(beat.wave);
@@ -302,6 +305,7 @@ class BeatService {
         // async files deletion
         return await Promise.all(fileData);
     }
+
     async uploadBeat(beat: BeatUploadInput): Promise<PrismaClient.Beat> {
         const beatFromDb = await prisma.beat.create({
             data: beat,
@@ -311,6 +315,7 @@ class BeatService {
         });
         return beatFromDb;
     }
+    
     async editBeat(
         beatOriginal: PrismaClient.Beat,
         dataToEdit: BeatUploadInput
@@ -331,6 +336,7 @@ class BeatService {
         });
         return beatUpdated;
     }
+    
     async deleteBeat(beat: PrismaClient.Beat) {
         // delete media files from AWS S3
         await this.beatAwsDelete(beat);

@@ -17,6 +17,7 @@ class AuthorService {
         });
         return authors;
     }
+
     // find author by query (username or displayedName)
     async findAuthors(query: string, viewed = 0): Promise<Author[]> {
         const authorFindManyArgs = {
@@ -41,6 +42,7 @@ class AuthorService {
         const authors = await prisma.user.findMany(authorFindManyArgs);
         return authors;
     }
+
     // individual author data
     async getAuthorByUsername(username: string): Promise<AuthorIndividual> {
         const authorFindUniqueArgs = {

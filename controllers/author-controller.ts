@@ -20,11 +20,16 @@ class AuthorController {
                     req.query.viewed ? +req.query.viewed : 0
                 );
             }
-            return res.json(authors);
+            return res.json({authors,
+                viewed: req.query.viewed
+                ? +req.query.viewed + authors.length
+                : authors.length,
+            });
         } catch (error) {
             next(error);
         }
     }
+
     // get individual author data
     async getIndividualAuthor(req: Request, res: Response, next: NextFunction) {
         try {
