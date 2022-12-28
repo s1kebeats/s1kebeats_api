@@ -56,7 +56,7 @@ model Beat {
   userId     Int
   downloads  Int     @default(0)
   plays      Int     @default(0)
-  image      String  @default("")
+  image      String?
   wave       String
   mp3        String
   stems      String?

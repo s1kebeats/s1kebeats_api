@@ -15,11 +15,11 @@ app.use(fileUpload());
 app.use(express.json({ limit: '1000mb' }));
 app.use(cookieParser());
 app.use(
-    cors({
-        credentials: true,
-        // nuxt server url
-        origin: process.env.CLIENT_URL,
-    })
+  cors({
+    credentials: true,
+    // nuxt server url
+    origin: process.env.CLIENT_URL,
+  })
 );
 
 // router

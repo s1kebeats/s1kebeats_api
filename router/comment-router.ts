@@ -5,16 +5,12 @@ import authMiddleware from '../middlewares/auth-middleware.js';
 const router = Router();
 
 router.get(
-    '/:id',
-    param('id').isDecimal().bail(),
-    authMiddleware,
-    query('viewed').if(query('viewed').exists()).isDecimal().bail(),
-    commentController.getComments
+  '/:id',
+  param('id').isDecimal().bail(),
+  authMiddleware,
+  query('viewed').if(query('viewed').exists()).isDecimal().bail(),
+  commentController.getComments
 );
-router.post(
-    '/delete/:id',
-    param('id').isDecimal().bail(),
-    commentController.deleteComment
-);
+router.post('/delete/:id', param('id').isDecimal().bail(), commentController.deleteComment);
 
 export default router;
