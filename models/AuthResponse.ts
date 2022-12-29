@@ -1,4 +1,4 @@
-import UserDto from '../dtos/user-dto.js';
+import UserDto from "../dtos/user-dto.js";
 
 export default interface AuthResponse {
   accessToken: string;

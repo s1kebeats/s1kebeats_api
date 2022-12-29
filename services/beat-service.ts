@@ -1,11 +1,11 @@
-import PrismaClient from '@prisma/client';
+import PrismaClient from "@prisma/client";
 const prisma = new PrismaClient.PrismaClient();
-import aws from 'aws-sdk';
+import aws from "aws-sdk";
 
-import ApiError from '../exceptions/api-error.js';
-import beatIndividualSelect, { BeatIndividual } from '../prisma-selects/beat-individual-select.js';
-import beatSelect, { Beat } from '../prisma-selects/beat-select.js';
-import mediaService from './media-service.js';
+import ApiError from "../exceptions/api-error.js";
+import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select.js";
+import beatSelect, { Beat } from "../prisma-selects/beat-select.js";
+import mediaService from "./media-service.js";
 
 export interface BeatIndividualWithRelated extends BeatIndividual {
   related: Beat[];
@@ -34,7 +34,7 @@ class BeatService {
   ): Promise<Beat[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};
     const orderBy: PrismaClient.Prisma.BeatOrderByWithRelationInput = {
-      id: 'asc',
+      id: "asc",
     };
     const queryArgs = {
       orderBy: orderBy,
@@ -45,11 +45,11 @@ class BeatService {
     };
 
     if (order) {
-      if (order[0] !== 'H' && order[0] !== 'L') {
-        throw ApiError.BadRequest('Wrong order.');
+      if (order[0] !== "H" && order[0] !== "L") {
+        throw ApiError.BadRequest("Wrong order.");
       }
       queryArgs.orderBy = {
-        [order.slice(1)]: order[0] === 'H' ? 'desc' : 'asc',
+        [order.slice(1)]: order[0] === "H" ? "desc" : "asc",
       };
     }
     // query in beat name / author name
@@ -59,7 +59,7 @@ class BeatService {
           {
             name: {
               contains: q,
-              mode: 'insensitive',
+              mode: "insensitive",
             },
           },
           {
@@ -68,13 +68,13 @@ class BeatService {
                 {
                   username: {
                     contains: q,
-                    mode: 'insensitive',
+                    mode: "insensitive",
                   },
                 },
                 {
                   displayedName: {
                     contains: q,
-                    mode: 'insensitive',
+                    mode: "insensitive",
                   },
                 },
               ],
@@ -139,11 +139,11 @@ class BeatService {
   parseTagsString(tags: string): PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[] {
     tags = JSON.parse(tags);
     if (!Array.isArray(tags)) {
-      throw ApiError.BadRequest('Wrong tags.');
+      throw ApiError.BadRequest("Wrong tags.");
     }
     tags.forEach((tag: PrismaClient.Tag) => {
       if (!tag.name) {
-        throw ApiError.BadRequest('Wrong tags.');
+        throw ApiError.BadRequest("Wrong tags.");
       }
     });
     // prisma client ConnectOrCreate syntax
@@ -319,18 +319,20 @@ class BeatService {
   async uploadBeat(data: PrismaClient.Prisma.BeatCreateInput): Promise<BeatIndividual> {
     const beat = await prisma.beat.create({
       data,
-      ...beatIndividualSelect
+      ...beatIndividualSelect,
     });
     return beat;
   }
 
-  async editBeat(beatId: number, data: PrismaClient.Prisma.BeatUpdateInput): Promise<void> {
-    await prisma.beat.update({
+  async editBeat(beatId: number, data: PrismaClient.Prisma.BeatUpdateInput): Promise<BeatIndividual> {
+    const beat = await prisma.beat.update({
       where: {
         id: beatId,
       },
       data,
+      ...beatIndividualSelect,
     });
+    return beat;
   }
 
   async deleteBeat(beat: PrismaClient.Beat) {

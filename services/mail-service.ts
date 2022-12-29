@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer from "nodemailer";
 
 class MailService {
   transporter: nodemailer.Transporter;
@@ -20,7 +20,7 @@ class MailService {
     await this.transporter.sendMail({
       from: process.env.SMTP_USER,
       to,
-      subject: 'Активация аккаунта на ' + process.env.BASE_URL,
+      subject: "Активация аккаунта на " + process.env.BASE_URL,
       html: `
                     <div>
                         <h1>Для активации перейдите по ссылке:</h1>

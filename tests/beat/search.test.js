@@ -1,6 +1,6 @@
-import request from 'supertest';
-import assert from 'assert';
-import app from '../../build/app.js';
+import request from "supertest";
+import assert from "assert";
+import app from "../../build/app.js";
 
 // Beats for test: [
 //   {
@@ -88,62 +88,62 @@ import app from '../../build/app.js';
 //     ],
 //   },
 // ];
-describe('Beats filtering and ordering', () => {
-  it('Only GET', async () => {
-    const res = await request(app).post('/api/beat/');
+describe("Beats filtering and ordering", () => {
+  it("Only GET", async () => {
+    const res = await request(app).post("/api/beat/");
     assert.equal(res.statusCode, 404);
   });
-  it('No query', async () => {
-    const res = await request(app).get('/api/beat/');
+  it("No query", async () => {
+    const res = await request(app).get("/api/beat/");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 4);
   });
-  it('Filter with tags: 7,3', async () => {
-    const res = await request(app).get('/api/beat/?tags=7,3');
+  it("Filter with tags: 7,3", async () => {
+    const res = await request(app).get("/api/beat/?tags=7,3");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 4);
   });
-  it('Filter with tags: 7', async () => {
-    const res = await request(app).get('/api/beat/?tags=7');
+  it("Filter with tags: 7", async () => {
+    const res = await request(app).get("/api/beat/?tags=7");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 1);
-    assert.equal(res.body.beats[0].name, 'outtahere');
+    assert.equal(res.body.beats[0].name, "outtahere");
   });
-  it('Filter with text: s1kebeats', async () => {
-    const res = await request(app).get('/api/beat/?q=s1kebeats');
+  it("Filter with text: s1kebeats", async () => {
+    const res = await request(app).get("/api/beat/?q=s1kebeats");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 4);
     // Beats with name or author username, containing text query
-    assert.equal(res.body.beats.map((item) => item.user.username).includes('s1kebeats'), true);
+    assert.equal(res.body.beats.map((item) => item.user.username).includes("s1kebeats"), true);
   });
-  it('Filter with text: outta', async () => {
-    const res = await request(app).get('/api/beat/?q=outta');
+  it("Filter with text: outta", async () => {
+    const res = await request(app).get("/api/beat/?q=outta");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 1);
     // Beats with name or author username, containing text query
-    assert.equal(res.body.beats[0].name, 'outtahere');
+    assert.equal(res.body.beats[0].name, "outtahere");
   });
-  it('Filter with bpm', async () => {
-    const res = await request(app).get('/api/beat/?bpm=140');
+  it("Filter with bpm", async () => {
+    const res = await request(app).get("/api/beat/?bpm=140");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 2);
-    assert.equal(res.body.beats[0].name, 'Chaze');
-    assert.equal(res.body.beats[1].name, 'Turnt');
+    assert.equal(res.body.beats[0].name, "Chaze");
+    assert.equal(res.body.beats[1].name, "Turnt");
   });
-  it('Order by wavePrice H(higher)', async () => {
-    const res = await request(app).get('/api/beat/?sort=HwavePrice');
+  it("Order by wavePrice H(higher)", async () => {
+    const res = await request(app).get("/api/beat/?sort=HwavePrice");
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.beats[0].name, 'outtahere');
+    assert.equal(res.body.beats[0].name, "outtahere");
   });
-  it('Order by wavePrice L(lower)', async () => {
-    const res = await request(app).get('/api/beat/?sort=LwavePrice');
+  it("Order by wavePrice L(lower)", async () => {
+    const res = await request(app).get("/api/beat/?sort=LwavePrice");
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.beats[0].name, 'Chaze');
+    assert.equal(res.body.beats[0].name, "Chaze");
   });
-  it('Filter with both bpm and text', async () => {
-    const res = await request(app).get('/api/beat/?q=s1kebeats&bpm=122');
+  it("Filter with both bpm and text", async () => {
+    const res = await request(app).get("/api/beat/?q=s1kebeats&bpm=122");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.beats.length, 1);
-    assert.equal(res.body.beats[0].name, 'outtahere');
+    assert.equal(res.body.beats[0].name, "outtahere");
   });
 });

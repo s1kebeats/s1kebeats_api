@@ -1,12 +1,10 @@
-import PrismaClient from '@prisma/client';
+import PrismaClient from "@prisma/client";
 const prisma = new PrismaClient.PrismaClient();
 
 class CommentService {
-  async uploadComment(commentPayload: PrismaClient.Prisma.CommentCreateManyInput) {
+  async uploadComment(data: PrismaClient.Prisma.CommentCreateInput) {
     const comment = await prisma.comment.create({
-      data: {
-        ...commentPayload,
-      },
+      data
     });
     return comment;
   }

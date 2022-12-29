@@ -1,4 +1,4 @@
-import PrismaClient from '@prisma/client';
+import PrismaClient from "@prisma/client";
 const beatForAuthorSelect = PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()({
   select: {
     id: true,

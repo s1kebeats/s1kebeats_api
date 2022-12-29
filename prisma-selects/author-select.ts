@@ -1,4 +1,4 @@
-import PrismaClient from '@prisma/client';
+import PrismaClient from "@prisma/client";
 const authorSelect = PrismaClient.Prisma.validator<PrismaClient.Prisma.UserArgs>()({
   select: {
     id: true,

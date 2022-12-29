@@ -1,8 +1,8 @@
-import aws from 'aws-sdk';
-import { UploadedFile } from 'express-fileupload';
-import { nanoid } from 'nanoid';
-import path from 'path';
-import ApiError from '../exceptions/api-error.js';
+import aws from "aws-sdk";
+import { UploadedFile } from "express-fileupload";
+import { nanoid } from "nanoid";
+import path from "path";
+import ApiError from "../exceptions/api-error.js";
 
 const awsConfig: aws.S3.ClientConfiguration = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
@@ -21,7 +21,7 @@ class MediaService {
       // multiple
       if (Array.isArray(extensions)) {
         if (!extensions.includes(ext)) {
-          throw ApiError.BadRequest(`Send file in ${extensions.join('/')} format.`);
+          throw ApiError.BadRequest(`Send file in ${extensions.join("/")} format.`);
         }
       } else {
         // single
@@ -39,32 +39,32 @@ class MediaService {
   }
   validateMedia(file: UploadedFile, path: string) {
     switch (path) {
-      case 'image': {
-        this.validate(file, ['.png', '.jpg', '.jpeg']);
+      case "image": {
+        this.validate(file, [".png", ".jpg", ".jpeg"]);
         break;
       }
-      case 'mp3': {
+      case "mp3": {
         this.validate(
           file,
-          '.mp3',
+          ".mp3",
           // 150mb
           150 * 1024 * 1024
         );
         break;
       }
-      case 'wav': {
+      case "wav": {
         this.validate(
           file,
-          '.wav',
+          ".wav",
           // 300mb
           300 * 1024 * 1024
         );
         break;
       }
-      case 'stems': {
+      case "stems": {
         this.validate(
           file,
-          ['.zip', '.rar'],
+          [".zip", ".rar"],
           // 500mb
           500 * 1024 * 1024
         );

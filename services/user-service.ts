@@ -1,12 +1,12 @@
-import PrismaClient from '@prisma/client';
-import bcrypt from 'bcrypt';
-import { nanoid } from 'nanoid';
+import PrismaClient from "@prisma/client";
+import bcrypt from "bcrypt";
+import { nanoid } from "nanoid";
 
-import UserDto from '../dtos/user-dto.js';
-import mailService from './mail-service.js';
-import tokenService from './token-service.js';
-import ApiError from '../exceptions/api-error.js';
-import AuthResponse from '../models/AuthResponse.js';
+import UserDto from "../dtos/user-dto.js";
+import mailService from "./mail-service.js";
+import tokenService from "./token-service.js";
+import ApiError from "../exceptions/api-error.js";
+import AuthResponse from "../models/AuthResponse.js";
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -29,7 +29,7 @@ class UserService {
     email,
     username,
     password,
-  }: Pick<PrismaClient.Prisma.UserCreateInput, 'email' | 'username' | 'password'>): Promise<void> {
+  }: Pick<PrismaClient.Prisma.UserCreateInput, "email" | "username" | "password">): Promise<void> {
     // check if username is already registered
     const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
       where: { username },
@@ -62,7 +62,7 @@ class UserService {
       },
     });
     if (!user) {
-      throw ApiError.BadRequest('Wrong activation link.');
+      throw ApiError.BadRequest("Wrong activation link.");
     }
     // update user isActivated state to true
     await prisma.user.update({

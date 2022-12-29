@@ -1,15 +1,15 @@
-import ApiError from '../exceptions/api-error.js';
-import beatService, { BeatUploadInput } from '../services/beat-service.js';
-import { Request, Response, NextFunction } from 'express';
-import UserDto from '../dtos/user-dto.js';
-import PrismaClient from '@prisma/client';
-import commentService from '../services/comment-service.js';
-import likeService from '../services/like-service.js';
-import { Beat } from '../prisma-selects/beat-select.js';
-import { BeatIndividual } from '../prisma-selects/beat-individual-select.js';
-import mediaService from '../services/media-service.js';
+import ApiError from "../exceptions/api-error.js";
+import beatService, { BeatUploadInput } from "../services/beat-service.js";
+import { Request, Response, NextFunction } from "express";
+import UserDto from "../dtos/user-dto.js";
+import PrismaClient from "@prisma/client";
+import commentService from "../services/comment-service.js";
+import likeService from "../services/like-service.js";
+import { Beat } from "../prisma-selects/beat-select.js";
+import { BeatIndividual } from "../prisma-selects/beat-individual-select.js";
+import mediaService from "../services/media-service.js";
 // req.user
-declare module 'express-serve-static-core' {
+declare module "express-serve-static-core" {
   interface Request {
     user?: UserDto;
   }
@@ -26,7 +26,7 @@ class BeatController {
         };
         // ids string to array of ids
         if (req.query.tags) {
-          query.tags = (req.query.tags as string).split(',').map((item) => +item);
+          query.tags = (req.query.tags as string).split(",").map((item) => +item);
         }
         beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
       } else {
@@ -65,7 +65,7 @@ class BeatController {
 
         stemsPrice,
         wavePrice,
-        
+
         wave,
         mp3,
         stems,
@@ -77,24 +77,24 @@ class BeatController {
         bpm: +bpm,
         description,
         tags: {
-          connectOrCreate: tags.split(',').map((tag: string) => {
+          connectOrCreate: tags.split(",").map((tag: string) => {
             return {
               where: { name: tag },
               create: { name: tag },
             };
-          })
+          }),
         },
 
         stemsPrice: +stemsPrice,
         wavePrice: +wavePrice,
-        
+
         wave,
         mp3,
         stems,
         image,
 
         user: {
-          connect: {  id: userId }
+          connect: { id: userId },
         },
       }))(req.body);
       const beat = await beatService.uploadBeat(payload);
@@ -104,17 +104,76 @@ class BeatController {
     }
   }
 
+  async edit(req: Request, res: Response, next: NextFunction) {
+    try {
+      const userId = req.user!.id;
+      const original = await beatService.getBeatById(+req.params.id);
+      if (userId !== original.userId) {
+        return next(ApiError.UnauthorizedUser());
+      }
+      const payload: PrismaClient.Prisma.BeatUpdateInput = (({
+        name,
+        bpm,
+        description,
+        tags,
+
+        wavePrice,
+        stemsPrice,
+
+        image,
+        wave,
+        mp3,
+        stems,
+      }) => ({
+        name,
+        bpm: +bpm,
+        description,
+        tags: {
+          connectOrCreate: tags.split(",").map((tag: string) => {
+            return {
+              where: { name: tag },
+              create: { name: tag },
+            };
+          }),
+        },
+
+        wavePrice: +wavePrice,
+        stemsPrice: +stemsPrice,
+
+        image,
+        wave,
+        mp3,
+        stems,
+      }))(req.body);
+      const mediaFileKeys = ["mp3", "wave", "stems", "image"] as const;
+      for (const key of mediaFileKeys) {
+        if (payload[key] && original[key]) {
+          mediaService.deleteObject(original[key]!);
+        }
+      }
+      const beat = await beatService.editBeat(original.id, payload);
+      return res.json(beat);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   async comment(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.user!.id;
       const id = +req.params.id;
       // has error throw inside, if beat doesn't exist
       const beat = await beatService.getBeatById(id);
-      const commentCandidate: PrismaClient.Prisma.CommentCreateManyInput = {
-        userId: req.user!.id,
-        beatId: beat.id,
+      const payload: PrismaClient.Prisma.CommentCreateInput = {
+        user: {
+          connect: { id: userId },
+        },
+        beat: {
+          connect: { id: beat.id }
+        },
         content: req.body.content,
       };
-      const comment = await commentService.uploadComment(commentCandidate);
+      const comment = await commentService.uploadComment(payload);
       return res.json(comment);
     } catch (error) {
       next(error);
@@ -123,18 +182,18 @@ class BeatController {
 
   async likeToggle(req: Request, res: Response, next: NextFunction) {
     try {
-      // Has built in 404 Throw
-      const beat = await beatService.getBeatById(+req.params.id);
-      const beatId = beat.id;
       const userId = req.user!.id;
+      const id = +req.params.id;
+      // Has built in 404 Throw
+      const beat = await beatService.getBeatById(id);
       let like: PrismaClient.Like | null;
-      like = await likeService.getLikeByIdentifier(beatId, userId);
+      like = await likeService.getLikeByIdentifier(beat.id, userId);
       if (like) {
         // delete the like from db
-        like = await likeService.deleteLike(beatId, userId);
+        like = await likeService.deleteLike(beat.id, userId);
       } else {
         // create like
-        like = await likeService.createLike(beatId, userId);
+        like = await likeService.createLike(beat.id, userId);
       }
       return res.json(like);
     } catch (error) {
@@ -144,50 +203,15 @@ class BeatController {
 
   async delete(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.user!.id;
+      const id = +req.params.id;
       // Has built in 404 Throw
-      const beat = await beatService.getBeatById(+req.params.id);
-      if (req.user!.id !== beat.userId) {
+      const beat = await beatService.getBeatById(id);
+      if (userId !== beat.userId) {
         return next(ApiError.UnauthorizedUser());
       }
       await beatService.deleteBeat(beat);
-      return res.json('success');
-    } catch (error) {
-      next(error);
-    }
-  }
-
-  async edit(req: Request, res: Response, next: NextFunction) {
-    try {
-      const original = await beatService.getBeatById(+req.params.id);
-      if (req.user!.id !== original.userId) {
-        return next(ApiError.UnauthorizedUser());
-      }
-      const payload: { [key: string]: string } = (({ mp3, wave, stems, image, name, tags }) => ({
-        mp3,
-        wave,
-        stems,
-        image,
-        name,
-        tags,
-      }))(req.body);
-      for (const key of Object.keys(payload)) {
-        if ((key === 'mp3' || key === 'wave' || key === 'stems' || key === 'image') && original[key]) {
-          mediaService.deleteObject(original[key]!);
-        }
-      }
-      const data: PrismaClient.Prisma.BeatUpdateInput = (({ tags, bpm, stemsPrice, wavePrice, ...rest }) => ({
-        bpm: +bpm,
-        stemsPrice: +stemsPrice,
-        wavePrice: +wavePrice,
-        ...rest,
-      }))(payload);
-      if (payload.tags) {
-        data.tags = {
-          connectOrCreate: beatService.parseTagsString(payload.tags),
-        };
-      }
-      await beatService.editBeat(original.id, data);
-      return res.json('success');
+      return res.json("success");
     } catch (error) {
       next(error);
     }

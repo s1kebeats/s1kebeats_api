@@ -1,8 +1,8 @@
-import userService from '../services/user-service.js';
-import ApiError from '../exceptions/api-error.js';
-import { Request, Response, NextFunction } from 'express';
-import PrismaClient from '@prisma/client';
-import mediaService from '../services/media-service.js';
+import userService from "../services/user-service.js";
+import ApiError from "../exceptions/api-error.js";
+import { Request, Response, NextFunction } from "express";
+import PrismaClient from "@prisma/client";
+import mediaService from "../services/media-service.js";
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -10,14 +10,14 @@ class UserController {
       const payload: Pick<
         PrismaClient.Prisma.UserCreateInput,
         // activationLink is generated automatically, so we don't need to pass it in the payload
-        'email' | 'username' | 'password'
+        "email" | "username" | "password"
       > = (({ email, username, password }: { [key: string]: string }) => ({
         email,
         username,
         password,
       }))(req.body);
       await userService.register(payload);
-      return res.json('success');
+      return res.json("success");
     } catch (error) {
       next(error);
     }
@@ -29,11 +29,11 @@ class UserController {
       const { username, password }: { username: string; password: string } = req.body;
       const userData = await userService.login(username, password, ip);
       // set refresh token httpOnly cookie
-      res.cookie('refreshToken', userData.refreshToken, {
+      res.cookie("refreshToken", userData.refreshToken, {
         // 30 days
         maxAge: 30 * 24 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
       });
       return res.json(userData);
     } catch (error) {
@@ -50,8 +50,8 @@ class UserController {
       }
       await userService.logout(refreshToken, ip);
       // remove cookie with refresh token
-      res.clearCookie('resfreshToken');
-      return res.json('sucess');
+      res.clearCookie("resfreshToken");
+      return res.json("sucess");
     } catch (error) {
       next(error);
     }
@@ -61,7 +61,7 @@ class UserController {
     try {
       const { activationLink } = req.params;
       await userService.activate(activationLink);
-      return res.json('success');
+      return res.json("success");
     } catch (error) {
       next(error);
     }
@@ -76,11 +76,11 @@ class UserController {
       }
       const userData = await userService.refresh(refreshToken, ip);
       // update refresh token cookie
-      res.cookie('refreshToken', userData.refreshToken, {
+      res.cookie("refreshToken", userData.refreshToken, {
         // 30 days
         maxAge: 30 * 24 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
+        secure: process.env.NODE_ENV === "production",
       });
       return res.json(userData);
     } catch (error) {
@@ -107,7 +107,7 @@ class UserController {
       }
       await userService.edit(userId, payload);
 
-      return res.json('success');
+      return res.json("success");
     } catch (error) {
       next(error);
     }

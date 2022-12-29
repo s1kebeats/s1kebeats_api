@@ -1,6 +1,6 @@
-import jsonwebtoken, { JwtPayload } from 'jsonwebtoken';
-import PrismaClient from '@prisma/client';
-import UserDto from '../dtos/user-dto.js';
+import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
+import PrismaClient from "@prisma/client";
+import UserDto from "../dtos/user-dto.js";
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -10,10 +10,10 @@ class TokenService {
     refreshToken: string;
   } {
     const accessToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET!, {
-      expiresIn: '30m',
+      expiresIn: "30m",
     });
     const refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: '30d',
+      expiresIn: "30d",
     });
     return {
       accessToken,

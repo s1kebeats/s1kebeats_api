@@ -9,7 +9,7 @@ export default class ApiError extends Error {
   }
 
   static UnauthorizedUser(): ApiError {
-    return new ApiError(401, 'Not authorized');
+    return new ApiError(401, "Not authorized");
   }
   static BadRequest(message: string, errors: any[] = []): ApiError {
     return new ApiError(400, message, errors);
@@ -18,6 +18,6 @@ export default class ApiError extends Error {
     return new ApiError(404, message, errors);
   }
   static NotActivatedEmail(): ApiError {
-    return new ApiError(403, 'Email is not confirmed');
+    return new ApiError(403, "Email is not confirmed");
   }
 }
