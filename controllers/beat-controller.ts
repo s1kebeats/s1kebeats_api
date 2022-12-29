@@ -1,6 +1,5 @@
 import ApiError from '../exceptions/api-error.js';
 import beatService, { BeatUploadInput } from '../services/beat-service.js';
-import { validationResult } from 'express-validator';
 import { Request, Response, NextFunction } from 'express';
 import UserDto from '../dtos/user-dto.js';
 import PrismaClient from '@prisma/client';
