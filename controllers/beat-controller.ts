@@ -169,7 +169,7 @@ class BeatController {
           connect: { id: userId },
         },
         beat: {
-          connect: { id: beat.id }
+          connect: { id: beat.id },
         },
         content: req.body.content,
       };

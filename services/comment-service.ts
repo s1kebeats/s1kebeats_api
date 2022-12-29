@@ -4,7 +4,7 @@ const prisma = new PrismaClient.PrismaClient();
 class CommentService {
   async uploadComment(data: PrismaClient.Prisma.CommentCreateInput) {
     const comment = await prisma.comment.create({
-      data
+      data,
     });
     return comment;
   }

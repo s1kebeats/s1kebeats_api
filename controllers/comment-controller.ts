@@ -16,7 +16,7 @@ class CommentController {
         return next(ApiError.UnauthorizedUser());
       }
       await commentService.deleteComment(comment.id);
-      return res.json('success');
+      return res.json("success");
     } catch (error) {
       next(error);
     }
