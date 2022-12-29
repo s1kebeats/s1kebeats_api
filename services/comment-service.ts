@@ -24,11 +24,10 @@ class CommentService {
     });
     return comment;
   }
-  async deleteComment(commentId: number) {
-    const comment = await prisma.comment.delete({
+  async deleteComment(commentId: number): Promise<void> {
+    await prisma.comment.delete({
       where: { id: commentId },
     });
-    return comment;
   }
 }
 

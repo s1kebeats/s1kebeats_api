@@ -1,6 +1,5 @@
 import { AWSError } from "aws-sdk";
 import { Request, Response, NextFunction } from "express";
-import { validationResult } from "express-validator";
 import sharp from "sharp";
 import ApiError from "../exceptions/api-error.js";
 import mediaService from "../services/media-service.js";
@@ -8,11 +7,6 @@ import mediaService from "../services/media-service.js";
 class MediaController {
   async upload(req: Request, res: Response, next: NextFunction) {
     try {
-      // express validator errors
-      const errors = validationResult(req);
-      if (!errors.isEmpty()) {
-        return next(ApiError.BadRequest("Data validation error.", errors.array()));
-      }
       const { file, path } = req.body;
       mediaService.validateMedia(file, path);
       if (path === "image") {
