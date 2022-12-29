@@ -7,7 +7,7 @@ const prisma = new PrismaClient.PrismaClient();
 
 class AuthorService {
   // returns all authors
-  async getAuthors(viewed = 0): Promise<Author[]> {
+  async getAuthors(viewed: number): Promise<Author[]> {
     const authors = await prisma.user.findMany({
       ...authorSelect,
       take: 10,
@@ -17,7 +17,7 @@ class AuthorService {
   }
 
   // find author by query (username or displayedName)
-  async findAuthors(query: string, viewed = 0): Promise<Author[]> {
+  async findAuthors(query: string, viewed: number): Promise<Author[]> {
     const authorFindManyArgs = {
       where: {
         OR: [

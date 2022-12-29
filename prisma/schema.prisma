@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output = "../node_modules/.prisma/client/index"
+  output   = "../node_modules/.prisma/client"
 }
 
 datasource db {
@@ -14,7 +14,8 @@ datasource db {
 model Token {
   id           Int    @id @default(autoincrement())
   user         User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  userId       Int    @unique
+  userId       Int
+  ip           String @unique
   refreshToken String @unique
 }
 
@@ -25,7 +26,7 @@ model User {
   password       String
   isActivated    Boolean @default(false)
   activationLink String  @unique
-  token          Token?
+  tokens         Token[]
 
   beats    Beat[]
   comments Comment[]
@@ -34,7 +35,7 @@ model User {
   createdAt     DateTime @default(now())
   displayedName String?
   about         String?
-  image         String   @default("")
+  image         String?
 
   youtube   String?
   vk        String?
@@ -87,5 +88,6 @@ model Like {
   beat      Beat     @relation(fields: [beatId], references: [id], onDelete: Cascade)
   beatId    Int
   createdAt DateTime @default(now())
+
   @@unique([userId, beatId], name: "likeIdentifier")
 }

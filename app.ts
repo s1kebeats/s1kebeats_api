@@ -11,6 +11,13 @@ dotenv.config();
 
 const app = express();
 
+app.set('trust proxy', true);
+
+// app.use((req, res, next) => {
+//   console.log(req.get('origin'));
+//   next();
+// });
+
 app.use(fileUpload());
 app.use(express.json({ limit: '1000mb' }));
 app.use(cookieParser());

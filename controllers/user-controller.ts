@@ -2,6 +2,7 @@ import userService from '../services/user-service.js';
 import ApiError from '../exceptions/api-error.js';
 import { Request, Response, NextFunction } from 'express';
 import PrismaClient from '@prisma/client';
+import mediaService from '../services/media-service.js';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -24,8 +25,9 @@ class UserController {
 
   async login(req: Request, res: Response, next: NextFunction) {
     try {
+      const ip = req.ip;
       const { username, password }: { username: string; password: string } = req.body;
-      const userData = await userService.login(username, password);
+      const userData = await userService.login(username, password, ip);
       // set refresh token httpOnly cookie
       res.cookie('refreshToken', userData.refreshToken, {
         // 30 days
@@ -41,11 +43,12 @@ class UserController {
 
   async logout(req: Request, res: Response, next: NextFunction) {
     try {
+      const ip = req.ip;
       const { refreshToken }: { refreshToken: string } = req.cookies;
       if (!refreshToken) {
         return next(ApiError.UnauthorizedUser());
       }
-      await userService.logout(refreshToken);
+      await userService.logout(refreshToken, ip);
       // remove cookie with refresh token
       res.clearCookie('resfreshToken');
       return res.json('sucess');
@@ -66,11 +69,12 @@ class UserController {
 
   async refresh(req: Request, res: Response, next: NextFunction) {
     try {
+      const ip = req.ip;
       const { refreshToken }: { refreshToken: string } = req.cookies;
       if (!refreshToken) {
         return next(ApiError.UnauthorizedUser());
       }
-      const userData = await userService.refresh(refreshToken);
+      const userData = await userService.refresh(refreshToken, ip);
       // update refresh token cookie
       res.cookie('refreshToken', userData.refreshToken, {
         // 30 days
@@ -86,6 +90,8 @@ class UserController {
 
   async edit(req: Request, res: Response, next: NextFunction) {
     try {
+      const userId = req.user!.id;
+      const original = await userService.getUserById(userId);
       const payload: PrismaClient.Prisma.UserUpdateInput = (({
         displayedName,
         about,
@@ -96,8 +102,9 @@ class UserController {
       }: {
         [key: string]: string;
       }) => ({ displayedName, about, vk, youtube, instagram, image }))(req.body);
-      const userId = req.user!.id;
-
+      if (payload.image && original.image) {
+        mediaService.deleteObject(original.image);
+      }
       await userService.edit(userId, payload);
 
       return res.json('success');

@@ -261,46 +261,46 @@ class BeatService {
   //   });
   //   return data;
   // }
-  async beatAwsEdit(
-    beatOriginal: PrismaClient.Beat,
-    dataToEdit: BeatUploadInput
-  ): Promise<{
-    wave?: string;
-    mp3?: string;
-    image?: string;
-    stems?: string;
-  }> {
-    const fileData: any = [null, null, null, null];
-    if (dataToEdit.wave) {
-      mediaService.deleteObject(beatOriginal.wave);
-      fileData[0] = mediaService.awsUpload(dataToEdit.wave, 'wave/');
-    }
-    if (dataToEdit.mp3) {
-      mediaService.deleteObject(beatOriginal.mp3);
-      fileData[1] = mediaService.awsUpload(dataToEdit.mp3, 'mp3/');
-    }
-    if (dataToEdit.image) {
-      if (beatOriginal.image) {
-        mediaService.deleteObject(beatOriginal.image);
-      }
-      fileData[2] = mediaService.awsUpload(dataToEdit.image, 'image/');
-    }
-    if (dataToEdit.stems) {
-      if (beatOriginal.stems) {
-        mediaService.deleteObject(beatOriginal.stems);
-      }
-      fileData[3] = mediaService.awsUpload(dataToEdit.stems, 'stems/');
-    }
-    const dataUploaded = await Promise.all(fileData).then((values: aws.S3.Object[]) => {
-      return {
-        wave: values[0] ? values[0].Key : undefined,
-        mp3: values[1] ? values[1].Key : undefined,
-        image: values[2] ? values[2].Key : undefined,
-        stems: values[3] ? values[3].Key : undefined,
-      };
-    });
-    return dataUploaded;
-  }
+  // async beatAwsEdit(
+  //   beatOriginal: PrismaClient.Beat,
+  //   dataToEdit: BeatUploadInput
+  // ): Promise<{
+  //   wave?: string;
+  //   mp3?: string;
+  //   image?: string;
+  //   stems?: string;
+  // }> {
+  //   const fileData: any = [null, null, null, null];
+  //   if (dataToEdit.wave) {
+  //     mediaService.deleteObject(beatOriginal.wave);
+  //     fileData[0] = mediaService.awsUpload(dataToEdit.wave, 'wave/');
+  //   }
+  //   if (dataToEdit.mp3) {
+  //     mediaService.deleteObject(beatOriginal.mp3);
+  //     fileData[1] = mediaService.awsUpload(dataToEdit.mp3, 'mp3/');
+  //   }
+  //   if (dataToEdit.image) {
+  //     if (beatOriginal.image) {
+  //       mediaService.deleteObject(beatOriginal.image);
+  //     }
+  //     fileData[2] = mediaService.awsUpload(dataToEdit.image, 'image/');
+  //   }
+  //   if (dataToEdit.stems) {
+  //     if (beatOriginal.stems) {
+  //       mediaService.deleteObject(beatOriginal.stems);
+  //     }
+  //     fileData[3] = mediaService.awsUpload(dataToEdit.stems, 'stems/');
+  //   }
+  //   const dataUploaded = await Promise.all(fileData).then((values: aws.S3.Object[]) => {
+  //     return {
+  //       wave: values[0] ? values[0].Key : undefined,
+  //       mp3: values[1] ? values[1].Key : undefined,
+  //       image: values[2] ? values[2].Key : undefined,
+  //       stems: values[3] ? values[3].Key : undefined,
+  //     };
+  //   });
+  //   return dataUploaded;
+  // }
 
   async beatAwsDelete(beat: PrismaClient.Beat) {
     const fileData: any = [null, null, null, null];
@@ -316,14 +316,12 @@ class BeatService {
     return await Promise.all(fileData);
   }
 
-  async uploadBeat(beat: BeatUploadInput): Promise<PrismaClient.Beat> {
-    const beatFromDb = await prisma.beat.create({
-      data: beat,
-      include: {
-        tags: true,
-      },
+  async uploadBeat(data: PrismaClient.Prisma.BeatCreateInput): Promise<BeatIndividual> {
+    const beat = await prisma.beat.create({
+      data,
+      ...beatIndividualSelect
     });
-    return beatFromDb;
+    return beat;
   }
 
   async editBeat(beatId: number, data: PrismaClient.Prisma.BeatUpdateInput): Promise<void> {

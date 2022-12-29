@@ -56,45 +56,48 @@ class BeatController {
   // beat upload
   async upload(req: Request, res: Response, next: NextFunction) {
     try {
-      let tags: PrismaClient.Tag[];
-      let connectOrCreateTags: PrismaClient.Prisma.TagCreateOrConnectWithoutBeatsInput[] | undefined;
-      if (req.body.tags) {
-        tags = JSON.parse(req.body.tags);
-        if (!Array.isArray(tags)) {
-          return next(ApiError.BadRequest('Wrong tags.'));
-        }
-        tags.forEach((tag: PrismaClient.Tag) => {
-          if (!tag.name) {
-            return next(ApiError.BadRequest('Wrong tags.'));
-          }
-        });
-        // prisma client ConnectOrCreate syntax
-        connectOrCreateTags = tags.map((tag: PrismaClient.Tag) => {
-          return {
-            where: { name: tag.name },
-            create: { name: tag.name },
-          };
-        });
-      }
-      const beatCandidate: BeatUploadInput = {
-        ...req.body,
-        wavePrice: +req.body.wavePrice,
-        ...req.files,
-        userId: req.user!.id,
-      };
-      if (connectOrCreateTags) {
-        beatCandidate.tags = {
-          connectOrCreate: connectOrCreateTags,
-        };
-      }
-      // convert strings to numbers
-      if (beatCandidate.bpm) {
-        beatCandidate.bpm = +beatCandidate.bpm;
-      }
-      if (beatCandidate.stemsPrice) {
-        beatCandidate.stemsPrice = +beatCandidate.stemsPrice;
-      }
-      const beat = await beatService.uploadBeat(beatCandidate);
+      const userId = req.user!.id;
+      const payload: PrismaClient.Prisma.BeatCreateInput = (({
+        name,
+        bpm,
+        description,
+        tags,
+
+        stemsPrice,
+        wavePrice,
+        
+        wave,
+        mp3,
+        stems,
+        image,
+      }: {
+        [key: string]: string;
+      }) => ({
+        name,
+        bpm: +bpm,
+        description,
+        tags: {
+          connectOrCreate: tags.split(',').map((tag: string) => {
+            return {
+              where: { name: tag },
+              create: { name: tag },
+            };
+          })
+        },
+
+        stemsPrice: +stemsPrice,
+        wavePrice: +wavePrice,
+        
+        wave,
+        mp3,
+        stems,
+        image,
+
+        user: {
+          connect: {  id: userId }
+        },
+      }))(req.body);
+      const beat = await beatService.uploadBeat(payload);
       return res.json(beat);
     } catch (error) {
       next(error);

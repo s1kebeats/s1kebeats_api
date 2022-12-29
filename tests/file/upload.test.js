@@ -5,5 +5,6 @@ import app from '../../build/app.js';
 describe('Uploading media files', function () {
   it('Only POST', async () => {
     const res = await request(app).get('/media/upload');
+    assert.equal(res.statusCode, 404);
   });
 });

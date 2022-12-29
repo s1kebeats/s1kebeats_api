@@ -20,16 +20,17 @@ class TokenService {
       refreshToken,
     };
   }
-  async saveToken(userId: number, refreshToken: string): Promise<PrismaClient.Token> {
+  async saveToken(userId: number, ip: string, refreshToken: string): Promise<PrismaClient.Token> {
     // update existing refresh token or create new token
     const tokenUpsertArgs: PrismaClient.Prisma.TokenUpsertArgs = {
       where: {
-        userId,
+        ip,
       },
       update: {
         refreshToken,
       },
       create: {
+        ip,
         userId,
         refreshToken,
       },
@@ -38,20 +39,21 @@ class TokenService {
     return token;
   }
   // remove token for user logout
-  async removeToken(refreshToken: string): Promise<PrismaClient.Token> {
+  async removeToken(ip: string): Promise<PrismaClient.Token> {
     const tokenDeleteArgs: PrismaClient.Prisma.TokenDeleteArgs = {
       where: {
-        refreshToken,
+        ip,
       },
     };
     const token = await prisma.token.delete(tokenDeleteArgs);
     return token;
   }
   // check for token existence
-  async findToken(refreshToken: string): Promise<PrismaClient.Token | null> {
+  async findToken(refreshToken: string, ip: string): Promise<PrismaClient.Token | null> {
     const tokenFindUniqueArgs: PrismaClient.Prisma.TokenFindUniqueArgs = {
       where: {
         refreshToken,
+        ip,
       },
     };
     const token = await prisma.token.findUnique(tokenFindUniqueArgs);

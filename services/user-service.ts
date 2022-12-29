@@ -12,13 +12,13 @@ const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
   // tokens and login/register dto generator
-  async generateData(user: PrismaClient.User): Promise<AuthResponse> {
+  async generateData(user: PrismaClient.User, ip: string): Promise<AuthResponse> {
     // remove confidentional information from user data
     const userDto = new UserDto(user);
     // generate tokens
     const tokens = tokenService.generateTokens(userDto);
     // save resfresh token in DB
-    await tokenService.saveToken(userDto.id, tokens.refreshToken);
+    await tokenService.saveToken(userDto.id, ip, tokens.refreshToken);
     return {
       ...tokens,
       user: userDto,
@@ -75,9 +75,8 @@ class UserService {
     });
   }
 
-  async login(username: string, password: string): Promise<AuthResponse> {
-    let user: PrismaClient.User | null;
-    user = await prisma.user.findUnique({
+  async login(username: string, password: string, ip: string): Promise<AuthResponse> {
+    const user = await prisma.user.findUnique({
       where: { username },
     });
     if (!user) {
@@ -92,24 +91,24 @@ class UserService {
       throw ApiError.UnauthorizedUser();
     }
     // create tokens and user DTO
-    const data = await this.generateData(user);
+    const data = await this.generateData(user, ip);
     return data;
   }
 
-  async logout(refreshToken: string): Promise<void> {
-    const token = await tokenService.findToken(refreshToken);
+  async logout(refreshToken: string, ip: string): Promise<void> {
+    const token = await tokenService.findToken(refreshToken, ip);
     if (!token) {
       throw ApiError.UnauthorizedUser();
     }
     // delete refresh token
-    await tokenService.removeToken(refreshToken);
+    await tokenService.removeToken(ip);
   }
 
-  async refresh(refreshToken: string): Promise<AuthResponse> {
+  async refresh(refreshToken: string, ip: string): Promise<AuthResponse> {
     // user data decoded from refresh token
     const userData = tokenService.validateRefreshToken(refreshToken);
     // check if token is in database
-    const tokenFromDb = await tokenService.findToken(refreshToken);
+    const tokenFromDb = await tokenService.findToken(refreshToken, ip);
     if (!userData || !tokenFromDb) {
       throw ApiError.UnauthorizedUser();
     }
@@ -118,7 +117,7 @@ class UserService {
       where: { id: userData.id },
     });
     // re-generate tokens and DTO
-    const data = await this.generateData(user!);
+    const data = await this.generateData(user!, ip);
     return data;
   }
 
@@ -128,6 +127,16 @@ class UserService {
       data: payload,
     };
     await prisma.user.update(userUpdateArgs);
+  }
+
+  async getUserById(id: number): Promise<PrismaClient.User> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+    });
+    if (!user) {
+      throw ApiError.NotFound(`User was not found.`);
+    }
+    return user;
   }
 }
 

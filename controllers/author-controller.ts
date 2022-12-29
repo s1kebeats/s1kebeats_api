@@ -1,6 +1,5 @@
 import authorService from '../services/author-service.js';
 import { Request, Response, NextFunction } from 'express';
-import PrismaClient from '@prisma/client';
 import { Author } from '../prisma-selects/author-select.js';
 import { AuthorIndividual } from '../prisma-selects/author-individual-select.js';
 

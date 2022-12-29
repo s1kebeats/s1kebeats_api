@@ -2,6 +2,7 @@
 CREATE TABLE "Token" (
     "id" SERIAL NOT NULL,
     "userId" INTEGER NOT NULL,
+    "ip" TEXT NOT NULL,
     "refreshToken" TEXT NOT NULL,
 
     CONSTRAINT "Token_pkey" PRIMARY KEY ("id")
@@ -18,7 +19,7 @@ CREATE TABLE "User" (
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "displayedName" TEXT,
     "about" TEXT,
-    "image" TEXT NOT NULL DEFAULT '',
+    "image" TEXT,
     "youtube" TEXT,
     "vk" TEXT,
     "instagram" TEXT,
@@ -36,7 +37,7 @@ CREATE TABLE "Beat" (
     "userId" INTEGER NOT NULL,
     "downloads" INTEGER NOT NULL DEFAULT 0,
     "plays" INTEGER NOT NULL DEFAULT 0,
-    "image" TEXT NOT NULL DEFAULT '',
+    "image" TEXT,
     "wave" TEXT NOT NULL,
     "mp3" TEXT NOT NULL,
     "stems" TEXT,
@@ -82,7 +83,7 @@ CREATE TABLE "_BeatToTag" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "Token_userId_key" ON "Token"("userId");
+CREATE UNIQUE INDEX "Token_ip_key" ON "Token"("ip");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "Token_refreshToken_key" ON "Token"("refreshToken");
@@ -109,7 +110,7 @@ CREATE INDEX "_BeatToTag_B_index" ON "_BeatToTag"("B");
 ALTER TABLE "Token" ADD CONSTRAINT "Token_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Beat" ADD CONSTRAINT "Beat_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "Beat" ADD CONSTRAINT "Beat_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "Comment" ADD CONSTRAINT "Comment_userId_fkey" FOREIGN KEY ("userId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;

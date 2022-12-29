@@ -5,7 +5,7 @@ export default class UserDto {
   username: string;
   id: number;
   isActivated: boolean;
-  image: string;
+  image: string | null;
 
   constructor(model: User) {
     this.email = model.email;
