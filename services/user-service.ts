@@ -97,7 +97,7 @@ class UserService {
 
   async logout(refreshToken: string, ip: string): Promise<void> {
     const token = await tokenService.findToken(refreshToken);
-    if (!token) {
+    if (!token || token.ip !== ip) {
       throw ApiError.UnauthorizedUser();
     }
     // delete refresh token
