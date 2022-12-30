@@ -15,23 +15,6 @@ describe("User logout", () => {
     const res = await request(app).post("/api/logout").set("Cookie", ["refreshToken=randomToken"]);
     assert.equal(res.statusCode, 401);
   });
-  it("Different IP's", async () => {
-    const login = await request(app).post("/api/login").set("X-Forwarded-For", "ip1").send({
-      username: "s1kebeats",
-      password: "Sbeats2005",
-    });
-    const refreshToken = login.body.refreshToken;
-    const logout = await request(app)
-      .post("/api/logout")
-      .set("X-Forwarded-For", "ip2")
-      .set("Cookie", ["refreshToken=" + refreshToken]);
-    assert.equal(logout.statusCode, 401);
-    // token should be deleted from database
-    const refreshWithDeletedToken = await request(app)
-      .get("/api/refresh")
-      .set("Cookie", ["refreshToken=" + refreshToken]);
-    assert.equal(refreshWithDeletedToken.statusCode, 401);
-  });
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
