@@ -30,10 +30,14 @@ router.post(
   userController.login
 );
 
-// users profile data editing
+// users data editing
 router.post(
   "/edit",
   authMiddleware,
+  body("username")
+    .if(body("username").exists())
+    .matches(/^[0-9a-zA-Z]+$/)
+    .bail(),
   body("displayedName").if(body("displayedName").exists()).isLength({ max: 255 }).bail(),
   body("about").if(body("about").exists()).isLength({ max: 255 }).bail(),
   body("youtube").if(body("youtube").exists()).isLength({ max: 255 }).bail(),

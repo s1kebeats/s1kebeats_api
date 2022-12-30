@@ -47,11 +47,11 @@ describe("User login", () => {
     const res = await request(app)
       .post("/api/login")
       .send({
-        login: "s1kebeats",
+        username: "s1kebeats",
         password: "randompassword",
       })
       .set("Content-Type", "application/json");
-    assert.equal(res.statusCode, 400);
+    assert.equal(res.statusCode, 401);
   });
   it("Wrong username", async () => {
     const res = await request(app)
@@ -61,6 +61,6 @@ describe("User login", () => {
         password: "Sbeats2005",
       })
       .set("Content-Type", "application/json");
-    assert.equal(res.statusCode, 400);
+    assert.equal(res.statusCode, 401);
   });
 });

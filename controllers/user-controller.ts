@@ -9,7 +9,7 @@ class UserController {
     try {
       const payload: Pick<
         PrismaClient.Prisma.UserCreateInput,
-        // activationLink is generated automatically, so we don't need to pass it in the payload
+        // activationLink is generated automatically, so we don't need to pass it in the payload type
         "email" | "username" | "password"
       > = (({ email, username, password }: { [key: string]: string }) => ({
         email,
@@ -93,6 +93,7 @@ class UserController {
       const userId = req.user!.id;
       const original = await userService.getUserById(userId);
       const payload: PrismaClient.Prisma.UserUpdateInput = (({
+        username,
         displayedName,
         about,
         vk,
@@ -101,7 +102,8 @@ class UserController {
         image,
       }: {
         [key: string]: string;
-      }) => ({ displayedName, about, vk, youtube, instagram, image }))(req.body);
+      }) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
+      // delete old profile image, if it's updated
       if (payload.image && original.image) {
         mediaService.deleteObject(original.image);
       }

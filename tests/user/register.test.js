@@ -97,25 +97,17 @@ describe("User registration", () => {
       .post("/api/register")
       .send({
         email: "adacenkoboos@gmail.com",
-        username: "s1kebeat2s",
+        username: "s1kebeats",
         password: "Sbeats2005",
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 200);
-    const login = await request(app)
-      .post("/api/login")
-      .send({
-        username: "s1kebeat2s",
-        password: "Sbeats2005",
-      })
-      .set("Content-Type", "application/json");
-    assert.equal(login.statusCode, 403);
   });
   it("Already used username", async () => {
     const res = await request(app)
       .post("/api/register")
       .send({
-        email: "random@email.com",
+        email: "adacenkoboos@gmail.com",
         username: "s1kebeats",
         password: "Sbeats2005",
       })
