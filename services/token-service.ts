@@ -33,7 +33,7 @@ class TokenService {
         ip,
         refreshToken,
         user: {
-          connect: { id: userId }
+          connect: { id: userId },
         },
       },
     };

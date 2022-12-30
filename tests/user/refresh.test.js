@@ -25,12 +25,12 @@ describe("Refresh user tokens", () => {
         username: "s1kebeats",
         password: "Sbeats2005",
       })
-      .set('X-Forwarded-For', 'ip1')
+      .set("X-Forwarded-For", "ip1")
       .set("Content-Type", "application/json");
     const refresh = await request(app)
       .get("/api/refresh")
       .set("Cookie", ["refreshToken=" + login.body.refreshToken])
-      .set('X-Forwarded-For', 'ip2')
+      .set("X-Forwarded-For", "ip2")
       .set("Content-Type", "application/json");
     assert.equal(refresh.statusCode, 401);
   });
