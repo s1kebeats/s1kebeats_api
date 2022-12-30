@@ -32,8 +32,7 @@ describe("User data editing", () => {
     const res = await request(app)
       .post("/api/edit")
       .set("Authorization", "Bearer " + accessToken)
-      .field("about", "User about")
-      .attach("image", "tests/files/test.jpg");
+      .send("");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.about, "User about");
     const image = await request(app).get("/api/file/" + res.body.image);
