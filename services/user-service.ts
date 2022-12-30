@@ -96,7 +96,7 @@ class UserService {
   }
 
   async logout(refreshToken: string, ip: string): Promise<void> {
-    const token = await tokenService.findToken(refreshToken, ip);
+    const token = await tokenService.findToken(refreshToken);
     if (!token) {
       throw ApiError.UnauthorizedUser();
     }
@@ -108,8 +108,8 @@ class UserService {
     // user data decoded from refresh token
     const userData = tokenService.validateRefreshToken(refreshToken);
     // check if token is in database
-    const tokenFromDb = await tokenService.findToken(refreshToken, ip);
-    if (!userData || !tokenFromDb) {
+    const tokenFromDb = await tokenService.findToken(refreshToken);
+    if (!userData || !tokenFromDb || tokenFromDb.ip !== ip) {
       throw ApiError.UnauthorizedUser();
     }
     // find user

@@ -31,8 +31,10 @@ class TokenService {
       },
       create: {
         ip,
-        userId,
         refreshToken,
+        user: {
+          connect: { id: userId }
+        },
       },
     };
     const token = await prisma.token.upsert(tokenUpsertArgs);
@@ -49,14 +51,12 @@ class TokenService {
     return token;
   }
   // check for token existence
-  async findToken(refreshToken: string, ip: string): Promise<PrismaClient.Token | null> {
-    const tokenFindUniqueArgs: PrismaClient.Prisma.TokenFindUniqueArgs = {
+  async findToken(refreshToken: string): Promise<PrismaClient.Token | null> {
+    const token = await prisma.token.findUnique({
       where: {
         refreshToken,
-        ip,
       },
-    };
-    const token = await prisma.token.findUnique(tokenFindUniqueArgs);
+    });
     return token;
   }
   // decode data from given tokens
