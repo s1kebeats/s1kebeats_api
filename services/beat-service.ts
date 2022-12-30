@@ -29,7 +29,7 @@ class BeatService {
 
   // find beats with query
   async findBeats(
-    { tags = [], q, bpm, order }: { q?: string; bpm?: string; order?: string; tags?: number[] },
+    { q, bpm, tags, order }: { q?: string; bpm?: string; tags?: string[]; order?: string },
     viewed = 0
   ): Promise<Beat[]> {
     const where: PrismaClient.Prisma.BeatWhereInput = {};

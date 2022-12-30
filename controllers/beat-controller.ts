@@ -21,13 +21,12 @@ class BeatController {
     try {
       let beats: Beat[];
       if (Object.keys(req.query).length) {
-        const query: { [key: string]: string | number[] } = {
-          ...(req.query as { [key: string]: string }),
-        };
-        // ids string to array of ids
-        if (req.query.tags) {
-          query.tags = (req.query.tags as string).split(",").map((item) => +item);
-        }
+        const query: { q?: string; bpm?: string; tags?: string[]; order?: string } = (({ q, bpm, tags, order }) => ({
+          q,
+          bpm,
+          tags: tags.split(","),
+          order,
+        }))(req.query as { [key: string]: string });
         beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
       } else {
         // get all beats
