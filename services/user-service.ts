@@ -56,7 +56,7 @@ class UserService {
 
   async activate(activationLink: string): Promise<void> {
     // validate activation link
-    let user = await prisma.user.findUnique({
+    const user = await prisma.user.findUnique({
       where: {
         activationLink,
       },

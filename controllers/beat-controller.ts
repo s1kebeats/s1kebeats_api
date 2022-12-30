@@ -1,5 +1,5 @@
 import ApiError from "../exceptions/api-error.js";
-import beatService, { BeatUploadInput } from "../services/beat-service.js";
+import beatService from "../services/beat-service.js";
 import { Request, Response, NextFunction } from "express";
 import UserDto from "../dtos/user-dto.js";
 import PrismaClient from "@prisma/client";
@@ -21,11 +21,16 @@ class BeatController {
     try {
       let beats: Beat[];
       if (Object.keys(req.query).length) {
-        const query: { q?: string; bpm?: string; tags?: string[]; order?: string } = (({ q, bpm, tags, order }) => ({
+        const query: { q?: string; bpm?: number; tags?: string[]; orderBy?: string } = (({
           q,
           bpm,
+          tags,
+          orderBy,
+        }) => ({
+          q,
+          bpm: +bpm,
           tags: tags.split(","),
-          order,
+          orderBy,
         }))(req.query as { [key: string]: string });
         beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
       } else {
