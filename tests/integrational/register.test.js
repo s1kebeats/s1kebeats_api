@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../../build/app.js";
+import app from "../../build/app.js";
 
 it("Register + login", async function () {
   const register = await request(app)

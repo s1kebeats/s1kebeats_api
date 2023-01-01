@@ -156,9 +156,7 @@ describe("Beat upload", () => {
     assert.equal(res.statusCode, 400);
   });
   it("Not authorized", async () => {
-    const res = await request(app)
-      .post("/api/beat/upload")
-      .send(data);
+    const res = await request(app).post("/api/beat/upload").send(data);
     assert.equal(res.statusCode, 401);
   });
   it("Success", async () => {

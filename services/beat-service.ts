@@ -22,13 +22,19 @@ class BeatService {
   }
 
   formatBeatOrderBy(orderBy: string): PrismaClient.Prisma.BeatAvgOrderByAggregateInput {
-    return orderBy.includes("Lower")
-      ? {
-          [orderBy.slice(0, -5)]: "asc",
-        }
-      : {
-          [orderBy.slice(0, -6)]: "desc",
-        };
+    if (orderBy.includes("Lower")) {
+      return {
+        [orderBy.slice(0, -5)]: "asc",
+      };
+    }
+    if (orderBy.includes("Higher")) {
+      return {
+        [orderBy.slice(0, -6)]: "desc",
+      };
+    }
+    return {
+      id: "desc",
+    };
   }
 
   // find beats with query

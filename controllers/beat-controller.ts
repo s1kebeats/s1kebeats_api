@@ -28,8 +28,8 @@ class BeatController {
           orderBy,
         }) => ({
           q,
-          bpm: +bpm,
-          tags: tags.split(","),
+          bpm: bpm ? +bpm : undefined,
+          tags: tags ? tags.split(",") : undefined,
           orderBy,
         }))(req.query as { [key: string]: string });
         beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
@@ -78,21 +78,23 @@ class BeatController {
         [key: string]: string;
       }) => ({
         name,
-        bpm: +bpm,
+        bpm: bpm ? +bpm : undefined,
         description,
-        tags: {
-          connectOrCreate: tags.split(",").map((tag: string) => {
-            if (!tag.match(/^[0-9a-zA-Z]+$/)) {
-              throw ApiError.BadRequest("Wrong tags");
+        tags: tags
+          ? {
+              connectOrCreate: tags.split(",").map((tag: string) => {
+                if (!tag.match(/^[0-9a-zA-Z]+$/)) {
+                  throw ApiError.BadRequest("Wrong tags");
+                }
+                return {
+                  where: { name: tag },
+                  create: { name: tag },
+                };
+              }),
             }
-            return {
-              where: { name: tag },
-              create: { name: tag },
-            };
-          }),
-        },
+          : undefined,
 
-        stemsPrice: +stemsPrice,
+        stemsPrice: stemsPrice ? +stemsPrice : undefined,
         wavePrice: +wavePrice,
 
         wave,
