@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 describe("Beat editing", () => {
   it("POST only", async () => {
@@ -22,7 +22,7 @@ describe("Beat editing", () => {
   });
   it("Success: name, description", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -40,7 +40,7 @@ describe("Beat editing", () => {
   it("Success: image", async () => {
     const notEditedBeat = await request(app).get("/api/beat/1");
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;

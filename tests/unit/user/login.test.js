@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 describe("User login", () => {
   it("Only POST", async () => {

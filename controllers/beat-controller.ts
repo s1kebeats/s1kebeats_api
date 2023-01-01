@@ -82,6 +82,9 @@ class BeatController {
         description,
         tags: {
           connectOrCreate: tags.split(",").map((tag: string) => {
+            if (!tag.match(/^[0-9a-zA-Z]+$/)) {
+              throw ApiError.BadRequest("Wrong tags");
+            }
             return {
               where: { name: tag },
               create: { name: tag },

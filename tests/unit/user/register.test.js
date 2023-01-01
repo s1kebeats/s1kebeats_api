@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 describe("User registration", () => {
   it("Only POST", async () => {
@@ -92,17 +92,6 @@ describe("User registration", () => {
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 400);
   });
-  it("Success", async () => {
-    const res = await request(app)
-      .post("/api/register")
-      .send({
-        email: "adacenkoboos@gmail.com",
-        username: "s1kebeats",
-        password: "Sbeats2005",
-      })
-      .set("Content-Type", "application/json");
-    assert.equal(res.statusCode, 200);
-  });
   it("Already used username", async () => {
     const res = await request(app)
       .post("/api/register")
@@ -113,5 +102,16 @@ describe("User registration", () => {
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 400);
+  });
+  it("Success", async () => {
+    const res = await request(app)
+      .post("/api/register")
+      .send({
+        email: "adacenkoboos@gmail.com",
+        username: "s1kebeats",
+        password: "Sbeats2005",
+      })
+      .set("Content-Type", "application/json");
+    assert.equal(res.statusCode, 200);
   });
 });

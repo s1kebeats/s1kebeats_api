@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 // Beat for tests: { id: 21, name: 'Chaze', user: { username: 's1kebeats' }, comments[0]: { content: 'Comment content' } }
 describe("Get individual beat data", () => {

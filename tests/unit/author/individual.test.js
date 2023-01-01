@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 // Author for tests: { username: 's1kebeats', beats: 4 }
 describe("Author individual data", () => {

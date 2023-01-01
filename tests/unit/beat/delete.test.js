@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 describe("Beat deletion", () => {
   it("Only POST", async () => {
@@ -24,7 +24,7 @@ describe("Beat deletion", () => {
   });
   it("Not existing beat", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -35,7 +35,7 @@ describe("Beat deletion", () => {
   });
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;

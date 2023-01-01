@@ -12,11 +12,14 @@ router.post(
   body("name").notEmpty().bail().isLength({ max: 255 }).bail(),
   // wavePrice required, numeric
   body("wavePrice").notEmpty().bail().isDecimal().bail(),
-  body("wave").notEmpty().bail(),
-  body("mp3").notEmpty().bail(),
+  body("wave").notEmpty().bail().contains("wave/").bail(),
+  body("mp3").notEmpty().bail().contains("mp3/").bail(),
   // stemsPrice numeric
-  body("stemsPrice").if(body("stems").exists()).notEmpty().bail().if(body("stemsPrice").exists()).isDecimal().bail(),
+  body("stemsPrice").if(body("stemsPrice").exists()).isDecimal().bail(),
+  body("stemsPrice").if(body("stems").exists()).notEmpty().bail(),
+  body("stems").if(body("stems").exists()).contains("stems/").bail(),
   body("stems").if(body("stemsPrice").exists()).notEmpty().bail(),
+  body("image").if(body("image").exists()).contains("image/").bail(),
   // bpm numeric
   body("bpm").if(body("bpm").exists()).isDecimal().bail(),
   // description 255 characters max

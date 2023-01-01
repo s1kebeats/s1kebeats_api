@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 describe("Liking beats", () => {
   it("Only POST", async () => {
@@ -28,7 +28,7 @@ describe("Liking beats", () => {
   });
   it("Adding like", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -41,7 +41,7 @@ describe("Liking beats", () => {
   });
   it("Removing the like", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "sbeats2005",
     });
     const accessToken = login.body.accessToken;

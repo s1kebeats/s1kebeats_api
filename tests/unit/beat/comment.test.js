@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../../build/app.js";
+import app from "../../../build/app.js";
 
 // Beat for tests: { id: 21 }
 describe("Beat commenting", () => {
@@ -15,7 +15,7 @@ describe("Beat commenting", () => {
   it("No comment content", async () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -27,7 +27,7 @@ describe("Beat commenting", () => {
   it("Not existing beat", async () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -43,7 +43,7 @@ describe("Beat commenting", () => {
   it("Non-numberic beat id", async () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
@@ -58,7 +58,7 @@ describe("Beat commenting", () => {
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
