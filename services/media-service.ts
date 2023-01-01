@@ -76,7 +76,7 @@ class MediaService {
   async awsUpload(file: UploadedFile, path: string): Promise<aws.S3.Object> {
     const params: aws.S3.PutObjectRequest = {
       Bucket: process.env.AWS_BUCKET_NAME!,
-      Key: path + nanoid(36),
+      Key: path + '/' + nanoid(36),
       Body: file.data,
     };
     return s3.upload(params).promise();
