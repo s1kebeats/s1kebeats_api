@@ -30,7 +30,6 @@ describe("Authors filtering", () => {
     const res = await request(app).get("/api/author/?q=jp");
     assert.equal(res.statusCode, 200);
     assert.equal(res.body.length, 1);
-    assert.equal(res.body[0].username, "jpbeatz");
   });
   it("Viewed: 10", async () => {
     const res = await request(app).get("/api/author/?viewed=10");

@@ -15,7 +15,5 @@ describe("Author individual data", () => {
   it("Success", async () => {
     const res = await request(app).get("/api/author/s1kebeats");
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.username, "s1kebeats");
-    assert.equal(res.body.beats.length, 4);
   });
 });

@@ -106,6 +106,10 @@ it("Upload 3 beats from 3 accounts + search", async () => {
   const s1kebeatsQ = await request(app).get("/api/beat/?q=s1ke");
   assert.equal(s1kebeatsQ.body.beats.length, 2, "q=s1ke");
 
+  // s1kebeats in name + 120 bpm
+  const s1kebeatsQ120Bpm = await request(app).get("/api/beat/?q=s1ke&bpm=120");
+  assert.equal(s1kebeatsQ120Bpm.body.beats.length, 0, "q=s1ke&bpm=120");
+
   const orderByStemsPrice = await request(app).get("/api/beat/?orderBy=stemsPriceLower");
   assert.equal(orderByStemsPrice.body.beats.length, 3, "orderByStemsPrice");
   assert.equal(orderByStemsPrice.body.beats[0].name, "Chaze", "orderByStemsPrice");
