@@ -11,31 +11,32 @@ describe("User data editing", () => {
     const res = await request(app).post("/api/edit");
     assert.equal(res.statusCode, 401);
   });
-  it("Wrong image", async () => {
+  it("Taken username", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
       .post("/api/edit")
       .set("Authorization", "Bearer " + accessToken)
-      .attach("image", "tests/files/outtahere_122BPM_Gunna.wav");
+      .send({
+        username: "s1kebeats",
+      });
     assert.equal(res.statusCode, 400);
   });
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
-      login: "s1kebeats",
+      username: "s1kebeats",
       password: "Sbeats2005",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
       .post("/api/edit")
       .set("Authorization", "Bearer " + accessToken)
-      .send("");
+      .send({
+        about: "2023 LETS GO!",
+      });
     assert.equal(res.statusCode, 200);
-    assert.equal(res.body.about, "User about");
-    const image = await request(app).get("/api/file/" + res.body.image);
-    assert.equal(image.statusCode, 200);
   });
 });

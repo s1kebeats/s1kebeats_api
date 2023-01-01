@@ -36,7 +36,7 @@ describe("Uploading media files", function () {
     const res = await request(app)
       .post("/api/media/upload")
       .set("Authorization", "Bearer " + accessToken)
-      .attach("file", "tests/files/outtahere_122BPM_Gunna.wav")
+      .attach("file", "tests/files/outtahere_122BPM_Gunna.wav");
     assert.equal(res.statusCode, 400);
   });
   it("Wrong image", async () => {

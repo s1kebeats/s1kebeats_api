@@ -122,12 +122,14 @@ class UserService {
   }
 
   async edit(userId: number, payload: PrismaClient.Prisma.UserUpdateInput): Promise<void> {
-    // check if username isn't already registered
-    const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
-      where: { username: payload.username as string },
-    });
-    if (existingUser) {
-      throw ApiError.BadRequest(`Username "${payload.username}" is already taken.`);
+    if (payload.username) {
+      // check if username isn't already registered
+      const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
+        where: { username: payload.username as string },
+      });
+      if (existingUser) {
+        throw ApiError.BadRequest(`Username "${payload.username}" is already taken.`);
+      }
     }
     const userUpdateArgs: PrismaClient.Prisma.UserUpdateArgs = {
       where: { id: userId },
