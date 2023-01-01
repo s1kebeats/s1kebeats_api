@@ -2,7 +2,7 @@ import request from "supertest";
 import assert from "assert";
 import app from "../../build/app.js";
 
-it("Upload media + get uploaded media", async function () {
+it("Upload a media + get an uploaded media", async function () {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Sbeats2005",
