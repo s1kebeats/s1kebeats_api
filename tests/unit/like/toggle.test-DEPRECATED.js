@@ -29,7 +29,7 @@ describe("Liking beats", () => {
   it("Adding like", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -42,7 +42,7 @@ describe("Liking beats", () => {
   it("Removing the like", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)

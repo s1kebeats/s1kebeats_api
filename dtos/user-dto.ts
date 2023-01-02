@@ -4,14 +4,14 @@ export default class UserDto {
   email: string;
   username: string;
   id: number;
-  isActivated: boolean;
   image: string | null;
+  displayedName: string | null;
 
   constructor(model: User) {
+    this.id = model.id;
     this.email = model.email;
     this.username = model.username;
-    this.id = model.id;
-    this.isActivated = model.isActivated;
+    this.displayedName = model.displayedName;
     this.image = model.image;
   }
 }

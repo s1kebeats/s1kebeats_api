@@ -8,12 +8,12 @@ it("Register + login", async function () {
     .send({
       email: "adacenkoboos@gmail.com",
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     })
     .set("Content-Type", "application/json");
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
-    password: "Sbeats2005",
+    password: "Password1234",
   });
   // email not confirmed
   assert.equal(login.statusCode, 403);

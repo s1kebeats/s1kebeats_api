@@ -25,7 +25,7 @@ describe("Beat deletion", () => {
   it("Not existing beat", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -36,7 +36,7 @@ describe("Beat deletion", () => {
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)

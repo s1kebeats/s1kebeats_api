@@ -137,14 +137,17 @@ class BeatController {
         name,
         bpm: +bpm,
         description,
-        tags: {
-          connectOrCreate: tags.split(",").map((tag: string) => {
-            return {
-              where: { name: tag },
-              create: { name: tag },
-            };
-          }),
-        },
+        tags: tags
+          ? {
+              set: [],
+              connectOrCreate: tags.split(",").map((tag: string) => {
+                return {
+                  where: { name: tag },
+                  create: { name: tag },
+                };
+              }),
+            }
+          : undefined,
 
         wavePrice: +wavePrice,
         stemsPrice: +stemsPrice,
@@ -154,6 +157,10 @@ class BeatController {
         mp3,
         stems,
       }))(req.body);
+      const merged = { ...original, ...payload };
+      if ((merged.stemsPrice && !merged.stems) || (merged.stems && !merged.stemsPrice)) {
+        return next(ApiError.BadRequest("Provide both stems and stems price"));
+      }
       const mediaFileKeys = ["mp3", "wave", "stems", "image"] as const;
       for (const key of mediaFileKeys) {
         if (payload[key] && original[key]) {

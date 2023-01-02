@@ -26,7 +26,7 @@ describe("Beat upload", () => {
   it("No beat name", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -38,7 +38,7 @@ describe("Beat upload", () => {
   it("No beat wavePrice", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -50,7 +50,7 @@ describe("Beat upload", () => {
   it("No beat wave", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -62,7 +62,7 @@ describe("Beat upload", () => {
   it("No beat mp3", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -74,7 +74,7 @@ describe("Beat upload", () => {
   it("stemsPrice without stems archive", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -86,7 +86,7 @@ describe("Beat upload", () => {
   it("stems archive without stemsPrice", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -98,7 +98,7 @@ describe("Beat upload", () => {
   it("Wrong stems archive", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -110,7 +110,7 @@ describe("Beat upload", () => {
   it("Wrong wave", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -122,7 +122,7 @@ describe("Beat upload", () => {
   it("Wrong mp3", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -134,7 +134,7 @@ describe("Beat upload", () => {
   it("Wrong image extension", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -146,7 +146,7 @@ describe("Beat upload", () => {
   it("Wrong tags", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -162,7 +162,7 @@ describe("Beat upload", () => {
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)

@@ -16,7 +16,7 @@ describe("Beat commenting", () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -28,7 +28,7 @@ describe("Beat commenting", () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -44,7 +44,7 @@ describe("Beat commenting", () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -59,7 +59,7 @@ describe("Beat commenting", () => {
     const login = await request(app).post("/api/login").send({
       // Activated user, created for tests
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)

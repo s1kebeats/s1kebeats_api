@@ -16,8 +16,8 @@ class UserController {
         username,
         password,
       }))(req.body);
-      await userService.register(payload);
-      return res.json("success");
+      const userDto = await userService.register(payload);
+      return res.json(userDto);
     } catch (error) {
       next(error);
     }

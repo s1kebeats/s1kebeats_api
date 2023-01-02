@@ -5,7 +5,7 @@ import app from "../../build/app.js";
 it("Upload a media + get an uploaded media", async function () {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
-    password: "Sbeats2005",
+    password: "Password1234",
   });
   const accessToken = login.body.accessToken;
   const upload = await request(app)

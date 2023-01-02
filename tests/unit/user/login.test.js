@@ -22,7 +22,7 @@ describe("User login", () => {
   it("Not activated user", async () => {
     const res = await request(app).post("/api/login").send({
       username: "datsenkoboos",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     assert.equal(res.statusCode, 403);
   });
@@ -41,7 +41,7 @@ describe("User login", () => {
       .post("/api/login")
       .send({
         username: "randonusername",
-        password: "Sbeats2005",
+        password: "Password1234",
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 401);
@@ -51,7 +51,7 @@ describe("User login", () => {
       .post("/api/login")
       .send({
         username: "s1kebeats",
-        password: "Sbeats2005",
+        password: "Password1234",
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 200);

@@ -14,7 +14,7 @@ const data = {
 it("Upload image + edit user data + get the user", async function () {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
-    password: "Sbeats2005",
+    password: "Password1234",
   });
   const accessToken = login.body.accessToken;
   const image = await request(app)

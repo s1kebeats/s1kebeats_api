@@ -18,7 +18,7 @@ describe("User logout", () => {
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const refreshToken = login.body.refreshToken;
     const logout = await request(app)

@@ -29,7 +29,7 @@ class UserService {
     email,
     username,
     password,
-  }: Pick<PrismaClient.Prisma.UserCreateInput, "email" | "username" | "password">): Promise<void> {
+  }: Pick<PrismaClient.Prisma.UserCreateInput, "email" | "username" | "password">): Promise<UserDto> {
     // check if username is already registered
     const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
       where: { username },
@@ -49,9 +49,11 @@ class UserService {
         activationLink,
       },
     };
-    await prisma.user.create(userCreateArgs);
+    const user = await prisma.user.create(userCreateArgs);
     // send email with activation link
     await mailService.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
+    const userDto = new UserDto(user);
+    return userDto;
   }
 
   async activate(activationLink: string): Promise<void> {

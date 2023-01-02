@@ -60,12 +60,13 @@ router.post(
   "/:id/edit",
   authMiddleware,
   param("id").isDecimal().bail(),
-  // name required, 255 characters max
   body("name").if(body("name").exists()).isLength({ max: 255 }).bail(),
-  // wavePrice required, numeric
   body("wavePrice").if(body("wavePrice").exists()).isDecimal().bail(),
-  // stemsPrice numeric
+  body("wave").if(body("wave").exists()).contains("wave/").bail(),
+  body("mp3").if(body("mp3").exists()).contains("mp3/").bail(),
   body("stemsPrice").if(body("stemsPrice").exists()).isDecimal().bail(),
+  body("stems").if(body("stems").exists()).contains("stems/").bail(),
+  body("image").if(body("image").exists()).contains("image/").bail(),
   // bpm numeric
   body("bpm").if(body("bpm").exists()).isDecimal().bail(),
   // description 255 characters max

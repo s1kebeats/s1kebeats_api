@@ -48,11 +48,11 @@ const beats = [
 const accounts = [
   {
     username: "s1kebeats",
-    password: "Sbeats2005",
+    password: "Password1234",
   },
   {
     username: "datsenkoboos",
-    password: "Sbeats2005",
+    password: "Password1234",
   },
 ];
 

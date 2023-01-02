@@ -98,7 +98,7 @@ describe("User registration", () => {
       .send({
         email: "adacenkoboos@gmail.com",
         username: "s1kebeats",
-        password: "Sbeats2005",
+        password: "Password1234",
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 400);
@@ -109,7 +109,7 @@ describe("User registration", () => {
       .send({
         email: "adacenkoboos@gmail.com",
         username: "s1kebeats",
-        password: "Sbeats2005",
+        password: "Password1234",
       })
       .set("Content-Type", "application/json");
     assert.equal(res.statusCode, 200);

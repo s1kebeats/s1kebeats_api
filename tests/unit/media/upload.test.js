@@ -17,7 +17,7 @@ describe("Uploading media files", function () {
   it("No file", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -30,7 +30,7 @@ describe("Uploading media files", function () {
   it("No path", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -42,7 +42,7 @@ describe("Uploading media files", function () {
   it("Wrong image", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -55,7 +55,7 @@ describe("Uploading media files", function () {
   it("Wrong stems", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -68,7 +68,7 @@ describe("Uploading media files", function () {
   it("Wrong mp3", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -81,7 +81,7 @@ describe("Uploading media files", function () {
   it("Wrong wav", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
@@ -94,7 +94,7 @@ describe("Uploading media files", function () {
   it("Success", async () => {
     const login = await request(app).post("/api/login").send({
       username: "s1kebeats",
-      password: "Sbeats2005",
+      password: "Password1234",
     });
     const accessToken = login.body.accessToken;
     const res = await request(app)
