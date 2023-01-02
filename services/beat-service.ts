@@ -86,13 +86,15 @@ class BeatService {
         bpm: {
           equals: bpm,
         },
-        tags: {
-          some: {
-            name: {
-              in: tags,
-            },
-          },
-        },
+        tags: tags
+          ? {
+              some: {
+                name: {
+                  in: tags,
+                },
+              },
+            }
+          : undefined,
       },
     };
     const beats = await prisma.beat.findMany({ ...queryArgs, ...beatSelect });
