@@ -1,0 +1,6 @@
+{
+  "watch": ["src"],
+  "ext": ".ts",
+  "ignore": [],
+  "exec": "esbuild ./src/app.ts --bundle --platform=node --packages=external --outfile=build/app.js && node ./build/app.js"
+}
