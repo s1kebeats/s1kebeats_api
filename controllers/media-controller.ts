@@ -2,8 +2,8 @@ import { AWSError } from "aws-sdk";
 import { Request, Response, NextFunction } from "express";
 import { UploadedFile } from "express-fileupload";
 import sharp from "sharp";
-import ApiError from "../exceptions/api-error.js";
-import mediaService from "../services/media-service.js";
+import ApiError from "../exceptions/api-error";
+import mediaService from "../services/media-service";
 
 class MediaController {
   async upload(req: Request, res: Response, next: NextFunction) {

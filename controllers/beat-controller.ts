@@ -1,13 +1,13 @@
-import ApiError from "../exceptions/api-error.js";
-import beatService from "../services/beat-service.js";
+import ApiError from "../exceptions/api-error";
+import beatService from "../services/beat-service";
 import { Request, Response, NextFunction } from "express";
-import UserDto from "../dtos/user-dto.js";
+import UserDto from "../dtos/user-dto";
 import PrismaClient from "@prisma/client";
-import commentService from "../services/comment-service.js";
-import likeService from "../services/like-service.js";
-import { Beat } from "../prisma-selects/beat-select.js";
-import { BeatIndividual } from "../prisma-selects/beat-individual-select.js";
-import mediaService from "../services/media-service.js";
+import commentService from "../services/comment-service";
+import likeService from "../services/like-service";
+import { Beat } from "../prisma-selects/beat-select";
+import { BeatIndividual } from "../prisma-selects/beat-individual-select";
+import mediaService from "../services/media-service";
 // req.user
 declare module "express-serve-static-core" {
   interface Request {

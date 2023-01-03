@@ -1,10 +1,10 @@
-import userRouter from "./user-router.js";
-import authorRouter from "./author-router.js";
-import beatRouter from "./beat-router.js";
-import mediaRouter from "./media-router.js";
+import userRouter from "./user-router";
+import authorRouter from "./author-router";
+import beatRouter from "./beat-router";
+import mediaRouter from "./media-router";
 import { Router } from "express";
-import commentRouter from "./comment-router.js";
-import tagRouter from "./tag-router.js";
+import commentRouter from "./comment-router";
+import tagRouter from "./tag-router";
 
 const router = Router();
 

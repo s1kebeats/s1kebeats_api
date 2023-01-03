@@ -1,7 +1,7 @@
-import authorService from "../services/author-service.js";
+import authorService from "../services/author-service";
 import { Request, Response, NextFunction } from "express";
-import { Author } from "../prisma-selects/author-select.js";
-import { AuthorIndividual } from "../prisma-selects/author-individual-select.js";
+import { Author } from "../prisma-selects/author-select";
+import { AuthorIndividual } from "../prisma-selects/author-individual-select";
 
 class AuthorController {
   async getAuthors(req: Request, res: Response, next: NextFunction) {

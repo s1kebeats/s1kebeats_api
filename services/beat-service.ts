@@ -1,10 +1,10 @@
 import PrismaClient from "@prisma/client";
 const prisma = new PrismaClient.PrismaClient();
 
-import ApiError from "../exceptions/api-error.js";
-import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select.js";
-import beatSelect, { Beat } from "../prisma-selects/beat-select.js";
-import mediaService from "./media-service.js";
+import ApiError from "../exceptions/api-error";
+import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select";
+import beatSelect, { Beat } from "../prisma-selects/beat-select";
+import mediaService from "./media-service";
 
 export interface BeatIndividualWithRelated extends BeatIndividual {
   related: Beat[];

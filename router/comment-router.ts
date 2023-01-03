@@ -1,8 +1,8 @@
 import { Router } from "express";
 import { query, param } from "express-validator";
-import commentController from "../controllers/comment-controller.js";
-import authMiddleware from "../middlewares/auth-middleware.js";
-import validationMiddleware from "../middlewares/validation-middleware.js";
+import commentController from "../controllers/comment-controller";
+import authMiddleware from "../middlewares/auth-middleware";
+import validationMiddleware from "../middlewares/validation-middleware";
 const router = Router();
 
 router.get(

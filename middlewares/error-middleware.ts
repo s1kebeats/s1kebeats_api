@@ -1,4 +1,4 @@
-import ApiError from "../exceptions/api-error.js";
+import ApiError from "../exceptions/api-error";
 import { Request, Response, NextFunction } from "express";
 
 export default function (err: Error, req: Request, res: Response, next: NextFunction): Response {

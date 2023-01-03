@@ -1,6 +1,6 @@
 import PrismaClient from "@prisma/client";
 import { Request, Response, NextFunction } from "express";
-import tagService from "../services/tag-service.js";
+import tagService from "../services/tag-service";
 
 class TagController {
   async getTags(req: Request, res: Response, next: NextFunction) {

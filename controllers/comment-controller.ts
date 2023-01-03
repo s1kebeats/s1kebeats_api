@@ -1,7 +1,7 @@
 import { NextFunction, Request, Response } from "express";
-import ApiError from "../exceptions/api-error.js";
-import beatService from "../services/beat-service.js";
-import commentService from "../services/comment-service.js";
+import ApiError from "../exceptions/api-error";
+import beatService from "../services/beat-service";
+import commentService from "../services/comment-service";
 
 class CommentController {
   async deleteComment(req: Request, res: Response, next: NextFunction) {

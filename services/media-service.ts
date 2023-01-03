@@ -2,7 +2,7 @@ import aws from "aws-sdk";
 import { UploadedFile } from "express-fileupload";
 import { nanoid } from "nanoid";
 import path from "path";
-import ApiError from "../exceptions/api-error.js";
+import ApiError from "../exceptions/api-error";
 
 const awsConfig: aws.S3.ClientConfiguration = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,

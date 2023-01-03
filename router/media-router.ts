@@ -1,9 +1,9 @@
 import { Router } from "express";
 const router = Router();
 import { body } from "express-validator";
-import authMiddleware from "../middlewares/auth-middleware.js";
-import mediaController from "../controllers/media-controller.js";
-import validationMiddleware from "../middlewares/validation-middleware.js";
+import authMiddleware from "../middlewares/auth-middleware";
+import mediaController from "../controllers/media-controller";
+import validationMiddleware from "../middlewares/validation-middleware";
 
 // getting media
 router.get("/:path/:key", mediaController.getMedia);

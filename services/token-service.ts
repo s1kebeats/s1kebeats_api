@@ -1,6 +1,6 @@
 import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
 import PrismaClient from "@prisma/client";
-import UserDto from "../dtos/user-dto.js";
+import UserDto from "../dtos/user-dto";
 
 const prisma = new PrismaClient.PrismaClient();
 

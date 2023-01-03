@@ -1,7 +1,7 @@
 import PrismaClient from "@prisma/client";
-import authorSelect, { Author } from "../prisma-selects/author-select.js";
-import authorIndividualSelect, { AuthorIndividual } from "../prisma-selects/author-individual-select.js";
-import ApiError from "../exceptions/api-error.js";
+import authorSelect, { Author } from "../prisma-selects/author-select";
+import authorIndividualSelect, { AuthorIndividual } from "../prisma-selects/author-individual-select";
+import ApiError from "../exceptions/api-error";
 
 const prisma = new PrismaClient.PrismaClient();
 

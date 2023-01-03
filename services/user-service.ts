@@ -2,11 +2,11 @@ import PrismaClient from "@prisma/client";
 import bcrypt from "bcrypt";
 import { nanoid } from "nanoid";
 
-import UserDto from "../dtos/user-dto.js";
-import mailService from "./mail-service.js";
-import tokenService from "./token-service.js";
-import ApiError from "../exceptions/api-error.js";
-import AuthResponse from "../models/AuthResponse.js";
+import UserDto from "../dtos/user-dto";
+import mailService from "./mail-service";
+import tokenService from "./token-service";
+import ApiError from "../exceptions/api-error";
+import AuthResponse from "../models/AuthResponse";
 
 const prisma = new PrismaClient.PrismaClient();
 

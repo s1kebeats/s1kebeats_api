@@ -1,8 +1,8 @@
-import userService from "../services/user-service.js";
-import ApiError from "../exceptions/api-error.js";
+import userService from "../services/user-service";
+import ApiError from "../exceptions/api-error";
 import { Request, Response, NextFunction } from "express";
 import PrismaClient from "@prisma/client";
-import mediaService from "../services/media-service.js";
+import mediaService from "../services/media-service";
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
