@@ -8,6 +8,7 @@ class CommentService {
     });
     return comment;
   }
+
   async getComments(beatId: number, viewed = 0) {
     const comments = await prisma.comment.findMany({
       where: {
@@ -18,12 +19,14 @@ class CommentService {
     });
     return comments;
   }
+
   async getCommentById(commentId: number) {
     const comment = await prisma.comment.findUnique({
       where: { id: commentId },
     });
     return comment;
   }
+
   async deleteComment(commentId: number): Promise<void> {
     await prisma.comment.delete({
       where: { id: commentId },

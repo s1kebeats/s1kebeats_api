@@ -2,13 +2,14 @@
   "name": "s1kebeats_api",
   "version": "1.0.0",
   "description": "",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "nodemon",
     "build": "node ./build.js",
     "format": "prettier --write .",
     "lint": "eslint --fix .",
-    "test": "jest"
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest"
   },
   "author": "",
   "license": "ISC",
@@ -21,8 +22,10 @@
     "@types/jest": "^29.2.5",
     "@types/jsonwebtoken": "^9.0.0",
     "@types/nodemailer": "^6.4.7",
+    "@types/sharp": "^0.31.1",
     "@types/supertest": "^2.0.12",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
+    "cross-env": "^7.0.3",
     "esbuild": "^0.16.13",
     "eslint": "^8.0.1",
     "eslint-config-standard-with-typescript": "^26.0.0",
@@ -60,5 +63,33 @@
       "pre-commit": "pretty-quick --staged"
     }
   },
-  "type": "module"
+  "jest": {
+    "clearMocks": true,
+    "collectCoverage": true,
+    "coverageDirectory": "coverage",
+    "moduleFileExtensions": [
+      "js",
+      "jsx",
+      "ts",
+      "tsx"
+    ],
+    "roots": [
+      "<rootDir>/src"
+    ],
+    "testEnvironment": "node",
+    "transform": {
+      "^.+\\.tsx?$": [
+        "ts-jest",
+        {
+          "useESM": true
+        }
+      ]
+    },
+    "extensionsToTreatAsEsm": [
+      ".ts"
+    ],
+    "transformIgnorePatterns": [
+      "\\\\node_modules\\\\"
+    ]
+  }
 }

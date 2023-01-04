@@ -11,7 +11,7 @@ class UserController {
         PrismaClient.Prisma.UserCreateInput,
         // activationLink is generated automatically, so we don't need to pass it in the payload type
         "email" | "username" | "password"
-      > = (({ email, username, password }: { [key: string]: string }) => ({
+      > = (({ email, username, password }: Record<string, string>) => ({
         email,
         username,
         password,
@@ -46,7 +46,8 @@ class UserController {
       const ip = req.ip;
       const { refreshToken }: { refreshToken: string } = req.cookies;
       if (!refreshToken) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       await userService.logout(refreshToken, ip);
       // remove cookie with refresh token
@@ -72,7 +73,8 @@ class UserController {
       const ip = req.ip;
       const { refreshToken }: { refreshToken: string } = req.cookies;
       if (!refreshToken) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       const userData = await userService.refresh(refreshToken, ip);
       // update refresh token cookie
@@ -100,9 +102,7 @@ class UserController {
         youtube,
         instagram,
         image,
-      }: {
-        [key: string]: string;
-      }) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
+      }: Record<string, string>) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
       // delete old profile image, if it's updated
       if (payload.image && original.image) {
         mediaService.deleteObject(original.image);

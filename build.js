@@ -8,5 +8,7 @@ esbuild
     packages: "external",
     format: "esm",
     outdir: "build",
+    sourcemap: true,
+    minify: process.env.NODE_ENV === "production",
   })
   .catch(() => process.exit(1));

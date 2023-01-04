@@ -37,6 +37,7 @@ class MediaService {
       }
     }
   }
+
   validateMedia(file: UploadedFile, path: string) {
     switch (path) {
       case "image": {
@@ -72,6 +73,7 @@ class MediaService {
       }
     }
   }
+
   // upload a file to aws s3 bucket
   async awsUpload(file: UploadedFile, path: string): Promise<aws.S3.Object> {
     const params: aws.S3.PutObjectRequest = {
@@ -79,15 +81,17 @@ class MediaService {
       Key: path + "/" + nanoid(36),
       Body: file.data,
     };
-    return s3.upload(params).promise();
+    return await s3.upload(params).promise();
   }
+
   async deleteObject(key: string) {
     const params: aws.S3.DeleteObjectRequest = {
       Key: key,
       Bucket: process.env.AWS_BUCKET_NAME!,
     };
-    return s3.deleteObject(params).promise();
+    return await s3.deleteObject(params).promise();
   }
+
   // get a file from aws s3 bucket and send it to the client
   async getMedia(key: string): Promise<aws.Request<aws.S3.GetObjectOutput, aws.AWSError>> {
     const data = await s3.getObject({

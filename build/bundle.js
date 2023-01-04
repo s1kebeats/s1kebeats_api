@@ -81,7 +81,7 @@ var MailService = class {
       yield this.transporter.sendMail({
         from: process.env.SMTP_USER,
         to,
-        subject: "\u0410\u043A\u0442\u0438\u0432\u0430\u0446\u0438\u044F \u0430\u043A\u043A\u0430\u0443\u043D\u0442\u0430 \u043D\u0430 " + process.env.BASE_URL,
+        subject: `\u0410\u043A\u0442\u0438\u0432\u0430\u0446\u0438\u044F \u0430\u043A\u043A\u0430\u0443\u043D\u0442\u0430 \u043D\u0430 ${process.env.BASE_URL}`,
         html: `
                     <div>
                         <h1>\u0414\u043B\u044F \u0430\u043A\u0442\u0438\u0432\u0430\u0446\u0438\u0438 \u043F\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435:</h1>
@@ -215,7 +215,7 @@ var UserService = class {
       const existingUser = yield prisma2.user.findUnique({
         where: { username }
       });
-      if (existingUser) {
+      if (existingUser != null) {
         throw ApiError.BadRequest(`Username "${username}" is already taken.`);
       }
       const hashedPassword = yield bcrypt.hash(password, 3);
@@ -241,7 +241,7 @@ var UserService = class {
           activationLink
         }
       });
-      if (!user) {
+      if (user == null) {
         throw ApiError.BadRequest("Wrong activation link.");
       }
       yield prisma2.user.update({
@@ -259,7 +259,7 @@ var UserService = class {
       const user = yield prisma2.user.findUnique({
         where: { username }
       });
-      if (!user) {
+      if (user == null) {
         throw ApiError.UnauthorizedUser();
       }
       if (!user.isActivated) {
@@ -276,7 +276,7 @@ var UserService = class {
   logout(refreshToken, ip) {
     return __async(this, null, function* () {
       const token = yield token_service_default.findToken(refreshToken);
-      if (!token || token.ip !== ip) {
+      if (token == null || token.ip !== ip) {
         throw ApiError.UnauthorizedUser();
       }
       yield token_service_default.removeToken(ip);
@@ -286,7 +286,7 @@ var UserService = class {
     return __async(this, null, function* () {
       const userData = token_service_default.validateRefreshToken(refreshToken);
       const tokenFromDb = yield token_service_default.findToken(refreshToken);
-      if (!userData || !tokenFromDb || tokenFromDb.ip !== ip) {
+      if (userData == null || tokenFromDb == null || tokenFromDb.ip !== ip) {
         throw ApiError.UnauthorizedUser();
       }
       const user = yield prisma2.user.findUnique({
@@ -302,7 +302,7 @@ var UserService = class {
         const existingUser = yield prisma2.user.findUnique({
           where: { username: payload.username }
         });
-        if (existingUser) {
+        if (existingUser != null) {
           throw ApiError.BadRequest(`Username "${payload.username}" is already taken.`);
         }
       }
@@ -318,8 +318,8 @@ var UserService = class {
       const user = yield prisma2.user.findUnique({
         where: { id }
       });
-      if (!user) {
-        throw ApiError.NotFound(`User was not found.`);
+      if (user == null) {
+        throw ApiError.NotFound("User was not found.");
       }
       return user;
     });
@@ -396,7 +396,7 @@ var MediaService = class {
         Key: path2 + "/" + nanoid2(36),
         Body: file.data
       };
-      return s3.upload(params).promise();
+      return yield s3.upload(params).promise();
     });
   }
   deleteObject(key) {
@@ -405,7 +405,7 @@ var MediaService = class {
         Key: key,
         Bucket: process.env.AWS_BUCKET_NAME
       };
-      return s3.deleteObject(params).promise();
+      return yield s3.deleteObject(params).promise();
     });
   }
   getMedia(key) {
@@ -460,7 +460,8 @@ var UserController = class {
         const ip = req.ip;
         const { refreshToken } = req.cookies;
         if (!refreshToken) {
-          return next(ApiError.UnauthorizedUser());
+          next(ApiError.UnauthorizedUser());
+          return;
         }
         yield user_service_default.logout(refreshToken, ip);
         res.clearCookie("resfreshToken");
@@ -487,7 +488,8 @@ var UserController = class {
         const ip = req.ip;
         const { refreshToken } = req.cookies;
         if (!refreshToken) {
-          return next(ApiError.UnauthorizedUser());
+          next(ApiError.UnauthorizedUser());
+          return;
         }
         const userData = yield user_service_default.refresh(refreshToken, ip);
         res.cookie("refreshToken", userData.refreshToken, {
@@ -538,20 +540,23 @@ function auth_middleware_default(req, res, next) {
     try {
       const authHeader = req.headers.authorization;
       if (!authHeader) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       const accessToken = authHeader.split(" ")[1];
       if (!accessToken) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       const userData = token_service_default.validateAccessToken(accessToken);
       if (!userData) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       req.user = userData;
       next();
     } catch (error) {
-      return next(ApiError.UnauthorizedUser());
+      next(ApiError.UnauthorizedUser());
     }
   });
 }
@@ -562,9 +567,10 @@ function validation_middleware_default(req, res, next) {
   return __async(this, null, function* () {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      return next(ApiError.BadRequest("Data validation error", errors.array()));
+      next(ApiError.BadRequest("Data validation error", errors.array()));
+      return;
     }
-    return next();
+    next();
   });
 }
 
@@ -702,8 +708,8 @@ var AuthorService = class {
         }
       }, author_individual_select_default);
       const author = yield prisma3.user.findUnique(authorFindUniqueArgs);
-      if (!author) {
-        throw ApiError.NotFound(`Author was not found.`);
+      if (author == null) {
+        throw ApiError.NotFound("Author was not found.");
       }
       return author;
     });
@@ -885,7 +891,7 @@ var BeatService = class {
           bpm: {
             equals: bpm
           },
-          tags: tags ? {
+          tags: tags != null ? {
             some: {
               name: {
                 in: tags
@@ -906,8 +912,8 @@ var BeatService = class {
         }
       }, beat_individual_select_default);
       const beat = yield prisma4.beat.findUnique(beatFindUniqueArgs);
-      if (!beat) {
-        throw ApiError.NotFound(`Beat was not found.`);
+      if (beat == null) {
+        throw ApiError.NotFound("Beat was not found.");
       }
       const relatedBeats = yield this.findBeats({
         tags: beat.tags.map((item) => item.name),
@@ -925,8 +931,8 @@ var BeatService = class {
           id
         }
       });
-      if (!beat) {
-        throw ApiError.NotFound(`Beat was not found.`);
+      if (beat == null) {
+        throw ApiError.NotFound("Beat was not found.");
       }
       return beat;
     });
@@ -1067,7 +1073,7 @@ var BeatController = class {
     return __async(this, null, function* () {
       try {
         let beats;
-        if (Object.keys(req.query).length) {
+        if (Object.keys(req.query).length > 0) {
           const query5 = (({
             q,
             bpm,
@@ -1124,7 +1130,7 @@ var BeatController = class {
           description,
           tags: tags ? {
             connectOrCreate: tags.split(",").map((tag) => {
-              if (!tag.match(/^[0-9a-zA-Z]+$/)) {
+              if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
                 throw ApiError.BadRequest("Wrong tags");
               }
               return {
@@ -1156,7 +1162,8 @@ var BeatController = class {
         const userId = req.user.id;
         const original = yield beat_service_default.getBeatById(+req.params.id);
         if (userId !== original.userId) {
-          return next(ApiError.UnauthorizedUser());
+          next(ApiError.UnauthorizedUser());
+          return;
         }
         const payload = (({
           name,
@@ -1191,7 +1198,8 @@ var BeatController = class {
         }))(req.body);
         const merged = __spreadValues(__spreadValues({}, original), payload);
         if (merged.stemsPrice && !merged.stems || merged.stems && !merged.stemsPrice) {
-          return next(ApiError.BadRequest("Provide both stems and stems price"));
+          next(ApiError.BadRequest("Provide both stems and stems price"));
+          return;
         }
         const mediaFileKeys = ["mp3", "wave", "stems", "image"];
         for (const key of mediaFileKeys) {
@@ -1236,7 +1244,7 @@ var BeatController = class {
         const beat = yield beat_service_default.getBeatById(id);
         let like;
         like = yield like_service_default.getLikeByIdentifier(beat.id, userId);
-        if (like) {
+        if (like != null) {
           like = yield like_service_default.deleteLike(beat.id, userId);
         } else {
           like = yield like_service_default.createLike(beat.id, userId);
@@ -1254,7 +1262,8 @@ var BeatController = class {
         const id = +req.params.id;
         const beat = yield beat_service_default.getBeatById(id);
         if (userId !== beat.userId) {
-          return next(ApiError.UnauthorizedUser());
+          next(ApiError.UnauthorizedUser());
+          return;
         }
         yield beat_service_default.deleteBeat(beat);
         return res.json("success");
@@ -1339,8 +1348,9 @@ var MediaController = class {
     return __async(this, null, function* () {
       try {
         const { path: path2 } = req.body;
-        if (!req.files || !req.files.file) {
-          return next(ApiError.BadRequest("File wasn't provided"));
+        if (req.files == null || !req.files.file) {
+          next(ApiError.BadRequest("File wasn't provided"));
+          return;
         }
         const file = req.files.file;
         media_service_default.validateMedia(file, path2);
@@ -1361,7 +1371,7 @@ var MediaController = class {
         const media = yield media_service_default.getMedia(`${path2}/${key}`);
         media.createReadStream().on("error", (error) => {
           if (error.code === "AccessDenied") {
-            return next(ApiError.NotFound("File was not found."));
+            next(ApiError.NotFound("File was not found."));
           }
         }).pipe(res);
       } catch (error) {
@@ -1393,11 +1403,13 @@ var CommentController = class {
         const userId = req.user.id;
         const id = +req.params.id;
         const comment = yield comment_service_default.getCommentById(id);
-        if (!comment) {
-          return next(ApiError.NotFound("Comment was not found."));
+        if (comment == null) {
+          next(ApiError.NotFound("Comment was not found."));
+          return;
         }
         if (comment.userId !== userId) {
-          return next(ApiError.UnauthorizedUser());
+          next(ApiError.UnauthorizedUser());
+          return;
         }
         yield comment_service_default.deleteComment(comment.id);
         return res.json("success");
@@ -1542,8 +1554,9 @@ var app_default = app;
 
 // src/server.ts
 var start = () => __async(void 0, null, function* () {
+  var _a;
   try {
-    app_default.listen(process.env.PORT || 5e3, () => {
+    app_default.listen((_a = process.env.PORT) != null ? _a : 5e3, () => {
       console.log(`Running on: http://localhost:${process.env.PORT}`);
     });
   } catch (error) {
@@ -1551,3 +1564,4 @@ var start = () => __async(void 0, null, function* () {
   }
 });
 start();
+//# sourceMappingURL=bundle.js.map

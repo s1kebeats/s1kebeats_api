@@ -34,7 +34,7 @@ class UserService {
     const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
       where: { username },
     });
-    if (existingUser) {
+    if (existingUser != null) {
       throw ApiError.BadRequest(`Username "${username}" is already taken.`);
     }
     // hash password
@@ -51,7 +51,7 @@ class UserService {
     };
     const user = await prisma.user.create(userCreateArgs);
     // send email with activation link
-    await mailService.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
+    await mailService.sendActivationMail(email, `${process.env.BASE_URL!}/api/activate/${activationLink}`);
     const userDto = new UserDto(user);
     return userDto;
   }
@@ -63,7 +63,7 @@ class UserService {
         activationLink,
       },
     });
-    if (!user) {
+    if (user == null) {
       throw ApiError.BadRequest("Wrong activation link.");
     }
     // update user isActivated state to true
@@ -81,7 +81,7 @@ class UserService {
     const user = await prisma.user.findUnique({
       where: { username },
     });
-    if (!user) {
+    if (user == null) {
       throw ApiError.UnauthorizedUser();
     }
     if (!user.isActivated) {
@@ -99,7 +99,7 @@ class UserService {
 
   async logout(refreshToken: string, ip: string): Promise<void> {
     const token = await tokenService.findToken(refreshToken);
-    if (!token || token.ip !== ip) {
+    if (token == null || token.ip !== ip) {
       throw ApiError.UnauthorizedUser();
     }
     // delete refresh token
@@ -111,7 +111,7 @@ class UserService {
     const userData = tokenService.validateRefreshToken(refreshToken);
     // check if token is in database
     const tokenFromDb = await tokenService.findToken(refreshToken);
-    if (!userData || !tokenFromDb || tokenFromDb.ip !== ip) {
+    if (userData == null || tokenFromDb == null || tokenFromDb.ip !== ip) {
       throw ApiError.UnauthorizedUser();
     }
     // find user
@@ -129,8 +129,8 @@ class UserService {
       const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
         where: { username: payload.username as string },
       });
-      if (existingUser) {
-        throw ApiError.BadRequest(`Username "${payload.username}" is already taken.`);
+      if (existingUser != null) {
+        throw ApiError.BadRequest(`Username "${payload.username as string}" is already taken.`);
       }
     }
     const userUpdateArgs: PrismaClient.Prisma.UserUpdateArgs = {
@@ -144,8 +144,8 @@ class UserService {
     const user = await prisma.user.findUnique({
       where: { id },
     });
-    if (!user) {
-      throw ApiError.NotFound(`User was not found.`);
+    if (user == null) {
+      throw ApiError.NotFound("User was not found.");
     }
     return user;
   }

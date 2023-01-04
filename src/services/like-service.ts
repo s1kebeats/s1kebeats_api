@@ -10,6 +10,7 @@ class LikeService {
     });
     return like;
   }
+
   async deleteLike(beatId: number, userId: number): Promise<PrismaClient.Like | null> {
     const like = await prisma.like.delete({
       where: {
@@ -18,6 +19,7 @@ class LikeService {
     });
     return like;
   }
+
   async createLike(beatId: number, userId: number): Promise<PrismaClient.Like | null> {
     const like = await prisma.like.create({
       data: {

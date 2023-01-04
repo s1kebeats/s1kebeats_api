@@ -1,26 +1,19 @@
 import ApiError from "../exceptions/api-error";
 import beatService from "../services/beat-service";
 import { Request, Response, NextFunction } from "express";
-import UserDto from "../dtos/user-dto";
 import PrismaClient from "@prisma/client";
 import commentService from "../services/comment-service";
 import likeService from "../services/like-service";
 import { Beat } from "../prisma-selects/beat-select";
 import { BeatIndividual } from "../prisma-selects/beat-individual-select";
 import mediaService from "../services/media-service";
-// req.user
-declare module "express-serve-static-core" {
-  interface Request {
-    user?: UserDto;
-  }
-}
 
 class BeatController {
   // find many beats
   async getBeats(req: Request, res: Response, next: NextFunction) {
     try {
       let beats: Beat[];
-      if (Object.keys(req.query).length) {
+      if (Object.keys(req.query).length > 0) {
         const query: { q?: string; bpm?: number; tags?: string[]; orderBy?: string } = (({
           q,
           bpm,
@@ -31,7 +24,7 @@ class BeatController {
           bpm: bpm ? +bpm : undefined,
           tags: tags ? tags.split(",") : undefined,
           orderBy,
-        }))(req.query as { [key: string]: string });
+        }))(req.query as Record<string, string>);
         beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
       } else {
         // get all beats
@@ -74,16 +67,14 @@ class BeatController {
         mp3,
         stems,
         image,
-      }: {
-        [key: string]: string;
-      }) => ({
+      }: Record<string, string>) => ({
         name,
         bpm: bpm ? +bpm : undefined,
         description,
         tags: tags
           ? {
               connectOrCreate: tags.split(",").map((tag: string) => {
-                if (!tag.match(/^[0-9a-zA-Z]+$/)) {
+                if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
                   throw ApiError.BadRequest("Wrong tags");
                 }
                 return {
@@ -118,7 +109,8 @@ class BeatController {
       const userId = req.user!.id;
       const original = await beatService.getBeatById(+req.params.id);
       if (userId !== original.userId) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       const payload: PrismaClient.Prisma.BeatUpdateInput = (({
         name,
@@ -159,7 +151,8 @@ class BeatController {
       }))(req.body);
       const merged = { ...original, ...payload };
       if ((merged.stemsPrice && !merged.stems) || (merged.stems && !merged.stemsPrice)) {
-        return next(ApiError.BadRequest("Provide both stems and stems price"));
+        next(ApiError.BadRequest("Provide both stems and stems price"));
+        return;
       }
       const mediaFileKeys = ["mp3", "wave", "stems", "image"] as const;
       for (const key of mediaFileKeys) {
@@ -204,7 +197,7 @@ class BeatController {
       const beat = await beatService.getBeatById(id);
       let like: PrismaClient.Like | null;
       like = await likeService.getLikeByIdentifier(beat.id, userId);
-      if (like) {
+      if (like != null) {
         // delete the like from db
         like = await likeService.deleteLike(beat.id, userId);
       } else {
@@ -224,7 +217,8 @@ class BeatController {
       // Has built in 404 Throw
       const beat = await beatService.getBeatById(id);
       if (userId !== beat.userId) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       await beatService.deleteBeat(beat);
       return res.json("success");

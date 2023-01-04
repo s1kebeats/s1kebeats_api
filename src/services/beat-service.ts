@@ -1,10 +1,10 @@
 import PrismaClient from "@prisma/client";
-const prisma = new PrismaClient.PrismaClient();
 
 import ApiError from "../exceptions/api-error";
 import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select";
 import beatSelect, { Beat } from "../prisma-selects/beat-select";
 import mediaService from "./media-service";
+const prisma = new PrismaClient.PrismaClient();
 
 export interface BeatIndividualWithRelated extends BeatIndividual {
   related: Beat[];
@@ -86,15 +86,16 @@ class BeatService {
         bpm: {
           equals: bpm,
         },
-        tags: tags
-          ? {
-              some: {
-                name: {
-                  in: tags,
+        tags:
+          tags != null
+            ? {
+                some: {
+                  name: {
+                    in: tags,
+                  },
                 },
-              },
-            }
-          : undefined,
+              }
+            : undefined,
       },
     };
     const beats = await prisma.beat.findMany({ ...queryArgs, ...beatSelect });
@@ -109,8 +110,8 @@ class BeatService {
       ...beatIndividualSelect,
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
-    if (!beat) {
-      throw ApiError.NotFound(`Beat was not found.`);
+    if (beat == null) {
+      throw ApiError.NotFound("Beat was not found.");
     }
     // related beats (beats with same tags or author)
     const relatedBeats = await this.findBeats({
@@ -129,8 +130,8 @@ class BeatService {
         id,
       },
     });
-    if (!beat) {
-      throw ApiError.NotFound(`Beat was not found.`);
+    if (beat == null) {
+      throw ApiError.NotFound("Beat was not found.");
     }
     return beat;
   }

@@ -9,8 +9,9 @@ class MediaController {
   async upload(req: Request, res: Response, next: NextFunction) {
     try {
       const { path } = req.body;
-      if (!req.files || !req.files.file) {
-        return next(ApiError.BadRequest("File wasn't provided"));
+      if (req.files == null || !req.files.file) {
+        next(ApiError.BadRequest("File wasn't provided"));
+        return;
       }
       const file = req.files.file as UploadedFile;
       mediaService.validateMedia(file, path);
@@ -34,7 +35,7 @@ class MediaController {
         .createReadStream()
         .on("error", (error: AWSError) => {
           if (error.code === "AccessDenied") {
-            return next(ApiError.NotFound("File was not found."));
+            next(ApiError.NotFound("File was not found."));
           }
         })
         .pipe(res);

@@ -9,11 +9,13 @@ class CommentController {
       const userId = req.user!.id;
       const id = +req.params.id;
       const comment = await commentService.getCommentById(id);
-      if (!comment) {
-        return next(ApiError.NotFound("Comment was not found."));
+      if (comment == null) {
+        next(ApiError.NotFound("Comment was not found."));
+        return;
       }
       if (comment.userId !== userId) {
-        return next(ApiError.UnauthorizedUser());
+        next(ApiError.UnauthorizedUser());
+        return;
       }
       await commentService.deleteComment(comment.id);
       return res.json("success");
@@ -21,6 +23,7 @@ class CommentController {
       next(error);
     }
   }
+
   async getComments(req: Request, res: Response, next: NextFunction) {
     try {
       const id = +req.params.id;

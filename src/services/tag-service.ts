@@ -15,6 +15,7 @@ class TagService {
     });
     return tags;
   }
+
   async getTags(viewed: number): Promise<PrismaClient.Tag[]> {
     const tags = await prisma.tag.findMany({
       take: 10,

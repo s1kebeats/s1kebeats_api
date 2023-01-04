@@ -6,7 +6,8 @@ import ApiError from "../exceptions/api-error";
 export default async function (req: Request, res: Response, next: NextFunction) {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
-    return next(ApiError.BadRequest("Data validation error", errors.array()));
+    next(ApiError.BadRequest("Data validation error", errors.array()));
+    return;
   }
-  return next();
+  next();
 }
