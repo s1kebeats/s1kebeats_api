@@ -1,12 +1,7 @@
-"use strict";
-var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
-var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
-var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
-var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
 var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
@@ -22,23 +17,6 @@ var __spreadValues = (a, b) => {
   return a;
 };
 var __spreadProps = (a, b) => __defProps(a, __getOwnPropDescs(b));
-var __export = (target, all) => {
-  for (var name in all)
-    __defProp(target, name, { get: all[name], enumerable: true });
-};
-var __copyProps = (to, from, except, desc) => {
-  if (from && typeof from === "object" || typeof from === "function") {
-    for (let key of __getOwnPropNames(from))
-      if (!__hasOwnProp.call(to, key) && key !== except)
-        __defProp(to, key, { get: () => from[key], enumerable: !(desc = __getOwnPropDesc(from, key)) || desc.enumerable });
-  }
-  return to;
-};
-var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__getProtoOf(mod)) : {}, __copyProps(
-  isNodeMode || !mod || !mod.__esModule ? __defProp(target, "default", { value: mod, enumerable: true }) : target,
-  mod
-));
-var __toCommonJS = (mod) => __copyProps(__defProp({}, "__esModule", { value: true }), mod);
 var __async = (__this, __arguments, generator) => {
   return new Promise((resolve, reject) => {
     var fulfilled = (value) => {
@@ -61,21 +39,16 @@ var __async = (__this, __arguments, generator) => {
 };
 
 // src/app.ts
-var app_exports = {};
-__export(app_exports, {
-  default: () => app_default
-});
-module.exports = __toCommonJS(app_exports);
-var import_dotenv = __toESM(require("dotenv"));
-var import_express8 = __toESM(require("express"));
-var import_cors = __toESM(require("cors"));
-var import_cookie_parser = __toESM(require("cookie-parser"));
-var import_express_fileupload = __toESM(require("express-fileupload"));
+import dotenv from "dotenv";
+import express from "express";
+import cors from "cors";
+import cookieParser from "cookie-parser";
+import fileUpload from "express-fileupload";
 
 // src/services/user-service.ts
-var import_client2 = __toESM(require("@prisma/client"));
-var import_bcrypt = __toESM(require("bcrypt"));
-var import_nanoid = require("nanoid");
+import PrismaClient2 from "@prisma/client";
+import bcrypt from "bcrypt";
+import { nanoid } from "nanoid";
 
 // src/dtos/user-dto.ts
 var UserDto = class {
@@ -89,7 +62,7 @@ var UserDto = class {
 };
 
 // src/services/mail-service.ts
-var import_nodemailer = __toESM(require("nodemailer"));
+import nodemailer from "nodemailer";
 var MailService = class {
   constructor() {
     const opts = {
@@ -101,7 +74,7 @@ var MailService = class {
         pass: process.env.SMTP_PASSWORD
       }
     };
-    this.transporter = import_nodemailer.default.createTransport(opts);
+    this.transporter = nodemailer.createTransport(opts);
   }
   sendActivationMail(to, link) {
     return __async(this, null, function* () {
@@ -122,15 +95,15 @@ var MailService = class {
 var mail_service_default = new MailService();
 
 // src/services/token-service.ts
-var import_jsonwebtoken = __toESM(require("jsonwebtoken"));
-var import_client = __toESM(require("@prisma/client"));
-var prisma = new import_client.default.PrismaClient();
+import jsonwebtoken from "jsonwebtoken";
+import PrismaClient from "@prisma/client";
+var prisma = new PrismaClient.PrismaClient();
 var TokenService = class {
   generateTokens(payload) {
-    const accessToken = import_jsonwebtoken.default.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
+    const accessToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
       expiresIn: "30m"
     });
-    const refreshToken = import_jsonwebtoken.default.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET, {
+    const refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET, {
       expiresIn: "30d"
     });
     return {
@@ -182,7 +155,7 @@ var TokenService = class {
   }
   validateAccessToken(accessToken) {
     try {
-      const decoded = import_jsonwebtoken.default.verify(accessToken, process.env.JWT_ACCESS_SECRET);
+      const decoded = jsonwebtoken.verify(accessToken, process.env.JWT_ACCESS_SECRET);
       return decoded;
     } catch (error) {
       return null;
@@ -190,7 +163,7 @@ var TokenService = class {
   }
   validateRefreshToken(refreshToken) {
     try {
-      const decoded = import_jsonwebtoken.default.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
+      const decoded = jsonwebtoken.verify(refreshToken, process.env.JWT_REFRESH_SECRET);
       return decoded;
     } catch (error) {
       return null;
@@ -221,7 +194,7 @@ var ApiError = class extends Error {
 };
 
 // src/services/user-service.ts
-var prisma2 = new import_client2.default.PrismaClient();
+var prisma2 = new PrismaClient2.PrismaClient();
 var UserService = class {
   generateData(user, ip) {
     return __async(this, null, function* () {
@@ -245,8 +218,8 @@ var UserService = class {
       if (existingUser) {
         throw ApiError.BadRequest(`Username "${username}" is already taken.`);
       }
-      const hashedPassword = yield import_bcrypt.default.hash(password, 3);
-      const activationLink = (0, import_nanoid.nanoid)(64);
+      const hashedPassword = yield bcrypt.hash(password, 3);
+      const activationLink = nanoid(64);
       const userCreateArgs = {
         data: {
           email,
@@ -292,7 +265,7 @@ var UserService = class {
       if (!user.isActivated) {
         throw ApiError.NotActivatedEmail();
       }
-      const passwordEquals = yield import_bcrypt.default.compare(password, user.password);
+      const passwordEquals = yield bcrypt.compare(password, user.password);
       if (!passwordEquals) {
         throw ApiError.UnauthorizedUser();
       }
@@ -355,19 +328,19 @@ var UserService = class {
 var user_service_default = new UserService();
 
 // src/services/media-service.ts
-var import_aws_sdk = __toESM(require("aws-sdk"));
-var import_nanoid2 = require("nanoid");
-var import_path = __toESM(require("path"));
+import aws from "aws-sdk";
+import { nanoid as nanoid2 } from "nanoid";
+import path from "path";
 var awsConfig = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
   region: process.env.AWS_BUCKET_REGION
 };
-var s3 = new import_aws_sdk.default.S3(awsConfig);
+var s3 = new aws.S3(awsConfig);
 var MediaService = class {
   validate(file, extensions, maxSize) {
     if (extensions) {
-      const ext = import_path.default.extname(file.name);
+      const ext = path.extname(file.name);
       if (Array.isArray(extensions)) {
         if (!extensions.includes(ext)) {
           throw ApiError.BadRequest(`Send file in ${extensions.join("/")} format.`);
@@ -420,7 +393,7 @@ var MediaService = class {
     return __async(this, null, function* () {
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: path2 + "/" + (0, import_nanoid2.nanoid)(36),
+        Key: path2 + "/" + nanoid2(36),
         Body: file.data
       };
       return s3.upload(params).promise();
@@ -556,8 +529,8 @@ var UserController = class {
 var user_controller_default = new UserController();
 
 // src/router/user-router.ts
-var import_express_validator2 = require("express-validator");
-var import_express = require("express");
+import { body } from "express-validator";
+import { Router } from "express";
 
 // src/middlewares/auth-middleware.ts
 function auth_middleware_default(req, res, next) {
@@ -584,10 +557,10 @@ function auth_middleware_default(req, res, next) {
 }
 
 // src/middlewares/validation-middleware.ts
-var import_express_validator = require("express-validator");
+import { validationResult } from "express-validator";
 function validation_middleware_default(req, res, next) {
   return __async(this, null, function* () {
-    const errors = (0, import_express_validator.validationResult)(req);
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return next(ApiError.BadRequest("Data validation error", errors.array()));
     }
@@ -596,31 +569,31 @@ function validation_middleware_default(req, res, next) {
 }
 
 // src/router/user-router.ts
-var router = (0, import_express.Router)();
+var router = Router();
 router.post(
   "/register",
-  (0, import_express_validator2.body)("email").isEmail().bail(),
-  (0, import_express_validator2.body)("username").notEmpty().bail().matches(/^[0-9a-zA-Z]+$/).bail(),
-  (0, import_express_validator2.body)("password").isLength({ min: 8 }).bail().matches(/\d/).bail().matches(/[A-Z]/).bail(),
+  body("email").isEmail().bail(),
+  body("username").notEmpty().bail().matches(/^[0-9a-zA-Z]+$/).bail(),
+  body("password").isLength({ min: 8 }).bail().matches(/\d/).bail().matches(/[A-Z]/).bail(),
   validation_middleware_default,
   user_controller_default.register
 );
 router.post(
   "/login",
-  (0, import_express_validator2.body)("username").notEmpty().bail(),
-  (0, import_express_validator2.body)("password").notEmpty().bail(),
+  body("username").notEmpty().bail(),
+  body("password").notEmpty().bail(),
   validation_middleware_default,
   user_controller_default.login
 );
 router.post(
   "/edit",
   auth_middleware_default,
-  (0, import_express_validator2.body)("username").if((0, import_express_validator2.body)("username").exists()).matches(/^[0-9a-zA-Z]+$/).bail(),
-  (0, import_express_validator2.body)("displayedName").if((0, import_express_validator2.body)("displayedName").exists()).isLength({ max: 255 }).bail(),
-  (0, import_express_validator2.body)("about").if((0, import_express_validator2.body)("about").exists()).isLength({ max: 255 }).bail(),
-  (0, import_express_validator2.body)("youtube").if((0, import_express_validator2.body)("youtube").exists()).isLength({ max: 255 }).bail(),
-  (0, import_express_validator2.body)("vk").if((0, import_express_validator2.body)("vk").exists()).isLength({ max: 255 }).bail(),
-  (0, import_express_validator2.body)("instagram").if((0, import_express_validator2.body)("instagram").exists()).isLength({ max: 255 }).bail(),
+  body("username").if(body("username").exists()).matches(/^[0-9a-zA-Z]+$/).bail(),
+  body("displayedName").if(body("displayedName").exists()).isLength({ max: 255 }).bail(),
+  body("about").if(body("about").exists()).isLength({ max: 255 }).bail(),
+  body("youtube").if(body("youtube").exists()).isLength({ max: 255 }).bail(),
+  body("vk").if(body("vk").exists()).isLength({ max: 255 }).bail(),
+  body("instagram").if(body("instagram").exists()).isLength({ max: 255 }).bail(),
   validation_middleware_default,
   user_controller_default.edit
 );
@@ -630,11 +603,11 @@ router.get("/refresh", user_controller_default.refresh);
 var user_router_default = router;
 
 // src/services/author-service.ts
-var import_client6 = __toESM(require("@prisma/client"));
+import PrismaClient6 from "@prisma/client";
 
 // src/prisma-selects/author-select.ts
-var import_client3 = __toESM(require("@prisma/client"));
-var authorSelect = import_client3.default.Prisma.validator()({
+import PrismaClient3 from "@prisma/client";
+var authorSelect = PrismaClient3.Prisma.validator()({
   select: {
     id: true,
     username: true,
@@ -645,11 +618,11 @@ var authorSelect = import_client3.default.Prisma.validator()({
 var author_select_default = authorSelect;
 
 // src/prisma-selects/author-individual-select.ts
-var import_client5 = __toESM(require("@prisma/client"));
+import PrismaClient5 from "@prisma/client";
 
 // src/prisma-selects/beat-for-author.ts
-var import_client4 = __toESM(require("@prisma/client"));
-var beatForAuthorSelect = import_client4.default.Prisma.validator()({
+import PrismaClient4 from "@prisma/client";
+var beatForAuthorSelect = PrismaClient4.Prisma.validator()({
   select: {
     id: true,
     name: true,
@@ -663,7 +636,7 @@ var beatForAuthorSelect = import_client4.default.Prisma.validator()({
 var beat_for_author_default = beatForAuthorSelect;
 
 // src/prisma-selects/author-individual-select.ts
-var authorIndividualSelect = import_client5.default.Prisma.validator()({
+var authorIndividualSelect = PrismaClient5.Prisma.validator()({
   select: {
     id: true,
     username: true,
@@ -685,7 +658,7 @@ var authorIndividualSelect = import_client5.default.Prisma.validator()({
 var author_individual_select_default = authorIndividualSelect;
 
 // src/services/author-service.ts
-var prisma3 = new import_client6.default.PrismaClient();
+var prisma3 = new PrismaClient6.PrismaClient();
 var AuthorService = class {
   getAuthors(viewed) {
     return __async(this, null, function* () {
@@ -773,12 +746,12 @@ var AuthorController = class {
 var author_controller_default = new AuthorController();
 
 // src/router/author-router.ts
-var import_express2 = require("express");
-var import_express_validator3 = require("express-validator");
-var router2 = (0, import_express2.Router)();
+import { Router as Router2 } from "express";
+import { query } from "express-validator";
+var router2 = Router2();
 router2.get(
   "/",
-  (0, import_express_validator3.query)("viewed").if((0, import_express_validator3.query)("viewed").exists()).isDecimal().bail(),
+  query("viewed").if(query("viewed").exists()).isDecimal().bail(),
   validation_middleware_default,
   author_controller_default.getAuthors
 );
@@ -786,11 +759,11 @@ router2.get("/:username", author_controller_default.getIndividualAuthor);
 var author_router_default = router2;
 
 // src/services/beat-service.ts
-var import_client9 = __toESM(require("@prisma/client"));
+import PrismaClient9 from "@prisma/client";
 
 // src/prisma-selects/beat-individual-select.ts
-var import_client7 = __toESM(require("@prisma/client"));
-var beatIndividualSelect = import_client7.default.Prisma.validator()({
+import PrismaClient7 from "@prisma/client";
+var beatIndividualSelect = PrismaClient7.Prisma.validator()({
   select: {
     id: true,
     name: true,
@@ -822,8 +795,8 @@ var beatIndividualSelect = import_client7.default.Prisma.validator()({
 var beat_individual_select_default = beatIndividualSelect;
 
 // src/prisma-selects/beat-select.ts
-var import_client8 = __toESM(require("@prisma/client"));
-var beatSelect = import_client8.default.Prisma.validator()({
+import PrismaClient8 from "@prisma/client";
+var beatSelect = PrismaClient8.Prisma.validator()({
   select: {
     id: true,
     name: true,
@@ -843,7 +816,7 @@ var beatSelect = import_client8.default.Prisma.validator()({
 var beat_select_default = beatSelect;
 
 // src/services/beat-service.ts
-var prisma4 = new import_client9.default.PrismaClient();
+var prisma4 = new PrismaClient9.PrismaClient();
 var BeatService = class {
   getBeats(viewed = 0) {
     return __async(this, null, function* () {
@@ -1005,8 +978,8 @@ var BeatService = class {
 var beat_service_default = new BeatService();
 
 // src/services/comment-service.ts
-var import_client10 = __toESM(require("@prisma/client"));
-var prisma5 = new import_client10.default.PrismaClient();
+import PrismaClient10 from "@prisma/client";
+var prisma5 = new PrismaClient10.PrismaClient();
 var CommentService = class {
   uploadComment(data) {
     return __async(this, null, function* () {
@@ -1047,8 +1020,8 @@ var CommentService = class {
 var comment_service_default = new CommentService();
 
 // src/services/like-service.ts
-var import_client11 = __toESM(require("@prisma/client"));
-var prisma6 = new import_client11.default.PrismaClient();
+import PrismaClient11 from "@prisma/client";
+var prisma6 = new PrismaClient11.PrismaClient();
 var LikeService = class {
   getLikeByIdentifier(beatId, userId) {
     return __async(this, null, function* () {
@@ -1294,73 +1267,73 @@ var BeatController = class {
 var beat_controller_default = new BeatController();
 
 // src/router/beat-router.ts
-var import_express_validator4 = require("express-validator");
-var import_express3 = require("express");
-var router3 = (0, import_express3.Router)();
+import { body as body2, param, query as query2 } from "express-validator";
+import { Router as Router3 } from "express";
+var router3 = Router3();
 router3.post(
   "/upload",
   auth_middleware_default,
-  (0, import_express_validator4.body)("name").notEmpty().bail().isLength({ max: 255 }).bail(),
-  (0, import_express_validator4.body)("wavePrice").notEmpty().bail().isDecimal().bail(),
-  (0, import_express_validator4.body)("wave").notEmpty().bail().contains("wave/").bail(),
-  (0, import_express_validator4.body)("mp3").notEmpty().bail().contains("mp3/").bail(),
-  (0, import_express_validator4.body)("stemsPrice").if((0, import_express_validator4.body)("stemsPrice").exists()).isDecimal().bail(),
-  (0, import_express_validator4.body)("stemsPrice").if((0, import_express_validator4.body)("stems").exists()).notEmpty().bail(),
-  (0, import_express_validator4.body)("stems").if((0, import_express_validator4.body)("stems").exists()).contains("stems/").bail(),
-  (0, import_express_validator4.body)("stems").if((0, import_express_validator4.body)("stemsPrice").exists()).notEmpty().bail(),
-  (0, import_express_validator4.body)("image").if((0, import_express_validator4.body)("image").exists()).contains("image/").bail(),
-  (0, import_express_validator4.body)("bpm").if((0, import_express_validator4.body)("bpm").exists()).isDecimal().bail(),
-  (0, import_express_validator4.body)("description").if((0, import_express_validator4.body)("description").exists()).isLength({ max: 255 }).bail(),
+  body2("name").notEmpty().bail().isLength({ max: 255 }).bail(),
+  body2("wavePrice").notEmpty().bail().isDecimal().bail(),
+  body2("wave").notEmpty().bail().contains("wave/").bail(),
+  body2("mp3").notEmpty().bail().contains("mp3/").bail(),
+  body2("stemsPrice").if(body2("stemsPrice").exists()).isDecimal().bail(),
+  body2("stemsPrice").if(body2("stems").exists()).notEmpty().bail(),
+  body2("stems").if(body2("stems").exists()).contains("stems/").bail(),
+  body2("stems").if(body2("stemsPrice").exists()).notEmpty().bail(),
+  body2("image").if(body2("image").exists()).contains("image/").bail(),
+  body2("bpm").if(body2("bpm").exists()).isDecimal().bail(),
+  body2("description").if(body2("description").exists()).isLength({ max: 255 }).bail(),
   validation_middleware_default,
   beat_controller_default.upload
 );
 router3.get(
   "/",
-  (0, import_express_validator4.query)("viewed").if((0, import_express_validator4.query)("viewed").exists()).isDecimal().bail(),
+  query2("viewed").if(query2("viewed").exists()).isDecimal().bail(),
   validation_middleware_default,
   beat_controller_default.getBeats
 );
-router3.get("/:id", (0, import_express_validator4.param)("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.getIndividualBeat);
+router3.get("/:id", param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.getIndividualBeat);
 router3.post(
   "/:id/comment",
   auth_middleware_default,
-  (0, import_express_validator4.param)("id").isDecimal().bail(),
-  (0, import_express_validator4.body)("content").notEmpty().isLength({ max: 255 }).bail(),
+  param("id").isDecimal().bail(),
+  body2("content").notEmpty().isLength({ max: 255 }).bail(),
   validation_middleware_default,
   beat_controller_default.comment
 );
 router3.post(
   "/:id/like",
   auth_middleware_default,
-  (0, import_express_validator4.param)("id").isDecimal().bail(),
+  param("id").isDecimal().bail(),
   validation_middleware_default,
   beat_controller_default.likeToggle
 );
-router3.post("/:id/delete", auth_middleware_default, (0, import_express_validator4.param)("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.delete);
+router3.post("/:id/delete", auth_middleware_default, param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.delete);
 router3.post(
   "/:id/edit",
   auth_middleware_default,
-  (0, import_express_validator4.param)("id").isDecimal().bail(),
-  (0, import_express_validator4.body)("name").if((0, import_express_validator4.body)("name").exists()).isLength({ max: 255 }).bail(),
-  (0, import_express_validator4.body)("wavePrice").if((0, import_express_validator4.body)("wavePrice").exists()).isDecimal().bail(),
-  (0, import_express_validator4.body)("wave").if((0, import_express_validator4.body)("wave").exists()).contains("wave/").bail(),
-  (0, import_express_validator4.body)("mp3").if((0, import_express_validator4.body)("mp3").exists()).contains("mp3/").bail(),
-  (0, import_express_validator4.body)("stemsPrice").if((0, import_express_validator4.body)("stemsPrice").exists()).isDecimal().bail(),
-  (0, import_express_validator4.body)("stems").if((0, import_express_validator4.body)("stems").exists()).contains("stems/").bail(),
-  (0, import_express_validator4.body)("image").if((0, import_express_validator4.body)("image").exists()).contains("image/").bail(),
-  (0, import_express_validator4.body)("bpm").if((0, import_express_validator4.body)("bpm").exists()).isDecimal().bail(),
-  (0, import_express_validator4.body)("description").if((0, import_express_validator4.body)("description").exists()).isLength({ max: 255 }).bail(),
+  param("id").isDecimal().bail(),
+  body2("name").if(body2("name").exists()).isLength({ max: 255 }).bail(),
+  body2("wavePrice").if(body2("wavePrice").exists()).isDecimal().bail(),
+  body2("wave").if(body2("wave").exists()).contains("wave/").bail(),
+  body2("mp3").if(body2("mp3").exists()).contains("mp3/").bail(),
+  body2("stemsPrice").if(body2("stemsPrice").exists()).isDecimal().bail(),
+  body2("stems").if(body2("stems").exists()).contains("stems/").bail(),
+  body2("image").if(body2("image").exists()).contains("image/").bail(),
+  body2("bpm").if(body2("bpm").exists()).isDecimal().bail(),
+  body2("description").if(body2("description").exists()).isLength({ max: 255 }).bail(),
   validation_middleware_default,
   beat_controller_default.edit
 );
 var beat_router_default = router3;
 
 // src/router/media-router.ts
-var import_express4 = require("express");
-var import_express_validator5 = require("express-validator");
+import { Router as Router4 } from "express";
+import { body as body3 } from "express-validator";
 
 // src/controllers/media-controller.ts
-var import_sharp = __toESM(require("sharp"));
+import sharp from "sharp";
 var MediaController = class {
   upload(req, res, next) {
     return __async(this, null, function* () {
@@ -1372,7 +1345,7 @@ var MediaController = class {
         const file = req.files.file;
         media_service_default.validateMedia(file, path2);
         if (path2 === "image") {
-          file.data = yield (0, import_sharp.default)(file.data).webp({ quality: 50 }).toBuffer();
+          file.data = yield sharp(file.data).webp({ quality: 50 }).toBuffer();
         }
         const media = yield media_service_default.awsUpload(file, path2);
         return res.json(media.Key);
@@ -1400,17 +1373,17 @@ var MediaController = class {
 var media_controller_default = new MediaController();
 
 // src/router/media-router.ts
-var router4 = (0, import_express4.Router)();
+var router4 = Router4();
 router4.get("/:path/:key", media_controller_default.getMedia);
-router4.post("/upload", auth_middleware_default, (0, import_express_validator5.body)("path").notEmpty().bail(), validation_middleware_default, media_controller_default.upload);
+router4.post("/upload", auth_middleware_default, body3("path").notEmpty().bail(), validation_middleware_default, media_controller_default.upload);
 var media_router_default = router4;
 
 // src/router/index.ts
-var import_express7 = require("express");
+import { Router as Router7 } from "express";
 
 // src/router/comment-router.ts
-var import_express5 = require("express");
-var import_express_validator6 = require("express-validator");
+import { Router as Router5 } from "express";
+import { query as query3, param as param2 } from "express-validator";
 
 // src/controllers/comment-controller.ts
 var CommentController = class {
@@ -1452,25 +1425,25 @@ var CommentController = class {
 var comment_controller_default = new CommentController();
 
 // src/router/comment-router.ts
-var router5 = (0, import_express5.Router)();
+var router5 = Router5();
 router5.get(
   "/:id",
   auth_middleware_default,
-  (0, import_express_validator6.param)("id").isDecimal().bail(),
-  (0, import_express_validator6.query)("viewed").if((0, import_express_validator6.query)("viewed").exists()).isDecimal().bail(),
+  param2("id").isDecimal().bail(),
+  query3("viewed").if(query3("viewed").exists()).isDecimal().bail(),
   validation_middleware_default,
   comment_controller_default.getComments
 );
-router5.post("/delete/:id", (0, import_express_validator6.param)("id").isDecimal().bail(), validation_middleware_default, comment_controller_default.deleteComment);
+router5.post("/delete/:id", param2("id").isDecimal().bail(), validation_middleware_default, comment_controller_default.deleteComment);
 var comment_router_default = router5;
 
 // src/router/tag-router.ts
-var import_express6 = require("express");
-var import_express_validator7 = require("express-validator");
+import { Router as Router6 } from "express";
+import { query as query4 } from "express-validator";
 
 // src/services/tag-service.ts
-var import_client12 = __toESM(require("@prisma/client"));
-var prisma7 = new import_client12.default.PrismaClient();
+import PrismaClient12 from "@prisma/client";
+var prisma7 = new PrismaClient12.PrismaClient();
 var TagService = class {
   findTags(name, viewed) {
     return __async(this, null, function* () {
@@ -1522,17 +1495,17 @@ var TagController = class {
 var tag_controller_default = new TagController();
 
 // src/router/tag-router.ts
-var router6 = (0, import_express6.Router)();
+var router6 = Router6();
 router6.get(
   "/",
-  (0, import_express_validator7.query)("viewed").if((0, import_express_validator7.query)("viewed").exists()).isDecimal().bail(),
+  query4("viewed").if(query4("viewed").exists()).isDecimal().bail(),
   validation_middleware_default,
   tag_controller_default.getTags
 );
 var tag_router_default = router6;
 
 // src/router/index.ts
-var router7 = (0, import_express7.Router)();
+var router7 = Router7();
 router7.use("/", user_router_default);
 router7.use("/author", author_router_default);
 router7.use("/beat", beat_router_default);
@@ -1551,14 +1524,14 @@ function error_middleware_default(err, req, res, next) {
 }
 
 // src/app.ts
-import_dotenv.default.config();
-var app = (0, import_express8.default)();
+dotenv.config();
+var app = express();
 app.set("trust proxy", true);
-app.use((0, import_express_fileupload.default)());
-app.use(import_express8.default.json({ limit: "1000mb" }));
-app.use((0, import_cookie_parser.default)());
+app.use(fileUpload());
+app.use(express.json({ limit: "1000mb" }));
+app.use(cookieParser());
 app.use(
-  (0, import_cors.default)({
+  cors({
     credentials: true,
     origin: process.env.CLIENT_URL
   })
@@ -1566,5 +1539,15 @@ app.use(
 app.use("/api", router_default);
 app.use(error_middleware_default);
 var app_default = app;
-// Annotate the CommonJS export names for ESM import in node:
-0 && (module.exports = {});
+
+// src/server.ts
+var start = () => __async(void 0, null, function* () {
+  try {
+    app_default.listen(process.env.PORT || 5e3, () => {
+      console.log(`Running on: http://localhost:${process.env.PORT}`);
+    });
+  } catch (error) {
+    console.log(error);
+  }
+});
+start();
