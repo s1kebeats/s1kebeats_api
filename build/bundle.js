@@ -262,12 +262,12 @@ var UserService = class {
       if (user == null) {
         throw ApiError.UnauthorizedUser();
       }
-      if (!user.isActivated) {
-        throw ApiError.NotActivatedEmail();
-      }
       const passwordEquals = yield bcrypt.compare(password, user.password);
       if (!passwordEquals) {
         throw ApiError.UnauthorizedUser();
+      }
+      if (!user.isActivated) {
+        throw ApiError.NotActivatedEmail();
       }
       const data = yield this.generateData(user, ip);
       return data;

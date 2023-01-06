@@ -84,13 +84,13 @@ class UserService {
     if (user == null) {
       throw ApiError.UnauthorizedUser();
     }
-    if (!user.isActivated) {
-      throw ApiError.NotActivatedEmail();
-    }
     // compare passwords
     const passwordEquals: boolean = await bcrypt.compare(password, user.password);
     if (!passwordEquals) {
       throw ApiError.UnauthorizedUser();
+    }
+    if (!user.isActivated) {
+      throw ApiError.NotActivatedEmail();
     }
     // create tokens and user DTO
     const data = await this.generateData(user, ip);
