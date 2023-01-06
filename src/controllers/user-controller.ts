@@ -27,7 +27,7 @@ class UserController {
     try {
       const ip = req.ip;
       const { username, password, refresh }: { username: string; password: string; refresh: boolean } = req.body;
-      const userData = await userService.login(username, password, ip, refresh);
+      const userData = await userService.login(username, password, ip, !!refresh);
       // set refresh token httpOnly cookie
       res.cookie("refreshToken", userData.refreshToken, {
         // 30 days
@@ -35,6 +35,7 @@ class UserController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
       });
+      console.log(userData.refreshToken)
       return res.json(userData);
     } catch (error) {
       next(error);

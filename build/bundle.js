@@ -445,12 +445,13 @@ var UserController = class {
       try {
         const ip = req.ip;
         const { username, password, refresh } = req.body;
-        const userData = yield user_service_default.login(username, password, ip, refresh);
+        const userData = yield user_service_default.login(username, password, ip, !!refresh);
         res.cookie("refreshToken", userData.refreshToken, {
           maxAge: 30 * 24 * 60 * 1e3,
           httpOnly: true,
           secure: process.env.NODE_ENV === "production"
         });
+        console.log(userData.refreshToken);
         return res.json(userData);
       } catch (error) {
         next(error);
