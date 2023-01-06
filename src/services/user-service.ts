@@ -12,13 +12,15 @@ const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
   // tokens and login/register dto generator
-  async generateData(user: PrismaClient.User, ip: string): Promise<AuthResponse> {
+  async generateData(user: PrismaClient.User, ip: string, refresh: boolean): Promise<AuthResponse> {
     // remove confidentional information from user data
     const userDto = new UserDto(user);
     // generate tokens
-    const tokens = tokenService.generateTokens(userDto);
+    const tokens = tokenService.generateTokens(userDto, refresh);
     // save resfresh token in DB
-    await tokenService.saveToken(userDto.id, ip, tokens.refreshToken);
+    if (tokens.refreshToken) {
+      await tokenService.saveToken(userDto.id, ip, tokens.refreshToken);
+    }
     return {
       ...tokens,
       user: userDto,
@@ -77,7 +79,7 @@ class UserService {
     });
   }
 
-  async login(username: string, password: string, ip: string): Promise<AuthResponse> {
+  async login(username: string, password: string, ip: string, refresh: boolean): Promise<AuthResponse> {
     const user = await prisma.user.findUnique({
       where: { username },
     });
@@ -93,7 +95,7 @@ class UserService {
       throw ApiError.NotActivatedEmail();
     }
     // create tokens and user DTO
-    const data = await this.generateData(user, ip);
+    const data = await this.generateData(user, ip, refresh);
     return data;
   }
 
@@ -119,7 +121,7 @@ class UserService {
       where: { id: userData.id },
     });
     // re-generate tokens and DTO
-    const data = await this.generateData(user!, ip);
+    const data = await this.generateData(user!, ip, true);
     return data;
   }
 

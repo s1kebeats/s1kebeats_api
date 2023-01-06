@@ -99,17 +99,18 @@ import jsonwebtoken from "jsonwebtoken";
 import PrismaClient from "@prisma/client";
 var prisma = new PrismaClient.PrismaClient();
 var TokenService = class {
-  generateTokens(payload) {
-    const accessToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
-      expiresIn: "30m"
-    });
-    const refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET, {
-      expiresIn: "30d"
-    });
-    return {
-      accessToken,
-      refreshToken
+  generateTokens(payload, refresh) {
+    const tokens = {
+      accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
+        expiresIn: "30m"
+      })
     };
+    if (refresh) {
+      tokens.refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET, {
+        expiresIn: "30d"
+      });
+    }
+    return tokens;
   }
   saveToken(userId, ip, refreshToken) {
     return __async(this, null, function* () {
@@ -196,11 +197,13 @@ var ApiError = class extends Error {
 // src/services/user-service.ts
 var prisma2 = new PrismaClient2.PrismaClient();
 var UserService = class {
-  generateData(user, ip) {
+  generateData(user, ip, refresh) {
     return __async(this, null, function* () {
       const userDto = new UserDto(user);
-      const tokens = token_service_default.generateTokens(userDto);
-      yield token_service_default.saveToken(userDto.id, ip, tokens.refreshToken);
+      const tokens = token_service_default.generateTokens(userDto, refresh);
+      if (tokens.refreshToken) {
+        yield token_service_default.saveToken(userDto.id, ip, tokens.refreshToken);
+      }
       return __spreadProps(__spreadValues({}, tokens), {
         user: userDto
       });
@@ -254,7 +257,7 @@ var UserService = class {
       });
     });
   }
-  login(username, password, ip) {
+  login(username, password, ip, refresh) {
     return __async(this, null, function* () {
       const user = yield prisma2.user.findUnique({
         where: { username }
@@ -269,7 +272,7 @@ var UserService = class {
       if (!user.isActivated) {
         throw ApiError.NotActivatedEmail();
       }
-      const data = yield this.generateData(user, ip);
+      const data = yield this.generateData(user, ip, refresh);
       return data;
     });
   }
@@ -292,7 +295,7 @@ var UserService = class {
       const user = yield prisma2.user.findUnique({
         where: { id: userData.id }
       });
-      const data = yield this.generateData(user, ip);
+      const data = yield this.generateData(user, ip, true);
       return data;
     });
   }
@@ -441,8 +444,8 @@ var UserController = class {
     return __async(this, null, function* () {
       try {
         const ip = req.ip;
-        const { username, password } = req.body;
-        const userData = yield user_service_default.login(username, password, ip);
+        const { username, password, refresh } = req.body;
+        const userData = yield user_service_default.login(username, password, ip, refresh);
         res.cookie("refreshToken", userData.refreshToken, {
           maxAge: 30 * 24 * 60 * 1e3,
           httpOnly: true,

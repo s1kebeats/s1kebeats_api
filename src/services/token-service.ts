@@ -5,20 +5,28 @@ import UserDto from "../dtos/user-dto";
 const prisma = new PrismaClient.PrismaClient();
 
 class TokenService {
-  generateTokens(payload: UserDto): {
+  generateTokens(
+    payload: UserDto,
+    refresh: boolean
+  ): {
     accessToken: string;
-    refreshToken: string;
+    refreshToken?: string;
   } {
-    const accessToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET!, {
-      expiresIn: "30m",
-    });
-    const refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET!, {
-      expiresIn: "30d",
-    });
-    return {
-      accessToken,
-      refreshToken,
+    const tokens: {
+      accessToken: string;
+      refreshToken?: string;
+    } = {
+      accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET!, {
+        expiresIn: "30m",
+      }),
     };
+    if (refresh) {
+      tokens.refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET!, {
+        expiresIn: "30d",
+      });
+    }
+
+    return tokens;
   }
 
   async saveToken(userId: number, ip: string, refreshToken: string): Promise<PrismaClient.Token> {

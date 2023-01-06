@@ -26,8 +26,8 @@ class UserController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const ip = req.ip;
-      const { username, password }: { username: string; password: string } = req.body;
-      const userData = await userService.login(username, password, ip);
+      const { username, password, refresh }: { username: string; password: string; refresh: boolean } = req.body;
+      const userData = await userService.login(username, password, ip, refresh);
       // set refresh token httpOnly cookie
       res.cookie("refreshToken", userData.refreshToken, {
         // 30 days
