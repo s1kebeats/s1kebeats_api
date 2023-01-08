@@ -1,6 +1,6 @@
 import request from "supertest";
 import assert from "assert";
-import app from "../app";
+import app from "./app.js";
 
 describe("User registration", () => {
   it("GET should return 404", async () => {

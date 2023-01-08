@@ -1556,17 +1556,7 @@ app.use(
 app.use("/api", router_default);
 app.use(error_middleware_default);
 var app_default = app;
-
-// src/server.ts
-var start = () => __async(void 0, null, function* () {
-  var _a;
-  try {
-    app_default.listen((_a = process.env.PORT) != null ? _a : 5e3, () => {
-      console.log(`Running on: http://localhost:${process.env.PORT}`);
-    });
-  } catch (error) {
-    console.log(error);
-  }
-});
-start();
-//# sourceMappingURL=bundle.js.map
+export {
+  app_default as default
+};
+//# sourceMappingURL=app.js.map
