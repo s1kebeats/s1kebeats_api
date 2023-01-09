@@ -1,27 +1,28 @@
 import request from "supertest";
 import assert from "assert";
-import prisma from '../client'
+import prisma from "../client";
+import bcrypt from "bcrypt";
 import app from "./app.js";
 
 beforeAll(async () => {
   await prisma.user.create({
     data: {
       username: "s1kebeats",
-      password: "s1kebeatsPassword",
+      password: await bcrypt.hash("Password1234", 3),
       email: "s1kebeats@gmail.com",
-      activationLink: "s1kebeats-activation-link"
-    }
-  })
-})
+      activationLink: "s1kebeats-activation-link",
+    },
+  });
+});
 
 afterAll(async () => {
-  await prisma.user.deleteMany()
-  await prisma.$disconnect()
-})
+  await prisma.user.deleteMany();
+  await prisma.$disconnect();
+});
 
 it("GET request should return 404", async () => {
   const res = await request(app).get("/api/register");
-  assert.equal(res.statusCode, 404);
+  await expect(res.statusCode).toEqual(404);
 });
 it("should return 400 without email provided", async () => {
   const res = await request(app)
