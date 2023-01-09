@@ -245,7 +245,7 @@ var UserService = class {
         }
       });
       if (user == null) {
-        throw ApiError.BadRequest("Wrong activation link.");
+        throw ApiError.NotFound("Wrong activation link.");
       }
       yield prisma2.user.update({
         where: {

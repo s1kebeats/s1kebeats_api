@@ -66,7 +66,7 @@ class UserService {
       },
     });
     if (user == null) {
-      throw ApiError.BadRequest("Wrong activation link.");
+      throw ApiError.NotFound("Wrong activation link.");
     }
     // update user isActivated state to true
     await prisma.user.update({

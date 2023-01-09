@@ -4,13 +4,17 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 
+const USERS_BEFORE_TESTS = 1;
+const mock = {
+  username: "s1kebeats",
+  password: await (() => bcrypt.hash("Password1234", 3))(),
+  email: "s1kebeats@gmail.com",
+  activationLink: "s1kebeats-activation-link",
+};
 beforeAll(async () => {
   await prisma.user.create({
     data: {
-      username: "s1kebeats",
-      password: await bcrypt.hash("Password1234", 3),
-      email: "s1kebeats@gmail.com",
-      activationLink: "s1kebeats-activation-link",
+      ...mock,
     },
   });
 });
@@ -120,7 +124,7 @@ it("providing already used username, should return 400", async () => {
     .set("Content-Type", "application/json");
   assert.equal(res.statusCode, 400);
 });
-it("providing right data, should return 200", async () => {
+it("providing right data, should return 200 and register new user", async () => {
   const res = await request(app)
     .post("/api/register")
     .send({
@@ -130,4 +134,10 @@ it("providing right data, should return 200", async () => {
     })
     .set("Content-Type", "application/json");
   assert.equal(res.statusCode, 200);
+  // number of users should increase by one the test registered successfully
+  assert.equal((await prisma.user.findMany()).length, USERS_BEFORE_TESTS + 1);
+  // registered user should be in the database
+  assert.equal(!!(await prisma.user.findUnique({ where: { username: mock.username } })), true);
+  // registered user isActivated field should be false
+  assert.equal((await prisma.user.findUnique({ where: { username: mock.username } }))!.isActivated, false);
 });

@@ -4,6 +4,23 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 
+function checkMockedUserLoginResponse(body: any): void {
+  assert.equal(body.user.email, mock.email);
+  assert.equal(body.user.username, mock.username);
+  assert.equal(body.user.displayedName, mock.displayedName);
+  assert.equal(body.user.image, mock.image);
+  assert.equal(typeof body.accessToken, "string");
+}
+
+const mock = {
+  username: "s1kebeats",
+  displayedName: "Arthur Datsenko-Boos",
+  image: "path/to/image",
+  password: await (() => bcrypt.hash("Password1234", 3))(),
+  email: "s1kebeats@gmail.com",
+  activationLink: "s1kebeats-activation-link",
+  isActivated: true,
+};
 beforeAll(async () => {
   await prisma.user.createMany({
     data: [
@@ -13,13 +30,7 @@ beforeAll(async () => {
         email: "datsenkoboos@gmail.com",
         activationLink: "datsenkoboos-activation-link",
       },
-      {
-        username: "s1kebeats",
-        password: await bcrypt.hash("Password1234", 3),
-        email: "s1kebeats@gmail.com",
-        activationLink: "s1kebeats-activation-link",
-        isActivated: true,
-      },
+      mock,
     ],
   });
 });
@@ -66,23 +77,27 @@ it("logging into account without activated email should return 403", async () =>
   });
   assert.equal(res.statusCode, 403);
 });
-it("providing right data, refresh=true, should return 200 and set http-only refresh token cookie", async () => {
+it("providing right data, refresh=true, should return 200 and set http-only refresh token cookie, should send right userDto", async () => {
   const res = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Password1234",
     refresh: true,
   });
   assert.equal(res.statusCode, 200);
+  checkMockedUserLoginResponse(res.body);
+
   // refresh token cookie check
   assert.equal(res.headers["set-cookie"][0].includes("refreshToken="), true);
   assert.equal(res.headers["set-cookie"][0].includes("HttpOnly"), true);
 });
-it("providing right data, refresh=false, should return 200 and should not set http-only refresh token cookie", async () => {
+it("providing right data, refresh=false, should return 200 and should not set http-only refresh token cookie, should send right userDto", async () => {
   const res = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Password1234",
   });
   assert.equal(res.statusCode, 200);
+  checkMockedUserLoginResponse(res.body);
+
   // refresh token cookie check
   assert.equal(res.headers["set-cookie"], undefined);
 });
