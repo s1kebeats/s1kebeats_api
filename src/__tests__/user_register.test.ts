@@ -1,117 +1,132 @@
 import request from "supertest";
 import assert from "assert";
+import prisma from '../client'
 import app from "./app.js";
 
-describe("User registration", () => {
-  it("GET should return 404", async () => {
-    const res = await request(app).get("/api/register");
-    assert.equal(res.statusCode, 404);
-  });
-  // it("No email", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       username: "randomusername",
-  //       password: "randompassword",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("No username", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       password: "randompassword",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("No password", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       username: "randomusername",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Wrong email", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random.com",
-  //       username: "randomusername",
-  //       password: "randompassword",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Too short password", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       username: "randomusername",
-  //       password: "1",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Password without digit", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       username: "randomusername",
-  //       password: "abcdefgHI",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Password without capital letter", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       username: "randomusername",
-  //       password: "abcdefg1111",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Username with banned characters", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "random@email.com",
-  //       username: "__randomusername",
-  //       password: "randompassword",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Already used username", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "adacenkoboos@gmail.com",
-  //       username: "s1kebeats",
-  //       password: "Password1234",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 400);
-  // });
-  // it("Success", async () => {
-  //   const res = await request(app)
-  //     .post("/api/register")
-  //     .send({
-  //       email: "adacenkoboos@gmail.com",
-  //       username: "s1kebeats",
-  //       password: "Password1234",
-  //     })
-  //     .set("Content-Type", "application/json");
-  //   assert.equal(res.statusCode, 200);
-  // });
+beforeAll(async () => {
+  await prisma.user.create({
+    data: {
+      username: "s1kebeats",
+      password: "s1kebeatsPassword",
+      email: "s1kebeats@gmail.com",
+      activationLink: "s1kebeats-activation-link"
+    }
+  })
+})
+
+afterAll(async () => {
+  await prisma.user.deleteMany()
+  await prisma.$disconnect()
+})
+
+it("GET request should return 404", async () => {
+  const res = await request(app).get("/api/register");
+  assert.equal(res.statusCode, 404);
+});
+it("should return 400 without email provided", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      username: "randomusername",
+      password: "randompassword",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("should return 400 without username provided", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      password: "randompassword",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("should return 400 without password provided", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "randomusername",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing wrong email, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random.com",
+      username: "randomusername",
+      password: "randompassword",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing password shorter than 8 chars, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "randomusername",
+      password: "1234567",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing password without digit, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "randomusername",
+      password: "abcdefgHI",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing password without at least one capital letter, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "randomusername",
+      password: "abcdefg1234",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing username with banned characters, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "__randomusername",
+      password: "randompassword",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing already used username, should return 400", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "s1kebeats",
+      password: "Password1234",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 400);
+});
+it("providing right data, should return 200", async () => {
+  const res = await request(app)
+    .post("/api/register")
+    .send({
+      email: "random@email.com",
+      username: "randomusername",
+      password: "Password1234",
+    })
+    .set("Content-Type", "application/json");
+  assert.equal(res.statusCode, 200);
 });

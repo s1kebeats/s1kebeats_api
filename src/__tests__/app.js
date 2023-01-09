@@ -4,15 +4,15 @@ var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
 var __getOwnPropSymbols = Object.getOwnPropertySymbols;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __propIsEnum = Object.prototype.propertyIsEnumerable;
-var __defNormalProp = (obj, key, value) => key in obj ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value }) : obj[key] = value;
+var __defNormalProp = (obj, key, value) =>
+  key in obj
+    ? __defProp(obj, key, { enumerable: true, configurable: true, writable: true, value })
+    : (obj[key] = value);
 var __spreadValues = (a, b) => {
-  for (var prop in b ||= {})
-    if (__hasOwnProp.call(b, prop))
-      __defNormalProp(a, prop, b[prop]);
+  for (var prop in (b ||= {})) if (__hasOwnProp.call(b, prop)) __defNormalProp(a, prop, b[prop]);
   if (__getOwnPropSymbols)
     for (var prop of __getOwnPropSymbols(b)) {
-      if (__propIsEnum.call(b, prop))
-        __defNormalProp(a, prop, b[prop]);
+      if (__propIsEnum.call(b, prop)) __defNormalProp(a, prop, b[prop]);
     }
   return a;
 };
@@ -33,7 +33,7 @@ var __async = (__this, __arguments, generator) => {
         reject(e);
       }
     };
-    var step = (x) => x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected);
+    var step = (x) => (x.done ? resolve(x.value) : Promise.resolve(x.value).then(fulfilled, rejected));
     step((generator = generator.apply(__this, __arguments)).next());
   });
 };
@@ -71,8 +71,8 @@ var MailService = class {
       secure: false,
       auth: {
         user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASSWORD
-      }
+        pass: process.env.SMTP_PASSWORD,
+      },
     };
     this.transporter = nodemailer.createTransport(opts);
   }
@@ -87,7 +87,7 @@ var MailService = class {
                         <h1>\u0414\u043B\u044F \u0430\u043A\u0442\u0438\u0432\u0430\u0446\u0438\u0438 \u043F\u0435\u0440\u0435\u0439\u0434\u0438\u0442\u0435 \u043F\u043E \u0441\u0441\u044B\u043B\u043A\u0435:</h1>
                         <a href="${link}">${link}</a>
                     </div>
-                `
+                `,
       });
     });
   }
@@ -102,12 +102,12 @@ var TokenService = class {
   generateTokens(payload, refresh) {
     const tokens = {
       accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
-        expiresIn: "30m"
-      })
+        expiresIn: "30m",
+      }),
     };
     if (refresh) {
       tokens.refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET, {
-        expiresIn: "30d"
+        expiresIn: "30d",
       });
     }
     return tokens;
@@ -116,18 +116,18 @@ var TokenService = class {
     return __async(this, null, function* () {
       const tokenUpsertArgs = {
         where: {
-          ip
+          ip,
         },
         update: {
-          refreshToken
+          refreshToken,
         },
         create: {
           ip,
           refreshToken,
           user: {
-            connect: { id: userId }
-          }
-        }
+            connect: { id: userId },
+          },
+        },
       };
       const token = yield prisma.token.upsert(tokenUpsertArgs);
       return token;
@@ -137,8 +137,8 @@ var TokenService = class {
     return __async(this, null, function* () {
       const tokenDeleteArgs = {
         where: {
-          ip
-        }
+          ip,
+        },
       };
       const token = yield prisma.token.delete(tokenDeleteArgs);
       return token;
@@ -148,8 +148,8 @@ var TokenService = class {
     return __async(this, null, function* () {
       const token = yield prisma.token.findUnique({
         where: {
-          refreshToken
-        }
+          refreshToken,
+        },
       });
       return token;
     });
@@ -205,18 +205,14 @@ var UserService = class {
         yield token_service_default.saveToken(userDto.id, ip, tokens.refreshToken);
       }
       return __spreadProps(__spreadValues({}, tokens), {
-        user: userDto
+        user: userDto,
       });
     });
   }
   register(_0) {
-    return __async(this, arguments, function* ({
-      email,
-      username,
-      password
-    }) {
+    return __async(this, arguments, function* ({ email, username, password }) {
       const existingUser = yield prisma2.user.findUnique({
-        where: { username }
+        where: { username },
       });
       if (existingUser != null) {
         throw ApiError.BadRequest(`Username "${username}" is already taken.`);
@@ -228,8 +224,8 @@ var UserService = class {
           email,
           username,
           password: hashedPassword,
-          activationLink
-        }
+          activationLink,
+        },
       };
       const user = yield prisma2.user.create(userCreateArgs);
       yield mail_service_default.sendActivationMail(email, `${process.env.BASE_URL}/api/activate/${activationLink}`);
@@ -241,26 +237,26 @@ var UserService = class {
     return __async(this, null, function* () {
       const user = yield prisma2.user.findUnique({
         where: {
-          activationLink
-        }
+          activationLink,
+        },
       });
       if (user == null) {
         throw ApiError.BadRequest("Wrong activation link.");
       }
       yield prisma2.user.update({
         where: {
-          activationLink
+          activationLink,
         },
         data: {
-          isActivated: true
-        }
+          isActivated: true,
+        },
       });
     });
   }
   login(username, password, ip, refresh) {
     return __async(this, null, function* () {
       const user = yield prisma2.user.findUnique({
-        where: { username }
+        where: { username },
       });
       if (user == null) {
         throw ApiError.UnauthorizedUser();
@@ -293,7 +289,7 @@ var UserService = class {
         throw ApiError.UnauthorizedUser();
       }
       const user = yield prisma2.user.findUnique({
-        where: { id: userData.id }
+        where: { id: userData.id },
       });
       const data = yield this.generateData(user, ip, true);
       return data;
@@ -303,7 +299,7 @@ var UserService = class {
     return __async(this, null, function* () {
       if (payload.username) {
         const existingUser = yield prisma2.user.findUnique({
-          where: { username: payload.username }
+          where: { username: payload.username },
         });
         if (existingUser != null) {
           throw ApiError.BadRequest(`Username "${payload.username}" is already taken.`);
@@ -311,7 +307,7 @@ var UserService = class {
       }
       const userUpdateArgs = {
         where: { id: userId },
-        data: payload
+        data: payload,
       };
       yield prisma2.user.update(userUpdateArgs);
     });
@@ -319,7 +315,7 @@ var UserService = class {
   getUserById(id) {
     return __async(this, null, function* () {
       const user = yield prisma2.user.findUnique({
-        where: { id }
+        where: { id },
       });
       if (user == null) {
         throw ApiError.NotFound("User was not found.");
@@ -337,7 +333,7 @@ import path from "path";
 var awsConfig = {
   secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY,
   accessKeyId: process.env.AWS_ACCESS_KEY_ID,
-  region: process.env.AWS_BUCKET_REGION
+  region: process.env.AWS_BUCKET_REGION,
 };
 var s3 = new aws.S3(awsConfig);
 var MediaService = class {
@@ -367,27 +363,15 @@ var MediaService = class {
         break;
       }
       case "mp3": {
-        this.validate(
-          file,
-          ".mp3",
-          150 * 1024 * 1024
-        );
+        this.validate(file, ".mp3", 150 * 1024 * 1024);
         break;
       }
       case "wav": {
-        this.validate(
-          file,
-          ".wav",
-          300 * 1024 * 1024
-        );
+        this.validate(file, ".wav", 300 * 1024 * 1024);
         break;
       }
       case "stems": {
-        this.validate(
-          file,
-          [".zip", ".rar"],
-          500 * 1024 * 1024
-        );
+        this.validate(file, [".zip", ".rar"], 500 * 1024 * 1024);
         break;
       }
     }
@@ -397,7 +381,7 @@ var MediaService = class {
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
         Key: path2 + "/" + nanoid2(36),
-        Body: file.data
+        Body: file.data,
       };
       return yield s3.upload(params).promise();
     });
@@ -406,7 +390,7 @@ var MediaService = class {
     return __async(this, null, function* () {
       const params = {
         Key: key,
-        Bucket: process.env.AWS_BUCKET_NAME
+        Bucket: process.env.AWS_BUCKET_NAME,
       };
       return yield s3.deleteObject(params).promise();
     });
@@ -415,7 +399,7 @@ var MediaService = class {
     return __async(this, null, function* () {
       const data = yield s3.getObject({
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: key
+        Key: key,
       });
       return data;
     });
@@ -431,7 +415,7 @@ var UserController = class {
         const payload = (({ email, username, password }) => ({
           email,
           username,
-          password
+          password,
         }))(req.body);
         const userDto = yield user_service_default.register(payload);
         return res.json(userDto);
@@ -450,7 +434,7 @@ var UserController = class {
           res.cookie("refreshToken", userData.refreshToken, {
             maxAge: 30 * 24 * 60 * 1e3,
             httpOnly: true,
-            secure: process.env.NODE_ENV === "production"
+            secure: process.env.NODE_ENV === "production",
           });
         }
         return res.json({ accessToken: userData.accessToken, user: userData.user });
@@ -500,7 +484,7 @@ var UserController = class {
         res.cookie("refreshToken", userData.refreshToken, {
           maxAge: 30 * 24 * 60 * 1e3,
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production"
+          secure: process.env.NODE_ENV === "production",
         });
         return res.json(userData);
       } catch (error) {
@@ -513,15 +497,15 @@ var UserController = class {
       try {
         const userId = req.user.id;
         const original = yield user_service_default.getUserById(userId);
-        const payload = (({
+        const payload = (({ username, displayedName, about, vk, youtube, instagram, image }) => ({
           username,
           displayedName,
           about,
           vk,
           youtube,
           instagram,
-          image
-        }) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
+          image,
+        }))(req.body);
         if (payload.image && original.image) {
           media_service_default.deleteObject(original.image);
         }
@@ -584,7 +568,11 @@ var router = Router();
 router.post(
   "/register",
   body("email").isEmail().bail(),
-  body("username").notEmpty().bail().matches(/^[0-9a-zA-Z]+$/).bail(),
+  body("username")
+    .notEmpty()
+    .bail()
+    .matches(/^[0-9a-zA-Z]+$/)
+    .bail(),
   body("password").isLength({ min: 8 }).bail().matches(/\d/).bail().matches(/[A-Z]/).bail(),
   validation_middleware_default,
   user_controller_default.register
@@ -599,7 +587,10 @@ router.post(
 router.post(
   "/edit",
   auth_middleware_default,
-  body("username").if(body("username").exists()).matches(/^[0-9a-zA-Z]+$/).bail(),
+  body("username")
+    .if(body("username").exists())
+    .matches(/^[0-9a-zA-Z]+$/)
+    .bail(),
   body("displayedName").if(body("displayedName").exists()).isLength({ max: 255 }).bail(),
   body("about").if(body("about").exists()).isLength({ max: 255 }).bail(),
   body("youtube").if(body("youtube").exists()).isLength({ max: 255 }).bail(),
@@ -623,8 +614,8 @@ var authorSelect = PrismaClient3.Prisma.validator()({
     id: true,
     username: true,
     displayedName: true,
-    image: true
-  }
+    image: true,
+  },
 });
 var author_select_default = authorSelect;
 
@@ -641,8 +632,8 @@ var beatForAuthorSelect = PrismaClient4.Prisma.validator()({
     image: true,
     mp3: true,
     wavePrice: true,
-    tags: true
-  }
+    tags: true,
+  },
 });
 var beat_for_author_default = beatForAuthorSelect;
 
@@ -661,10 +652,10 @@ var authorIndividualSelect = PrismaClient5.Prisma.validator()({
     vk: true,
     _count: {
       select: {
-        beats: true
-      }
-    }
-  }
+        beats: true,
+      },
+    },
+  },
 });
 var author_individual_select_default = authorIndividualSelect;
 
@@ -673,45 +664,56 @@ var prisma3 = new PrismaClient6.PrismaClient();
 var AuthorService = class {
   getAuthors(viewed) {
     return __async(this, null, function* () {
-      const authors = yield prisma3.user.findMany(__spreadProps(__spreadValues({}, author_select_default), {
-        take: 10,
-        skip: viewed
-      }));
+      const authors = yield prisma3.user.findMany(
+        __spreadProps(__spreadValues({}, author_select_default), {
+          take: 10,
+          skip: viewed,
+        })
+      );
       return authors;
     });
   }
   findAuthors(query5, viewed) {
     return __async(this, null, function* () {
-      const authorFindManyArgs = __spreadProps(__spreadValues({
-        where: {
-          OR: [
-            {
-              username: {
-                contains: query5
-              }
+      const authorFindManyArgs = __spreadProps(
+        __spreadValues(
+          {
+            where: {
+              OR: [
+                {
+                  username: {
+                    contains: query5,
+                  },
+                },
+                {
+                  displayedName: {
+                    contains: query5,
+                  },
+                },
+              ],
             },
-            {
-              displayedName: {
-                contains: query5
-              }
-            }
-          ]
+          },
+          author_select_default
+        ),
+        {
+          take: 10,
+          skip: viewed,
         }
-      }, author_select_default), {
-        take: 10,
-        skip: viewed
-      });
+      );
       const authors = yield prisma3.user.findMany(authorFindManyArgs);
       return authors;
     });
   }
   getAuthorByUsername(username) {
     return __async(this, null, function* () {
-      const authorFindUniqueArgs = __spreadValues({
-        where: {
-          username
-        }
-      }, author_individual_select_default);
+      const authorFindUniqueArgs = __spreadValues(
+        {
+          where: {
+            username,
+          },
+        },
+        author_individual_select_default
+      );
       const author = yield prisma3.user.findUnique(authorFindUniqueArgs);
       if (author == null) {
         throw ApiError.NotFound("Author was not found.");
@@ -735,7 +737,7 @@ var AuthorController = class {
         }
         return res.json({
           authors,
-          viewed: req.query.viewed ? +req.query.viewed + authors.length : authors.length
+          viewed: req.query.viewed ? +req.query.viewed + authors.length : authors.length,
         });
       } catch (error) {
         next(error);
@@ -793,15 +795,15 @@ var beatIndividualSelect = PrismaClient7.Prisma.validator()({
       take: 10,
       select: {
         content: true,
-        user: __spreadValues({}, author_select_default)
-      }
+        user: __spreadValues({}, author_select_default),
+      },
     },
     _count: {
       select: {
-        likes: true
-      }
-    }
-  }
+        likes: true,
+      },
+    },
+  },
 });
 var beat_individual_select_default = beatIndividualSelect;
 
@@ -819,10 +821,10 @@ var beatSelect = PrismaClient8.Prisma.validator()({
       select: {
         id: true,
         username: true,
-        displayedName: true
-      }
-    }
-  }
+        displayedName: true,
+      },
+    },
+  },
 });
 var beat_select_default = beatSelect;
 
@@ -831,26 +833,28 @@ var prisma4 = new PrismaClient9.PrismaClient();
 var BeatService = class {
   getBeats(viewed = 0) {
     return __async(this, null, function* () {
-      const beats = yield prisma4.beat.findMany(__spreadProps(__spreadValues({}, beat_select_default), {
-        skip: viewed,
-        take: 10
-      }));
+      const beats = yield prisma4.beat.findMany(
+        __spreadProps(__spreadValues({}, beat_select_default), {
+          skip: viewed,
+          take: 10,
+        })
+      );
       return beats;
     });
   }
   formatBeatOrderBy(orderBy) {
     if (orderBy.includes("Lower")) {
       return {
-        [orderBy.slice(0, -5)]: "asc"
+        [orderBy.slice(0, -5)]: "asc",
       };
     }
     if (orderBy.includes("Higher")) {
       return {
-        [orderBy.slice(0, -6)]: "desc"
+        [orderBy.slice(0, -6)]: "desc",
       };
     }
     return {
-      id: "desc"
+      id: "desc",
     };
   }
   findBeats(_0) {
@@ -862,8 +866,8 @@ var BeatService = class {
             {
               name: {
                 contains: q,
-                mode: "insensitive"
-              }
+                mode: "insensitive",
+              },
             },
             {
               user: {
@@ -871,39 +875,44 @@ var BeatService = class {
                   {
                     username: {
                       contains: q,
-                      mode: "insensitive"
-                    }
+                      mode: "insensitive",
+                    },
                   },
                   {
                     displayedName: {
                       contains: q,
-                      mode: "insensitive"
-                    }
-                  }
-                ]
-              }
-            }
-          ]
+                      mode: "insensitive",
+                    },
+                  },
+                ],
+              },
+            },
+          ],
         };
       }
       const queryArgs = {
         take: 10,
         skip: viewed,
-        orderBy: orderBy ? this.formatBeatOrderBy(orderBy) : {
-          id: "desc"
-        },
+        orderBy: orderBy
+          ? this.formatBeatOrderBy(orderBy)
+          : {
+              id: "desc",
+            },
         where: __spreadProps(__spreadValues({}, nameQuery), {
           bpm: {
-            equals: bpm
+            equals: bpm,
           },
-          tags: tags != null ? {
-            some: {
-              name: {
-                in: tags
-              }
-            }
-          } : void 0
-        })
+          tags:
+            tags != null
+              ? {
+                  some: {
+                    name: {
+                      in: tags,
+                    },
+                  },
+                }
+              : void 0,
+        }),
       };
       const beats = yield prisma4.beat.findMany(__spreadValues(__spreadValues({}, queryArgs), beat_select_default));
       return beats;
@@ -911,21 +920,24 @@ var BeatService = class {
   }
   getIndividualBeat(id) {
     return __async(this, null, function* () {
-      const beatFindUniqueArgs = __spreadValues({
-        where: {
-          id
-        }
-      }, beat_individual_select_default);
+      const beatFindUniqueArgs = __spreadValues(
+        {
+          where: {
+            id,
+          },
+        },
+        beat_individual_select_default
+      );
       const beat = yield prisma4.beat.findUnique(beatFindUniqueArgs);
       if (beat == null) {
         throw ApiError.NotFound("Beat was not found.");
       }
       const relatedBeats = yield this.findBeats({
         tags: beat.tags.map((item) => item.name),
-        q: beat.user.username
+        q: beat.user.username,
       });
       return __spreadProps(__spreadValues({}, beat), {
-        related: relatedBeats.filter((item) => item.id !== beat.id)
+        related: relatedBeats.filter((item) => item.id !== beat.id),
       });
     });
   }
@@ -933,8 +945,8 @@ var BeatService = class {
     return __async(this, null, function* () {
       const beat = yield prisma4.beat.findUnique({
         where: {
-          id
-        }
+          id,
+        },
       });
       if (beat == null) {
         throw ApiError.NotFound("Beat was not found.");
@@ -958,20 +970,30 @@ var BeatService = class {
   }
   uploadBeat(data) {
     return __async(this, null, function* () {
-      const beat = yield prisma4.beat.create(__spreadValues({
-        data
-      }, beat_individual_select_default));
+      const beat = yield prisma4.beat.create(
+        __spreadValues(
+          {
+            data,
+          },
+          beat_individual_select_default
+        )
+      );
       return beat;
     });
   }
   editBeat(beatId, data) {
     return __async(this, null, function* () {
-      const beat = yield prisma4.beat.update(__spreadValues({
-        where: {
-          id: beatId
-        },
-        data
-      }, beat_individual_select_default));
+      const beat = yield prisma4.beat.update(
+        __spreadValues(
+          {
+            where: {
+              id: beatId,
+            },
+            data,
+          },
+          beat_individual_select_default
+        )
+      );
       return beat;
     });
   }
@@ -980,8 +1002,8 @@ var BeatService = class {
       yield this.beatAwsDelete(beat);
       yield prisma4.beat.delete({
         where: {
-          id: beat.id
-        }
+          id: beat.id,
+        },
       });
     });
   }
@@ -995,7 +1017,7 @@ var CommentService = class {
   uploadComment(data) {
     return __async(this, null, function* () {
       const comment = yield prisma5.comment.create({
-        data
+        data,
       });
       return comment;
     });
@@ -1004,10 +1026,10 @@ var CommentService = class {
     return __async(this, null, function* () {
       const comments = yield prisma5.comment.findMany({
         where: {
-          beatId
+          beatId,
         },
         take: 10,
-        skip: viewed
+        skip: viewed,
       });
       return comments;
     });
@@ -1015,7 +1037,7 @@ var CommentService = class {
   getCommentById(commentId) {
     return __async(this, null, function* () {
       const comment = yield prisma5.comment.findUnique({
-        where: { id: commentId }
+        where: { id: commentId },
       });
       return comment;
     });
@@ -1023,7 +1045,7 @@ var CommentService = class {
   deleteComment(commentId) {
     return __async(this, null, function* () {
       yield prisma5.comment.delete({
-        where: { id: commentId }
+        where: { id: commentId },
       });
     });
   }
@@ -1038,8 +1060,8 @@ var LikeService = class {
     return __async(this, null, function* () {
       const like = yield prisma6.like.findUnique({
         where: {
-          likeIdentifier: { userId, beatId }
-        }
+          likeIdentifier: { userId, beatId },
+        },
       });
       return like;
     });
@@ -1048,8 +1070,8 @@ var LikeService = class {
     return __async(this, null, function* () {
       const like = yield prisma6.like.delete({
         where: {
-          likeIdentifier: { userId, beatId }
-        }
+          likeIdentifier: { userId, beatId },
+        },
       });
       return like;
     });
@@ -1059,12 +1081,12 @@ var LikeService = class {
       const like = yield prisma6.like.create({
         data: {
           user: {
-            connect: { id: userId }
+            connect: { id: userId },
           },
           beat: {
-            connect: { id: beatId }
-          }
-        }
+            connect: { id: beatId },
+          },
+        },
       });
       return like;
     });
@@ -1079,16 +1101,11 @@ var BeatController = class {
       try {
         let beats;
         if (Object.keys(req.query).length > 0) {
-          const query5 = (({
-            q,
-            bpm,
-            tags,
-            orderBy
-          }) => ({
+          const query5 = (({ q, bpm, tags, orderBy }) => ({
             q,
             bpm: bpm ? +bpm : void 0,
             tags: tags ? tags.split(",") : void 0,
-            orderBy
+            orderBy,
           }))(req.query);
           beats = yield beat_service_default.findBeats(query5, req.query.viewed ? +req.query.viewed : 0);
         } else {
@@ -1096,7 +1113,7 @@ var BeatController = class {
         }
         return res.json({
           beats,
-          viewed: req.query.viewed ? +req.query.viewed + beats.length : beats.length
+          viewed: req.query.viewed ? +req.query.viewed + beats.length : beats.length,
         });
       } catch (error) {
         next(error);
@@ -1118,32 +1135,23 @@ var BeatController = class {
     return __async(this, null, function* () {
       try {
         const userId = req.user.id;
-        const payload = (({
-          name,
-          bpm,
-          description,
-          tags,
-          stemsPrice,
-          wavePrice,
-          wave,
-          mp3,
-          stems,
-          image
-        }) => ({
+        const payload = (({ name, bpm, description, tags, stemsPrice, wavePrice, wave, mp3, stems, image }) => ({
           name,
           bpm: bpm ? +bpm : void 0,
           description,
-          tags: tags ? {
-            connectOrCreate: tags.split(",").map((tag) => {
-              if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
-                throw ApiError.BadRequest("Wrong tags");
+          tags: tags
+            ? {
+                connectOrCreate: tags.split(",").map((tag) => {
+                  if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
+                    throw ApiError.BadRequest("Wrong tags");
+                  }
+                  return {
+                    where: { name: tag },
+                    create: { name: tag },
+                  };
+                }),
               }
-              return {
-                where: { name: tag },
-                create: { name: tag }
-              };
-            })
-          } : void 0,
+            : void 0,
           stemsPrice: stemsPrice ? +stemsPrice : void 0,
           wavePrice: +wavePrice,
           wave,
@@ -1151,8 +1159,8 @@ var BeatController = class {
           stems,
           image,
           user: {
-            connect: { id: userId }
-          }
+            connect: { id: userId },
+          },
         }))(req.body);
         const beat = yield beat_service_default.uploadBeat(payload);
         return res.json(beat);
@@ -1170,39 +1178,30 @@ var BeatController = class {
           next(ApiError.UnauthorizedUser());
           return;
         }
-        const payload = (({
-          name,
-          bpm,
-          description,
-          tags,
-          wavePrice,
-          stemsPrice,
-          image,
-          wave,
-          mp3,
-          stems
-        }) => ({
+        const payload = (({ name, bpm, description, tags, wavePrice, stemsPrice, image, wave, mp3, stems }) => ({
           name,
           bpm: +bpm,
           description,
-          tags: tags ? {
-            set: [],
-            connectOrCreate: tags.split(",").map((tag) => {
-              return {
-                where: { name: tag },
-                create: { name: tag }
-              };
-            })
-          } : void 0,
+          tags: tags
+            ? {
+                set: [],
+                connectOrCreate: tags.split(",").map((tag) => {
+                  return {
+                    where: { name: tag },
+                    create: { name: tag },
+                  };
+                }),
+              }
+            : void 0,
           wavePrice: +wavePrice,
           stemsPrice: +stemsPrice,
           image,
           wave,
           mp3,
-          stems
+          stems,
         }))(req.body);
         const merged = __spreadValues(__spreadValues({}, original), payload);
-        if (merged.stemsPrice && !merged.stems || merged.stems && !merged.stemsPrice) {
+        if ((merged.stemsPrice && !merged.stems) || (merged.stems && !merged.stemsPrice)) {
           next(ApiError.BadRequest("Provide both stems and stems price"));
           return;
         }
@@ -1227,12 +1226,12 @@ var BeatController = class {
         const beat = yield beat_service_default.getBeatById(id);
         const payload = {
           user: {
-            connect: { id: userId }
+            connect: { id: userId },
           },
           beat: {
-            connect: { id: beat.id }
+            connect: { id: beat.id },
           },
-          content: req.body.content
+          content: req.body.content,
         };
         const comment = yield comment_service_default.uploadComment(payload);
         return res.json(comment);
@@ -1307,7 +1306,12 @@ router3.get(
   validation_middleware_default,
   beat_controller_default.getBeats
 );
-router3.get("/:id", param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.getIndividualBeat);
+router3.get(
+  "/:id",
+  param("id").isDecimal().bail(),
+  validation_middleware_default,
+  beat_controller_default.getIndividualBeat
+);
 router3.post(
   "/:id/comment",
   auth_middleware_default,
@@ -1323,7 +1327,13 @@ router3.post(
   validation_middleware_default,
   beat_controller_default.likeToggle
 );
-router3.post("/:id/delete", auth_middleware_default, param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.delete);
+router3.post(
+  "/:id/delete",
+  auth_middleware_default,
+  param("id").isDecimal().bail(),
+  validation_middleware_default,
+  beat_controller_default.delete
+);
 router3.post(
   "/:id/edit",
   auth_middleware_default,
@@ -1374,11 +1384,14 @@ var MediaController = class {
       try {
         const { key, path: path2 } = req.params;
         const media = yield media_service_default.getMedia(`${path2}/${key}`);
-        media.createReadStream().on("error", (error) => {
-          if (error.code === "AccessDenied") {
-            next(ApiError.NotFound("File was not found."));
-          }
-        }).pipe(res);
+        media
+          .createReadStream()
+          .on("error", (error) => {
+            if (error.code === "AccessDenied") {
+              next(ApiError.NotFound("File was not found."));
+            }
+          })
+          .pipe(res);
       } catch (error) {
         next(error);
       }
@@ -1390,7 +1403,13 @@ var media_controller_default = new MediaController();
 // src/router/media-router.ts
 var router4 = Router4();
 router4.get("/:path/:key", media_controller_default.getMedia);
-router4.post("/upload", auth_middleware_default, body3("path").notEmpty().bail(), validation_middleware_default, media_controller_default.upload);
+router4.post(
+  "/upload",
+  auth_middleware_default,
+  body3("path").notEmpty().bail(),
+  validation_middleware_default,
+  media_controller_default.upload
+);
 var media_router_default = router4;
 
 // src/router/index.ts
@@ -1431,7 +1450,7 @@ var CommentController = class {
         const comments = yield comment_service_default.getComments(beat.id, req.query.viewed ? +req.query.viewed : 0);
         return res.json({
           comments,
-          viewed: req.query.viewed ? +req.query.viewed + comments.length : comments.length
+          viewed: req.query.viewed ? +req.query.viewed + comments.length : comments.length,
         });
       } catch (error) {
         next(error);
@@ -1451,7 +1470,12 @@ router5.get(
   validation_middleware_default,
   comment_controller_default.getComments
 );
-router5.post("/delete/:id", param2("id").isDecimal().bail(), validation_middleware_default, comment_controller_default.deleteComment);
+router5.post(
+  "/delete/:id",
+  param2("id").isDecimal().bail(),
+  validation_middleware_default,
+  comment_controller_default.deleteComment
+);
 var comment_router_default = router5;
 
 // src/router/tag-router.ts
@@ -1467,11 +1491,11 @@ var TagService = class {
       const tags = yield prisma7.tag.findMany({
         where: {
           name: {
-            contains: name
-          }
+            contains: name,
+          },
         },
         take: 10,
-        skip: viewed
+        skip: viewed,
       });
       return tags;
     });
@@ -1480,7 +1504,7 @@ var TagService = class {
     return __async(this, null, function* () {
       const tags = yield prisma7.tag.findMany({
         take: 10,
-        skip: viewed
+        skip: viewed,
       });
       return tags;
     });
@@ -1501,7 +1525,7 @@ var TagController = class {
         }
         return res.json({
           tags,
-          viewed: req.query.viewed ? +req.query.viewed + tags.length : tags.length
+          viewed: req.query.viewed ? +req.query.viewed + tags.length : tags.length,
         });
       } catch (error) {
         next(error);
@@ -1550,13 +1574,11 @@ app.use(cookieParser());
 app.use(
   cors({
     credentials: true,
-    origin: process.env.CLIENT_URL
+    origin: process.env.CLIENT_URL,
   })
 );
 app.use("/api", router_default);
 app.use(error_middleware_default);
 var app_default = app;
-export {
-  app_default as default
-};
+export { app_default as default };
 //# sourceMappingURL=app.js.map
