@@ -102,7 +102,7 @@ var TokenService = class {
   generateTokens(payload, refresh) {
     const tokens = {
       accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET, {
-        expiresIn: "30m"
+        expiresIn: "15m"
       })
     };
     if (refresh) {
@@ -502,7 +502,7 @@ var UserController = class {
           httpOnly: true,
           secure: process.env.NODE_ENV === "production"
         });
-        return res.json(userData);
+        return res.json({ accessToken: userData.accessToken, user: userData.user });
       } catch (error) {
         next(error);
       }
@@ -540,31 +540,28 @@ import { body } from "express-validator";
 import { Router } from "express";
 
 // src/middlewares/auth-middleware.ts
-function auth_middleware_default(req, res, next) {
-  return __async(this, null, function* () {
-    try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader) {
-        next(ApiError.UnauthorizedUser());
-        return;
+import passport from "passport";
+import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_ACCESS_SECRET
+    },
+    (jwtPayload, done) => __async(void 0, null, function* () {
+      try {
+        const user = yield user_service_default.getUserById(jwtPayload.id);
+        if (user) {
+          return done(null, user);
+        }
+        return done(null, false);
+      } catch (error) {
+        return done(error, false);
       }
-      const accessToken = authHeader.split(" ")[1];
-      if (!accessToken) {
-        next(ApiError.UnauthorizedUser());
-        return;
-      }
-      const userData = token_service_default.validateAccessToken(accessToken);
-      if (!userData) {
-        next(ApiError.UnauthorizedUser());
-        return;
-      }
-      req.user = userData;
-      next();
-    } catch (error) {
-      next(ApiError.UnauthorizedUser());
-    }
-  });
-}
+    })
+  )
+);
+var auth_middleware_default = passport.authenticate("jwt", { session: false });
 
 // src/middlewares/validation-middleware.ts
 import { validationResult } from "express-validator";
@@ -610,7 +607,7 @@ router.post(
 );
 router.post("/logout", user_controller_default.logout);
 router.get("/activate/:activationLink", user_controller_default.activate);
-router.get("/refresh", user_controller_default.refresh);
+router.post("/refresh", user_controller_default.refresh);
 var user_router_default = router;
 
 // src/services/author-service.ts

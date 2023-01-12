@@ -54,6 +54,6 @@ router.post("/logout", userController.logout);
 router.get("/activate/:activationLink", userController.activate);
 
 // refresh tokens
-router.get("/refresh", userController.refresh);
+router.post("/refresh", userController.refresh);
 
 export default router;

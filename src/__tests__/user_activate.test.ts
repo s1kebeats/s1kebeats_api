@@ -1,5 +1,4 @@
 import request from "supertest";
-import assert from "assert";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
@@ -33,5 +32,5 @@ it("providing wrong activation link should return 404", async () => {
 it("providing valid activation link should return 200 and update users isActivated field to true", async () => {
   const res = await request(app).get("/api/activate/datsenkoboos-activation-link");
   await expect(res.statusCode).toEqual(200);
-  await expect(!!(await prisma.user.findUnique({ where: { username: 'datsenkoboos' } }))).toEqual(true);
+  await expect(!!(await prisma.user.findUnique({ where: { username: "datsenkoboos" } }))).toEqual(true);
 });

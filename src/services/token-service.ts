@@ -17,7 +17,7 @@ class TokenService {
       refreshToken?: string;
     } = {
       accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET!, {
-        expiresIn: "30m",
+        expiresIn: "15m",
       }),
     };
     if (refresh) {

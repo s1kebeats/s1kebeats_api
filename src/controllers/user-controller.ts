@@ -3,7 +3,6 @@ import ApiError from "../exceptions/api-error";
 import { Request, Response, NextFunction } from "express";
 import PrismaClient from "@prisma/client";
 import mediaService from "../services/media-service";
-import UserDto from "dtos/user-dto";
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -28,6 +27,7 @@ class UserController {
     try {
       const ip = req.ip;
       const { username, password, refresh }: { username: string; password: string; refresh: boolean } = req.body;
+
       const userData = await userService.login(username, password, ip, !!refresh);
       if (!!refresh) {
         // set refresh token httpOnly cookie
@@ -87,7 +87,7 @@ class UserController {
         httpOnly: true,
         secure: process.env.NODE_ENV === "production",
       });
-      return res.json(userData);
+      return res.json({ accessToken: userData.accessToken, user: userData.user });
     } catch (error) {
       next(error);
     }

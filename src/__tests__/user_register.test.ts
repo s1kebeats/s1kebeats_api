@@ -124,7 +124,7 @@ it("providing already used username, should return 400", async () => {
     .set("Content-Type", "application/json");
   assert.equal(res.statusCode, 400);
 });
-it("providing right data, should return 200 and register new user", async () => {
+it("providing right data, should return 200 and register new user with isActivated field = false", async () => {
   const res = await request(app)
     .post("/api/register")
     .send({
