@@ -43,6 +43,7 @@ router.post(
   body("youtube").if(body("youtube").exists()).isLength({ max: 255 }).bail(),
   body("vk").if(body("vk").exists()).isLength({ max: 255 }).bail(),
   body("instagram").if(body("instagram").exists()).isLength({ max: 255 }).bail(),
+  body("image").if(body("image").exists()).contains("image/").bail(),
   validationMiddleware,
   userController.edit
 );

@@ -3,16 +3,16 @@ import assert from "assert";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
+import PrismaClient from "@prisma/client";
 
-function checkMockedUserLoginResponse(body: any): void {
-  assert.equal(body.user.email, mock.email);
-  assert.equal(body.user.username, mock.username);
-  assert.equal(body.user.displayedName, mock.displayedName);
-  assert.equal(body.user.image, mock.image);
-  assert.equal(typeof body.accessToken, "string");
+async function checkMockedUserLoginResponse(body: any) {
+  for (let key of ["email", "username", "displayedName", "image"]) {
+    await expect(body.user[key]).toEqual(mock[key as keyof typeof mock]);
+  }
+  await expect(typeof body.accessToken).toEqual("string");
 }
 
-const mock = {
+const mock: PrismaClient.Prisma.UserCreateInput = {
   username: "s1kebeats",
   displayedName: "Arthur Datsenko-Boos",
   image: "path/to/image",
