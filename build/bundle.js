@@ -685,12 +685,14 @@ var AuthorService = class {
           OR: [
             {
               username: {
-                contains: query5
+                contains: query5,
+                mode: "insensitive"
               }
             },
             {
               displayedName: {
-                contains: query5
+                contains: query5,
+                mode: "insensitive"
               }
             }
           ]

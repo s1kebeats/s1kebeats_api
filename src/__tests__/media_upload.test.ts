@@ -29,10 +29,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("not authorized request should return 401", async () => {
-  const res = await request(app)
-    .post("/api/media/upload")
-    .attach("image", mediaLocations.image)
-    .field("path", "image");
+  const res = await request(app).post("/api/media/upload").attach("image", mediaLocations.image).field("path", "image");
   await expect(res.statusCode).toBe(401);
 });
 it('no "file" field attached should return 400', async () => {

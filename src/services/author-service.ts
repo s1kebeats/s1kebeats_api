@@ -24,11 +24,13 @@ class AuthorService {
           {
             username: {
               contains: query,
+              mode: "insensitive" as PrismaClient.Prisma.QueryMode,
             },
           },
           {
             displayedName: {
               contains: query,
+              mode: "insensitive" as PrismaClient.Prisma.QueryMode,
             },
           },
         ],
