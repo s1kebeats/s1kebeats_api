@@ -41,8 +41,11 @@ it("providing valid refresh token, should return 200 and invalidate refreshToken
     refresh: true,
   });
   const refreshToken = login.headers["set-cookie"][0].split(" ")[0];
+
   const res = await request(app).post("/api/logout").set("Cookie", refreshToken);
   await expect(res.statusCode).toEqual(200);
+
+  // check that refreshToken is not valid anymore
   const refreshWithDeletedToken = await request(app).post("/api/refresh").set("Cookie", refreshToken);
   await expect(refreshWithDeletedToken.statusCode).toEqual(401);
 });

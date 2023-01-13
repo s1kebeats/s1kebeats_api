@@ -366,13 +366,16 @@ var MediaService = class {
         this.validate(file, ".mp3", 150 * 1024 * 1024);
         break;
       }
-      case "wav": {
+      case "wave": {
         this.validate(file, ".wav", 300 * 1024 * 1024);
         break;
       }
       case "stems": {
         this.validate(file, [".zip", ".rar"], 500 * 1024 * 1024);
         break;
+      }
+      default: {
+        throw ApiError.BadRequest("Invalid path");
       }
     }
   }
@@ -1187,6 +1190,9 @@ var BeatController = class {
             ? {
                 set: [],
                 connectOrCreate: tags.split(",").map((tag) => {
+                  if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
+                    throw ApiError.BadRequest("Wrong tags");
+                  }
                   return {
                     where: { name: tag },
                     create: { name: tag },

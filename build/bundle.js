@@ -374,7 +374,7 @@ var MediaService = class {
         );
         break;
       }
-      case "wav": {
+      case "wave": {
         this.validate(
           file,
           ".wav",
@@ -389,6 +389,9 @@ var MediaService = class {
           500 * 1024 * 1024
         );
         break;
+      }
+      default: {
+        throw ApiError.BadRequest("Invalid path");
       }
     }
   }
@@ -1188,6 +1191,9 @@ var BeatController = class {
           tags: tags ? {
             set: [],
             connectOrCreate: tags.split(",").map((tag) => {
+              if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
+                throw ApiError.BadRequest("Wrong tags");
+              }
               return {
                 where: { name: tag },
                 create: { name: tag }

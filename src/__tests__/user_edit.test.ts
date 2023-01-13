@@ -58,6 +58,7 @@ it("providing used username, should return 400", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/edit")
     .set("Authorization", "Bearer " + accessToken)
@@ -72,6 +73,7 @@ it("providing username with banned characters, should return 400", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/edit")
     .set("Authorization", "Bearer " + accessToken)
@@ -86,6 +88,7 @@ it("providing wrong image key, should return 400", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/edit")
     .set("Authorization", "Bearer " + accessToken)
@@ -100,11 +103,14 @@ it("providing valid data, should return 200 and edit the user", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/edit")
     .set("Authorization", "Bearer " + accessToken)
     .send(editPayload);
   await expect(res.statusCode).toEqual(200);
+
+  // check that the user was edited
   const user = await request(app).get("/api/author/" + editPayload.username);
   await checkEditedUser(user.body);
 });

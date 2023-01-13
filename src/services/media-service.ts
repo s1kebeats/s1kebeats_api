@@ -53,7 +53,7 @@ class MediaService {
         );
         break;
       }
-      case "wav": {
+      case "wave": {
         this.validate(
           file,
           ".wav",
@@ -70,6 +70,9 @@ class MediaService {
           500 * 1024 * 1024
         );
         break;
+      }
+      default: {
+        throw ApiError.BadRequest("Invalid path");
       }
     }
   }

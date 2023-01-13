@@ -5,7 +5,7 @@ import app from "./app.js";
 import PrismaClient from "@prisma/client";
 
 const MOCKED_USERS = 4;
-const usersList = [
+const usersList: PrismaClient.Prisma.UserCreateInput[] = [
   {
     username: "alice56",
     password: await (() => bcrypt.hash("Password1234", 3))(),
@@ -32,6 +32,7 @@ const usersList = [
     activationLink: "bob78-activation-link",
   },
 ];
+
 beforeAll(async () => {
   await prisma.user.createMany({
     data: usersList,

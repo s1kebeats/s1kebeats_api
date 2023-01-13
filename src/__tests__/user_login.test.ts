@@ -4,13 +4,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import PrismaClient from "@prisma/client";
-
-async function checkMockedUserLoginResponse(body: any) {
-  for (let key of ["email", "username", "displayedName", "image"]) {
-    await expect(body.user[key]).toEqual(mock[key as keyof typeof mock]);
-  }
-  await expect(typeof body.accessToken).toEqual("string");
-}
+import checkAuthResponse from "./utils/checkAuthResponse";
 
 const mock: PrismaClient.Prisma.UserCreateInput = {
   username: "s1kebeats",
@@ -48,27 +42,27 @@ it("should return 400 without username provided", async () => {
   const res = await request(app).post("/api/login").send({
     password: "randompassword",
   });
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("should return 400 without password provided", async () => {
   const res = await request(app).post("/api/login").send({
     username: "randomusername",
   });
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("logging with wrong password should return 401", async () => {
   const res = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "randompassword",
   });
-  assert.equal(res.statusCode, 401);
+  await expect(res.statusCode).toBe(401);
 });
-it("logging with not registered username should return 401", async () => {
+it("logging with unregistered username should return 401", async () => {
   const res = await request(app).post("/api/login").send({
     username: "randonusername",
     password: "Password1234",
   });
-  assert.equal(res.statusCode, 401);
+  await expect(res.statusCode).toBe(401);
 });
 it("logging into account without activated email should return 403", async () => {
   const res = await request(app).post("/api/login").send({
@@ -83,8 +77,10 @@ it("providing right data, refresh=true, should return 200 and set http-only refr
     password: "Password1234",
     refresh: true,
   });
-  assert.equal(res.statusCode, 200);
-  checkMockedUserLoginResponse(res.body);
+  await expect(res.statusCode).toBe(200);
+
+  // checking sent userDto
+  checkAuthResponse(res.body, mock);
 
   // refresh token cookie check
   assert.equal(res.headers["set-cookie"][0].includes("refreshToken="), true);
@@ -95,8 +91,10 @@ it("providing right data, refresh=false, should return 200 and should not set ht
     username: "s1kebeats",
     password: "Password1234",
   });
-  assert.equal(res.statusCode, 200);
-  checkMockedUserLoginResponse(res.body);
+  await expect(res.statusCode).toBe(200);
+
+  // checking sent userDto
+  checkAuthResponse(res.body, mock);
 
   // refresh token cookie check
   assert.equal(res.headers["set-cookie"], undefined);

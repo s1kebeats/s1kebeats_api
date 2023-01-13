@@ -41,15 +41,21 @@ it("refresh with right refreshToken http-only cookie should return 200 and new v
     refresh: true,
   });
   let refreshTokenCookie = login.headers["set-cookie"][0].split(" ")[0];
+
   const res = await request(app).post("/api/refresh").set("Cookie", refreshTokenCookie);
   await expect(res.statusCode).toEqual(200);
   await expect(res.headers["set-cookie"][0].includes("refreshToken=")).toBe(true);
   await expect(res.headers["set-cookie"][0].includes("HttpOnly")).toBe(true);
+
   refreshTokenCookie = res.headers["set-cookie"][0].split(" ")[0];
+
+  // request to a random endpoint with required authorization to check that new accessToken is valid
   const edit = await request(app)
     .post("/api/edit")
     .set("Authorization", "Bearer " + res.body.accessToken);
   await expect(edit.statusCode).toEqual(200);
+
+  // checking that new refreshToken is valid
   const refreshWithNewRefreshToken = await request(app).post("/api/refresh").set("Cookie", refreshTokenCookie);
   await expect(refreshWithNewRefreshToken.statusCode).toEqual(200);
 });

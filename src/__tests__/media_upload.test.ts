@@ -1,5 +1,4 @@
 import request from "supertest";
-import assert from "assert";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
@@ -38,6 +37,7 @@ it('no "file" field attached should return 400', async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
@@ -50,32 +50,48 @@ it("no path provided should return 400", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
-    .attach("file", mediaLocations.jpg);
+    .attach("file", mediaLocations.image);
   await expect(res.statusCode).toBe(400);
 });
-
-it("providing media file with wrong extension to image path", async () => {
+it("invalid path provided should return 400", async () => {
   const login = await request(app).post("/api/login").send({
     username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
-    .attach("file", mediaLocations.wav)
+    .attach("file", mediaLocations.image)
+    .field("path", "randomPath");
+  await expect(res.statusCode).toBe(400);
+});
+it("providing media file with wrong extension to image path should return 400", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "datsenkoboos",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
+
+  const res = await request(app)
+    .post("/api/media/upload")
+    .set("Authorization", "Bearer " + accessToken)
+    .attach("file", mediaLocations.wave)
     .field("path", "image");
   await expect(res.statusCode).toBe(400);
 });
-it("providing media file with wrong extension to stems path", async () => {
+it("providing media file with wrong extension to stems path should return 400", async () => {
   const login = await request(app).post("/api/login").send({
     username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
@@ -83,12 +99,13 @@ it("providing media file with wrong extension to stems path", async () => {
     .field("path", "stems");
   await expect(res.statusCode).toBe(400);
 });
-it("providing media file with wrong extension to mp3 path", async () => {
+it("providing media file with wrong extension to mp3 path should return 400", async () => {
   const login = await request(app).post("/api/login").send({
     username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
@@ -96,12 +113,13 @@ it("providing media file with wrong extension to mp3 path", async () => {
     .field("path", "mp3");
   await expect(res.statusCode).toBe(400);
 });
-it("providing media file with wrong extension to wav path", async () => {
+it("providing media file with wrong extension to wav path should return 400", async () => {
   const login = await request(app).post("/api/login").send({
     username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
@@ -115,13 +133,17 @@ it("valid data provided, should return 200 and upload the file", async () => {
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
+
   const res = await request(app)
     .post("/api/media/upload")
     .set("Authorization", "Bearer " + accessToken)
     .attach("file", mediaLocations.image)
     .field("path", "image");
-  assert.equal(res.statusCode, 200);
+  await expect(res.statusCode).toBe(200);
+
   const key = res.body;
+
+  // check if the file was uploaded
   const media = await request(app).get("/api/media/" + key);
   await expect(media.statusCode).toBe(200);
 });

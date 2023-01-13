@@ -36,7 +36,7 @@ it("should return 400 without email provided", async () => {
       password: "randompassword",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("should return 400 without username provided", async () => {
   const res = await request(app)
@@ -46,7 +46,7 @@ it("should return 400 without username provided", async () => {
       password: "randompassword",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("should return 400 without password provided", async () => {
   const res = await request(app)
@@ -56,7 +56,7 @@ it("should return 400 without password provided", async () => {
       username: "randomusername",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("providing wrong email, should return 400", async () => {
   const res = await request(app)
@@ -67,7 +67,7 @@ it("providing wrong email, should return 400", async () => {
       password: "randompassword",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("providing password shorter than 8 chars, should return 400", async () => {
   const res = await request(app)
@@ -78,7 +78,7 @@ it("providing password shorter than 8 chars, should return 400", async () => {
       password: "1234567",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("providing password without digit, should return 400", async () => {
   const res = await request(app)
@@ -89,9 +89,9 @@ it("providing password without digit, should return 400", async () => {
       password: "abcdefgHI",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
-it("providing password without at least one capital letter, should return 400", async () => {
+it("providing password without any capital letters, should return 400", async () => {
   const res = await request(app)
     .post("/api/register")
     .send({
@@ -100,7 +100,7 @@ it("providing password without at least one capital letter, should return 400", 
       password: "abcdefg1234",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("providing username with banned characters, should return 400", async () => {
   const res = await request(app)
@@ -111,7 +111,7 @@ it("providing username with banned characters, should return 400", async () => {
       password: "randompassword",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
 it("providing already used username, should return 400", async () => {
   const res = await request(app)
@@ -122,9 +122,9 @@ it("providing already used username, should return 400", async () => {
       password: "Password1234",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 400);
+  await expect(res.statusCode).toBe(400);
 });
-it("providing right data, should return 200 and register new user with isActivated field = false", async () => {
+it("providing valid data, should return 200 and register new user with isActivated field = false", async () => {
   const res = await request(app)
     .post("/api/register")
     .send({
@@ -133,11 +133,14 @@ it("providing right data, should return 200 and register new user with isActivat
       password: "Password1234",
     })
     .set("Content-Type", "application/json");
-  assert.equal(res.statusCode, 200);
-  // number of users should increase by one the test registered successfully
+  await expect(res.statusCode).toBe(200);
+
+  // number of users should increase by the one that test registered
   assert.equal((await prisma.user.findMany()).length, USERS_BEFORE_TESTS + 1);
+
   // registered user should be in the database
   assert.equal(!!(await prisma.user.findUnique({ where: { username: mock.username } })), true);
+
   // registered user isActivated field should be false
   assert.equal((await prisma.user.findUnique({ where: { username: mock.username } }))!.isActivated, false);
 });
