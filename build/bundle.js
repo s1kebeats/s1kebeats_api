@@ -321,9 +321,6 @@ var UserService = class {
       const user = yield prisma2.user.findUnique({
         where: { id }
       });
-      if (user == null) {
-        throw ApiError.NotFound("User was not found.");
-      }
       return user;
     });
   }

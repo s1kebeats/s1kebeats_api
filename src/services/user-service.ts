@@ -142,13 +142,10 @@ class UserService {
     await prisma.user.update(userUpdateArgs);
   }
 
-  async getUserById(id: number): Promise<PrismaClient.User> {
+  async getUserById(id: number): Promise<PrismaClient.User | null> {
     const user = await prisma.user.findUnique({
       where: { id },
     });
-    if (user == null) {
-      throw ApiError.NotFound("User was not found.");
-    }
     return user;
   }
 }

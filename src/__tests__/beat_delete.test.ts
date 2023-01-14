@@ -62,27 +62,27 @@ afterAll(async () => {
 });
 
 it("GET request should return 404", async () => {
-  const res = await request(app).get(`/api/beat/${id}/edit`);
-  // 400 because of Id param validator on the individual beat path
+  const res = await request(app).get(`/api/beat/${id}/delete`);
   await expect(res.statusCode).toBe(404);
 });
-it("not authorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/edit`);
+it("unauthorized request should return 401", async () => {
+  console.log(id);
+  const res = await request(app).post(`/api/beat/${id}/delete`);
   await expect(res.statusCode).toBe(401);
 });
-it("request to edit a beat that doesn't exist, should return 404", async () => {
+it("request to delete a beat that doesn't exist, should return 404", async () => {
   const login = await request(app).post("/api/login").send({
-    login: "datsenkoboos",
+    username: "s1kebeats",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/-1/edit`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).post(`/api/beat/-1/delete`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(404);
 });
-it("request to edit beat that belongs to other user, should return 401", async () => {
+it("request to delete beat that belongs to other user, should return 401", async () => {
   const login = await request(app).post("/api/login").send({
-    login: "datsenkoboos",
+    username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
@@ -90,52 +90,7 @@ it("request to edit beat that belongs to other user, should return 401", async (
   const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(401);
 });
-it("providing stemsPrice without stems media file, should return 400", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
-  });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app)
-    .post(`/api/beat/${id}/edit`)
-    .set("Authorization", "Bearer " + accessToken)
-    .send({
-      stemsPrice: 1000,
-    });
-  await expect(res.statusCode).toBe(400);
-});
-it("providing stems without stemsPrice, should return 400", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
-  });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app)
-    .post(`/api/beat/${id}/edit`)
-    .set("Authorization", "Bearer " + accessToken)
-    .send({
-      stems: "stems/randomFile",
-    });
-  await expect(res.statusCode).toBe(400);
-});
-it("request with wrong tags, should return 400", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
-  });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app)
-    .post(`/api/beat/${id}/edit`)
-    .set("Authorization", "Bearer " + accessToken)
-    .send({
-      tags: "_/f",
-    });
-  await expect(res.statusCode).toBe(400);
-});
-it("providing valid data, should return 200, edit the beat and delete old media", async () => {
+it("valid request, should return 200, delete the beat and it's media", async () => {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Password1234",
@@ -193,52 +148,23 @@ it("providing valid data, should return 200, edit the beat and delete old media"
     });
   const id = beatUpload.body.id;
 
-  const editPayload = {
-    wave: "/wave/new",
-    mp3: "/mp3/new",
-    image: "/image/newImage",
-    stems: "/stems/new",
-    name: "different name",
-    description: "different description",
-    bpm: 150,
-    stemsPrice: 5000,
-    wavePrice: 1000,
-    tags: "newTag,s1kebeats",
-  };
-
-  const res = await request(app)
-    .post(`/api/beat/${id}/edit`)
-    .set("Authorization", "Bearer " + accessToken)
-    .send(editPayload);
+  const res = await request(app).post(`/api/beat/${id}/delete`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
-  // check that beat was edited
-  const beat = await request(app).get("/api/beat/" + id);
-  beat.body.tags = beat.body.tags.map((tag: { name: string }) => tag.name);
-  for (let key of Object.keys(editPayload)) {
-    if (key === "tags") {
-      await expect(beat.body.tags.length).toBe(2);
-      await expect(beat.body.tags.includes("newTag")).toBe(true);
-      await expect(beat.body.tags.includes("s1kebeats")).toBe(true);
-      continue;
-    }
-    // wave and stems should not be accessible without payment
-    if (key === "wave" || key === "stems") {
-      await expect(beat.body[key]).toBe(undefined);
-      continue;
-    }
-    await expect(beat.body[key]).toBe(editPayload[key as keyof typeof editPayload]);
-  }
-  // check that old beat media was deleted
-  const oldImage = await request(app).get("/api/media/" + image);
-  await expect(oldImage.statusCode).toBe(404);
+  // check that beat was deleted
+  const deleted = await request(app).post(`/api/beat/${id}`);
+  await expect(deleted.statusCode).toBe(404);
 
-  const oldWave = await request(app).get("/api/media/" + wave);
-  await expect(oldWave.statusCode).toBe(404);
+  // check that all beat media was deleted
+  const beatImage = await request(app).get("/api/media/" + image);
+  await expect(beatImage.statusCode).toBe(404);
 
-  const oldMp3 = await request(app).get("/api/media/" + mp3);
-  await expect(oldMp3.statusCode).toBe(404);
+  const beatWave = await request(app).get("/api/media/" + wave);
+  await expect(beatWave.statusCode).toBe(404);
 
-  const oldStems = await request(app).get("/api/media/" + stems);
-  await expect(oldStems.statusCode).toBe(404);
+  const beatMp3 = await request(app).get("/api/media/" + mp3);
+  await expect(beatMp3.statusCode).toBe(404);
+
+  const beatStems = await request(app).get("/api/media/" + stems);
+  await expect(beatStems.statusCode).toBe(404);
 });
