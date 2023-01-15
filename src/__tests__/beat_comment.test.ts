@@ -39,14 +39,14 @@ afterAll(async () => {
 });
 
 it("GET request should return 404", async () => {
-  const res = await request(app).get(`/api/beat/${id}/like`);
+  const res = await request(app).get(`/api/beat/${id}/comment`);
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/like`);
+  const res = await request(app).post(`/api/beat/${id}/comment`);
   await expect(res.statusCode).toBe(401);
 });
-it("request to not existing beat should return 404", async () => {
+it("request without comment content provided should return 400", async () => {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Password1234",
@@ -54,11 +54,26 @@ it("request to not existing beat should return 404", async () => {
   const accessToken = login.body.accessToken;
 
   const res = await request(app)
-    .post(`/api/-1/like`)
+    .post(`/api/beat/${id}/comment`)
+    .set("Authorization", "Bearer " + accessToken);
+  await expect(res.statusCode).toBe(400);
+});
+it("valid request to not existing beat should return 404", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "s1kebeats",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
+
+  const res = await request(app)
+    .post("/api/beat/-1/comment")
+    .send({
+      content: "Comment content",
+    })
     .set("Authorization", "Bearer " + accessToken);
   await expect(res.statusCode).toBe(404);
 });
-it("valid request, should return 200 and add the like", async () => {
+it("valid request, should return 200 and add a new comment to the beat", async () => {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",
     password: "Password1234",
@@ -66,25 +81,14 @@ it("valid request, should return 200 and add the like", async () => {
   const accessToken = login.body.accessToken;
 
   const res = await request(app)
-    .post(`/api/beat/${id}/like`)
+    .post(`/api/beat/${id}/comment`)
+    .send({
+      content: "First comment",
+    })
     .set("Authorization", "Bearer " + accessToken);
   await expect(res.statusCode).toBe(200);
 
-  const beat = await request(app).get("/api/beat/" + id);
-  await expect(beat.body._count.likes).toBe(1);
-});
-it("valid request, should return 200 and remove the like", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
-  });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app)
-    .post(`/api/beat/${id}/like`)
-    .set("Authorization", "Bearer " + accessToken);
-  await expect(res.statusCode).toBe(200);
-
-  const beat = await request(app).get("/api/beat/" + id);
-  await expect(beat.body._count.likes).toBe(0);
+  const beat = await request(app).get(`/api/beat/${id}`);
+  await expect(beat.body.comments.length).toBe(1);
+  await expect(beat.body.comments[0].content).toBe("First comment");
 });
