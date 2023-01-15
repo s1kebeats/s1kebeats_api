@@ -72,7 +72,7 @@ it("not authorized request should return 401", async () => {
 });
 it("request to edit a beat that doesn't exist, should return 404", async () => {
   const login = await request(app).post("/api/login").send({
-    login: "datsenkoboos",
+    username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;
@@ -82,7 +82,7 @@ it("request to edit a beat that doesn't exist, should return 404", async () => {
 });
 it("request to edit beat that belongs to other user, should return 401", async () => {
   const login = await request(app).post("/api/login").send({
-    login: "datsenkoboos",
+    username: "datsenkoboos",
     password: "Password1234",
   });
   const accessToken = login.body.accessToken;

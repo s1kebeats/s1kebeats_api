@@ -8,6 +8,7 @@ class TagService {
       where: {
         name: {
           contains: name,
+          mode: "insensitive",
         },
       },
       take: 10,

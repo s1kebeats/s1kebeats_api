@@ -1496,6 +1496,7 @@ var TagService = class {
         where: {
           name: {
             contains: name,
+            mode: "insensitive",
           },
         },
         take: 10,
