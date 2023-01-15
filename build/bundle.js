@@ -1470,7 +1470,8 @@ var TagService = class {
       const tags = yield prisma7.tag.findMany({
         where: {
           name: {
-            contains: name
+            contains: name,
+            mode: "insensitive"
           }
         },
         take: 10,
