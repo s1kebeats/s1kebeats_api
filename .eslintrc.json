@@ -10,5 +10,7 @@
     "sourceType": "module",
     "project": ["./tsconfig.json"]
   },
-  "rules": {}
+  "rules": {
+    "prefer-template": 2
+  }
 }

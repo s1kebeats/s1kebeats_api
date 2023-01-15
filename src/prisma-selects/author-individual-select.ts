@@ -1,5 +1,5 @@
-import PrismaClient from "@prisma/client";
-import beatForAuthorSelect from "./beat-for-author";
+import PrismaClient from '@prisma/client'
+import beatForAuthorSelect from './beat-for-author'
 const authorIndividualSelect = PrismaClient.Prisma.validator<PrismaClient.Prisma.UserArgs>()({
   select: {
     id: true,
@@ -9,17 +9,17 @@ const authorIndividualSelect = PrismaClient.Prisma.validator<PrismaClient.Prisma
     about: true,
     image: true,
     beats: {
-      ...beatForAuthorSelect,
+      ...beatForAuthorSelect
     },
     youtube: true,
     instagram: true,
     vk: true,
     _count: {
       select: {
-        beats: true,
-      },
-    },
-  },
-});
-export type AuthorIndividual = PrismaClient.Prisma.UserGetPayload<typeof authorIndividualSelect>;
-export default authorIndividualSelect;
+        beats: true
+      }
+    }
+  }
+})
+export type AuthorIndividual = PrismaClient.Prisma.UserGetPayload<typeof authorIndividualSelect>
+export default authorIndividualSelect

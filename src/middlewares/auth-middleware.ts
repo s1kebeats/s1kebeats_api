@@ -1,25 +1,25 @@
-import passport from "passport";
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import userService from "../services/user-service";
+import passport from 'passport'
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt'
+import userService from '../services/user-service'
 
 passport.use(
   new JwtStrategy(
     {
       jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-      secretOrKey: process.env.JWT_ACCESS_SECRET,
+      secretOrKey: process.env.JWT_ACCESS_SECRET
     },
     async (jwtPayload, done) => {
       try {
-        const user = await userService.getUserById(jwtPayload.id);
-        if (user) {
-          return done(null, user);
+        const user = await userService.getUserById(jwtPayload.id)
+        if (user != null) {
+          done(null, user); return
         }
-        return done(null, false);
+        done(null, false); return
       } catch (error) {
-        return done(error, false);
+        done(error, false)
       }
     }
   )
-);
+)
 
-export default passport.authenticate("jwt", { session: false });
+export default passport.authenticate('jwt', { session: false })
