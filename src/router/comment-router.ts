@@ -1,18 +1,18 @@
-import { Router } from 'express'
-import { query, param } from 'express-validator'
-import commentController from '../controllers/comment-controller'
-import authMiddleware from '../middlewares/auth-middleware'
-import validationMiddleware from '../middlewares/validation-middleware'
-const router = Router()
+import { Router } from "express";
+import { query, param } from "express-validator";
+import commentController from "../controllers/comment-controller";
+import authMiddleware from "../middlewares/auth-middleware";
+import validationMiddleware from "../middlewares/validation-middleware";
+const router = Router();
 
 router.get(
-  '/:id',
+  "/:id",
   authMiddleware,
-  param('id').isDecimal().bail(),
-  query('viewed').if(query('viewed').exists()).isDecimal().bail(),
+  param("id").isDecimal().bail(),
+  query("viewed").if(query("viewed").exists()).isDecimal().bail(),
   validationMiddleware,
   commentController.getComments
-)
-router.post('/delete/:id', param('id').isDecimal().bail(), validationMiddleware, commentController.deleteComment)
+);
+router.post("/delete/:id", param("id").isDecimal().bail(), validationMiddleware, commentController.deleteComment);
 
-export default router
+export default router;

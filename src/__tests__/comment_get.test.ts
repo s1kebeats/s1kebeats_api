@@ -1,121 +1,114 @@
-import request from 'supertest'
-import prisma from '../client'
-import bcrypt from 'bcrypt'
-import app from './app.js'
+import request from "supertest";
+import prisma from "../client";
+import bcrypt from "bcrypt";
+import app from "./app.js";
 
-let beatId: number | null = null
-let userId: number | null = null
+let beatId: number | null = null;
+let userId: number | null = null;
 beforeAll(async () => {
   const user = await prisma.user.create({
     data: {
-      username: 's1kebeats',
-      password: await bcrypt.hash('Password1234', 3),
-      email: 's1kebeats@gmail.com',
-      activationLink: 's1kebeats-activation-link',
-      isActivated: true
-    }
-  })
-  userId = user.id
+      username: "s1kebeats",
+      password: await bcrypt.hash("Password1234", 3),
+      email: "s1kebeats@gmail.com",
+      activationLink: "s1kebeats-activation-link",
+      isActivated: true,
+    },
+  });
+  userId = user.id;
   const beat = await prisma.beat.create({
     data: {
-      name: 'outtahere',
+      name: "outtahere",
       user: {
         connect: {
-          username: 's1kebeats'
-        }
+          username: "s1kebeats",
+        },
       },
       wavePrice: 499,
-      wave: 'wave/',
-      mp3: 'mp3/',
-      image: 'image/',
+      wave: "wave/",
+      mp3: "mp3/",
+      image: "image/",
       comments: {
         createMany: {
           data: [
             {
-              content: 'First Comment',
-              userId
+              content: "First Comment",
+              userId,
             },
             {
-              content: 'Second Comment',
-              userId
+              content: "Second Comment",
+              userId,
             },
             {
-              content: 'Third Comment',
-              userId
+              content: "Third Comment",
+              userId,
             },
             {
-              content: 'Fourth Comment',
-              userId
+              content: "Fourth Comment",
+              userId,
             },
             {
-              content: 'Fifth Comment',
-              userId
-            }
-          ]
-        }
-      }
-    }
-  })
-  beatId = beat.id
-})
+              content: "Fifth Comment",
+              userId,
+            },
+          ],
+        },
+      },
+    },
+  });
+  beatId = beat.id;
+});
 
 afterAll(async () => {
-  await prisma.user.deleteMany()
-  await prisma.$disconnect()
-})
-it('unauthorized request should return 401', async () => {
-  const res = await request(app).get(`/api/comment/${beatId}`)
-  await expect(res.statusCode).toBe(401)
-})
-it('POST request should return 404', async () => {
-  const login = await request(app).post('/api/login').send({
-    username: 's1kebeats',
-    password: 'Password1234'
-  })
-  const accessToken = login.body.accessToken
+  await prisma.user.deleteMany();
+  await prisma.$disconnect();
+});
 
-  const res = await request(app)
-    .post(`/api/comment/${beatId}`)
-    .set('Authorization', `Bearer ${accessToken}`)
-  await expect(res.statusCode).toBe(404)
-})
-it('request to comments for not existing beat should return 404', async () => {
-  const login = await request(app).post('/api/login').send({
-    username: 's1kebeats',
-    password: 'Password1234'
-  })
-  const accessToken = login.body.accessToken
+it("unauthorized request should return 401", async () => {
+  const res = await request(app).get(`/api/comment/${beatId}`);
+  await expect(res.statusCode).toBe(401);
+});
+it("POST request should return 404", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "s1kebeats",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .get('/api/comment/-1')
-    .set('Authorization', `Bearer ${accessToken}`)
-  await expect(res.statusCode).toBe(404)
-})
-it('valid request, should return 200 and beat comments', async () => {
-  const login = await request(app).post('/api/login').send({
-    username: 's1kebeats',
-    password: 'Password1234'
-  })
-  const accessToken = login.body.accessToken
+  const res = await request(app).post(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
+  await expect(res.statusCode).toBe(404);
+});
+it("request to comments for not existing beat should return 404", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "s1kebeats",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .get(`/api/comment/${beatId}`)
-    .set('Authorization', `Bearer ${accessToken}`)
-  await expect(res.statusCode).toBe(200)
-  await expect(res.body.comments.length).toBe(5)
-  await expect(res.body.viewed).toBe(5)
-})
-it('valid request with viewed = 10, should return 200 and skip comments', async () => {
-  const login = await request(app).post('/api/login').send({
-    username: 's1kebeats',
-    password: 'Password1234'
-  })
-  const accessToken = login.body.accessToken
+  const res = await request(app).get("/api/comment/-1").set("Authorization", `Bearer ${accessToken}`);
+  await expect(res.statusCode).toBe(404);
+});
+it("valid request, should return 200 and beat comments", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "s1kebeats",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .get(`/api/comment/${beatId}/?viewed=10`)
-    .set('Authorization', `Bearer ${accessToken}`)
-  await expect(res.statusCode).toBe(200)
-  await expect(res.body.comments.length).toBe(0)
-  await expect(res.body.viewed).toBe(10)
-})
+  const res = await request(app).get(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
+  await expect(res.statusCode).toBe(200);
+  await expect(res.body.comments.length).toBe(5);
+  await expect(res.body.viewed).toBe(5);
+});
+it("valid request with viewed = 10, should return 200 and skip comments", async () => {
+  const login = await request(app).post("/api/login").send({
+    username: "s1kebeats",
+    password: "Password1234",
+  });
+  const accessToken = login.body.accessToken;
+
+  const res = await request(app).get(`/api/comment/${beatId}/?viewed=10`).set("Authorization", `Bearer ${accessToken}`);
+  await expect(res.statusCode).toBe(200);
+  await expect(res.body.comments.length).toBe(0);
+  await expect(res.body.viewed).toBe(10);
+});

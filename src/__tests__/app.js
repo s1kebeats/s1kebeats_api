@@ -380,7 +380,7 @@ var MediaService = class {
     return __async(this, null, function* () {
       const params = {
         Bucket: process.env.AWS_BUCKET_NAME,
-        Key: path2 + "/" + nanoid2(36),
+        Key: `${path2}/${nanoid2(36)}`,
         Body: file.data,
       };
       return yield s3.upload(params).promise();
@@ -430,7 +430,7 @@ var UserController = class {
         const ip = req.ip;
         const { username, password, refresh } = req.body;
         const userData = yield user_service_default.login(username, password, ip, !!refresh);
-        if (!!refresh) {
+        if (refresh) {
           res.cookie("refreshToken", userData.refreshToken, {
             maxAge: 30 * 24 * 60 * 1e3,
             httpOnly: true,
@@ -536,12 +536,14 @@ passport.use(
       __async(void 0, null, function* () {
         try {
           const user = yield user_service_default.getUserById(jwtPayload.id);
-          if (user) {
-            return done(null, user);
+          if (user != null) {
+            done(null, user);
+            return;
           }
-          return done(null, false);
+          done(null, false);
+          return;
         } catch (error) {
-          return done(error, false);
+          done(error, false);
         }
       })
   )
