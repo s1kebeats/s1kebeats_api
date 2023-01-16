@@ -8,6 +8,7 @@ class CommentController {
     try {
       const userId = req.user!.id;
       const id = +req.params.id;
+
       const comment = await commentService.getCommentById(id);
       if (comment == null) {
         next(ApiError.NotFound("Comment was not found."));

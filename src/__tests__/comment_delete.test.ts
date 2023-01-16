@@ -67,6 +67,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
+  console.log(commentId);
   const res = await request(app).post("/api/comment/delete/" + commentId);
   await expect(res.statusCode).toBe(401);
 });
@@ -95,6 +96,8 @@ it("valid request, should return 200 and delete the comment", async () => {
   await expect(res.statusCode).toBe(200);
 
   // check that the comment was deleted
-  const comment = await request(app).get("/api/comment/" + beatId);
+  const comment = await request(app)
+    .get("/api/comment/" + beatId)
+    .set("Authorization", "Bearer " + accessToken);
   await expect(comment.body.comments.length).toBe(0);
 });

@@ -1478,6 +1478,7 @@ router5.get(
 );
 router5.post(
   "/delete/:id",
+  auth_middleware_default,
   param2("id").isDecimal().bail(),
   validation_middleware_default,
   comment_controller_default.deleteComment

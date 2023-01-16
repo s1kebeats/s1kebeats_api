@@ -13,6 +13,12 @@ router.get(
   validationMiddleware,
   commentController.getComments
 );
-router.post("/delete/:id", param("id").isDecimal().bail(), validationMiddleware, commentController.deleteComment);
+router.post(
+  "/delete/:id",
+  authMiddleware,
+  param("id").isDecimal().bail(),
+  validationMiddleware,
+  commentController.deleteComment
+);
 
 export default router;

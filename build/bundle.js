@@ -1456,7 +1456,13 @@ router5.get(
   validation_middleware_default,
   comment_controller_default.getComments
 );
-router5.post("/delete/:id", param2("id").isDecimal().bail(), validation_middleware_default, comment_controller_default.deleteComment);
+router5.post(
+  "/delete/:id",
+  auth_middleware_default,
+  param2("id").isDecimal().bail(),
+  validation_middleware_default,
+  comment_controller_default.deleteComment
+);
 var comment_router_default = router5;
 
 // src/router/tag-router.ts
