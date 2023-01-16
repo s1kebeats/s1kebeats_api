@@ -5,31 +5,6 @@ import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 import PrismaClient from "@prisma/client";
 
-const firstBeatMock: PrismaClient.Prisma.BeatCreateInput = {
-  name: "outtahere",
-  tags: {
-    connectOrCreate: [
-      {
-        where: { name: "s1kebeats" },
-        create: { name: "s1kebeats" },
-      },
-      {
-        where: { name: "wheezy" },
-        create: { name: "wheezy" },
-      },
-    ],
-  },
-  user: {
-    connect: {
-      username: "s1kebeats",
-    },
-  },
-  wavePrice: 499,
-  wave: "wave/",
-  mp3: "mp3/",
-  image: "image/",
-};
-
 let id: null | number = null;
 beforeAll(async () => {
   await prisma.user.createMany({
