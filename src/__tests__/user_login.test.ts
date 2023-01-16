@@ -15,7 +15,7 @@ const mock: PrismaClient.Prisma.UserCreateInput = {
   activationLink: "s1kebeats-activation-link",
   isActivated: true,
 };
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -29,7 +29,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

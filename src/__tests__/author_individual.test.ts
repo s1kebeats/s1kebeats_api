@@ -13,7 +13,7 @@ async function checkIndividualAuthorResponse(body: any) {
   await expect(body.image).toBe("path/to/image");
 }
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.create({
     data: {
       username: "s1kebeats",
@@ -27,7 +27,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

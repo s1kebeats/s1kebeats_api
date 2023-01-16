@@ -3,7 +3,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -16,7 +16,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

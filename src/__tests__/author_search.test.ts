@@ -33,13 +33,13 @@ const usersList: PrismaClient.Prisma.UserCreateInput[] = [
   },
 ];
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: usersList,
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

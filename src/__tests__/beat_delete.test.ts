@@ -6,7 +6,7 @@ import mediaLocations from "./media/mediaLocations";
 import PrismaClient from "@prisma/client";
 
 let id: null | number = null;
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -26,13 +26,25 @@ beforeAll(async () => {
     ],
   });
   const beat = await prisma.beat.create({
-    data: firstBeatMock,
+    data: {
+      name: "outtahere",
+      user: {
+        connect: {
+          username: "s1kebeats",
+        },
+      },
+      wavePrice: 499,
+      wave: "wave/",
+      mp3: "mp3/",
+      image: "image/",
+    },
   });
   id = beat.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
   await prisma.$disconnect();
 });
 
@@ -41,7 +53,6 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
-  console.log(id);
   const res = await request(app).post(`/api/beat/${id}/delete`);
   await expect(res.statusCode).toBe(401);
 });

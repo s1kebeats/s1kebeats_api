@@ -18,7 +18,7 @@ const data = {
   image: "image/",
 };
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -32,8 +32,9 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
   await prisma.$disconnect();
 });
 

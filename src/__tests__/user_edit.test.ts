@@ -19,7 +19,7 @@ async function checkEditedUser(body: any) {
   }
 }
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -39,7 +39,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

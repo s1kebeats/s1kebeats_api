@@ -42,8 +42,9 @@ class BeatController {
   // get individual beat data
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
+      console.log(req.user);
       const id = +req.params.id;
-      const beat: BeatIndividual = await beatService.getIndividualBeat(id);
+      const beat: BeatIndividual = await beatService.getIndividualBeat(id, !!req.user);
       return res.json(beat);
     } catch (error) {
       next(error);

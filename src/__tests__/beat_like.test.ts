@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "./app.js";
 
 let id: number | null = null;
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -33,8 +33,10 @@ beforeAll(async () => {
   id = beat.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
+  await prisma.like.deleteMany();
   await prisma.$disconnect();
 });
 

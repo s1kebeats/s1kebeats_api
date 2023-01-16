@@ -2,7 +2,7 @@ import request from "supertest";
 import prisma from "../client";
 import app from "./app.js";
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.tag.createMany({
     data: [
       {
@@ -24,8 +24,9 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.tag.deleteMany();
   await prisma.$disconnect();
 });
 

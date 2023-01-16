@@ -11,7 +11,7 @@ const mock = {
   email: "s1kebeats@gmail.com",
   activationLink: "s1kebeats-activation-link",
 };
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.create({
     data: {
       ...mock,
@@ -19,7 +19,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

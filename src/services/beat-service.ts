@@ -1,4 +1,5 @@
 import PrismaClient from "@prisma/client";
+import authorSelect from "prisma-selects/author-select";
 
 import ApiError from "../exceptions/api-error";
 import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select";
@@ -92,6 +93,7 @@ class BeatService {
                 some: {
                   name: {
                     in: tags,
+                    mode: "insensitive",
                   },
                 },
               }
@@ -102,12 +104,12 @@ class BeatService {
     return beats;
   }
 
-  async getIndividualBeat(id: number): Promise<BeatIndividualWithRelated> {
+  async getIndividualBeat(id: number, authorized: boolean): Promise<BeatIndividualWithRelated> {
     const beatFindUniqueArgs = {
       where: {
         id,
       },
-      ...beatIndividualSelect,
+      ...beatIndividualSelect(authorized),
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
     if (beat == null) {
@@ -153,7 +155,7 @@ class BeatService {
   async uploadBeat(data: PrismaClient.Prisma.BeatCreateInput): Promise<BeatIndividual> {
     const beat = await prisma.beat.create({
       data,
-      ...beatIndividualSelect,
+      ...beatIndividualSelect(false),
     });
     return beat;
   }
@@ -164,7 +166,7 @@ class BeatService {
         id: beatId,
       },
       data,
-      ...beatIndividualSelect,
+      ...beatIndividualSelect(false),
     });
     return beat;
   }

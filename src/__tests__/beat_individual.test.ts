@@ -9,12 +9,12 @@ async function checkIndividualAuthorResponse(body: any) {
   await expect(body.name).toBe("outtahere");
   await expect(body.user.username).toBe("s1kebeats");
   await expect(body.tags.length).toBe(2);
-  await expect(body.image).toBe("/image");
+  await expect(body.image).toBe("image/");
   await expect(body.related.length).toBe(0);
 }
 
 let beatId: number | null = null;
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.create({
     data: {
       username: "s1kebeats",
@@ -55,21 +55,22 @@ beforeAll(async () => {
   beatId = beat.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
   await prisma.$disconnect();
 });
 
 it("POST request should return 404", async () => {
-  const res = await request(app).post("/api/beat/" + beatId);
+  const res = await request(app).post(`/api/beat/${beatId}`);
   await expect(res.statusCode).toBe(404);
 });
 it("request to not existing beat, should return 404", async () => {
-  const res = await request(app).get("/api/author/-1");
+  const res = await request(app).get("/api/beat/-1");
   await expect(res.statusCode).toBe(404);
 });
 it("valid unauthorized request, should return 200 and send individual beat data", async () => {
-  const res = await request(app).get("/api/beat/" + beatId);
+  const res = await request(app).get(`/api/beat/${beatId}`);
   await expect(res.statusCode).toBe(200);
 
   await expect(res.body.comments).toBe(undefined);
@@ -83,11 +84,9 @@ it("valid authorized request, should return 200 and send individual beat data", 
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .get("/api/beat/" + beatId)
-    .set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).get(`/api/beat/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
-
+  console.log(res.body);
   await expect(res.body.comments.length).toBe(0);
   // check response body
   await checkIndividualAuthorResponse(res.body);

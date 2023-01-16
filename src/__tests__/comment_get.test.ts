@@ -5,7 +5,7 @@ import app from "./app.js";
 
 let beatId: number | null = null;
 let userId: number | null = null;
-beforeAll(async () => {
+beforeEach(async () => {
   const user = await prisma.user.create({
     data: {
       username: "s1kebeats",
@@ -59,8 +59,10 @@ beforeAll(async () => {
   beatId = beat.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
+  await prisma.comment.deleteMany();
   await prisma.$disconnect();
 });
 

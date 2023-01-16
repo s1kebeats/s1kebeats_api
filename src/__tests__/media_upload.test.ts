@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -18,7 +18,7 @@ beforeAll(async () => {
   });
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
   await prisma.$disconnect();
 });

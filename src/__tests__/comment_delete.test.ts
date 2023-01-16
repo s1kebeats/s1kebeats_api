@@ -5,7 +5,7 @@ import app from "./app.js";
 
 let commentId: number | null = null;
 let beatId: number | null = null;
-beforeAll(async () => {
+beforeEach(async () => {
   const s1kebeats = await prisma.user.create({
     data: {
       username: "s1kebeats",
@@ -57,18 +57,20 @@ beforeAll(async () => {
   commentId = comment.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
+  await prisma.comment.deleteMany();
   await prisma.$disconnect();
 });
 
 it("GET request should return 404", async () => {
-  const res = await request(app).get("/api/comment/delete/" + commentId);
+  const res = await request(app).get(`/api/comment/delete/${commentId}`);
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
   console.log(commentId);
-  const res = await request(app).post("/api/comment/delete/" + commentId);
+  const res = await request(app).post(`/api/comment/delete/${commentId}`);
   await expect(res.statusCode).toBe(401);
 });
 it("request to delete a comment that belongs to other user should return 401", async () => {
@@ -78,9 +80,7 @@ it("request to delete a comment that belongs to other user should return 401", a
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .post("/api/comment/delete/" + commentId)
-    .set("Authorization", "Bearer " + accessToken);
+  const res = await request(app).post(`/api/comment/delete/${commentId}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(401);
 });
 it("valid request, should return 200 and delete the comment", async () => {
@@ -90,14 +90,10 @@ it("valid request, should return 200 and delete the comment", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .post("/api/comment/delete/" + commentId)
-    .set("Authorization", "Bearer " + accessToken);
+  const res = await request(app).post(`/api/comment/delete/${commentId}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
   // check that the comment was deleted
-  const comment = await request(app)
-    .get("/api/comment/" + beatId)
-    .set("Authorization", "Bearer " + accessToken);
+  const comment = await request(app).get(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(comment.body.comments.length).toBe(0);
 });

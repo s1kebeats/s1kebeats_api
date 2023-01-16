@@ -10,7 +10,7 @@
     "build:test": "node ./build_test_env.js",
     "format": "prettier --write .",
     "lint": "eslint --fix .",
-    "test": "npm run build:test && npm run format && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest -b"
+    "test": "npm run build:test && npm run format && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest -b --runInBand"
   },
   "author": "",
   "license": "ISC",

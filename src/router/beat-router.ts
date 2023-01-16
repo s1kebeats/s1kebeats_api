@@ -3,6 +3,7 @@ import authMiddleware from "../middlewares/auth-middleware";
 import { body, param, query } from "express-validator";
 import { Router } from "express";
 import validationMiddleware from "../middlewares/validation-middleware";
+import optionalAuthMiddleware from "../middlewares/optional-auth-middleware";
 const router = Router();
 
 router.post(
@@ -35,7 +36,13 @@ router.get(
   beatController.getBeats
 );
 
-router.get("/:id", param("id").isDecimal().bail(), validationMiddleware, beatController.getIndividualBeat);
+router.get(
+  "/:id",
+  optionalAuthMiddleware,
+  param("id").isDecimal().bail(),
+  validationMiddleware,
+  beatController.getIndividualBeat
+);
 
 router.post(
   "/:id/comment",

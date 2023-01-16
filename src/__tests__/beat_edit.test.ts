@@ -31,7 +31,7 @@ const firstBeatMock: PrismaClient.Prisma.BeatCreateInput = {
 };
 
 let id: null | number = null;
-beforeAll(async () => {
+beforeEach(async () => {
   await prisma.user.createMany({
     data: [
       {
@@ -56,8 +56,9 @@ beforeAll(async () => {
   id = beat.id;
 });
 
-afterAll(async () => {
+afterEach(async () => {
   await prisma.user.deleteMany();
+  await prisma.beat.deleteMany();
   await prisma.$disconnect();
 });
 
