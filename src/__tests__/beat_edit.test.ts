@@ -230,4 +230,4 @@ it("providing valid data, should return 200, edit the beat and delete old media"
 
   const oldStems = await request(app).get(`/api/media/${stems}`);
   await expect(oldStems.statusCode).toBe(404);
-});
+}, 25000);

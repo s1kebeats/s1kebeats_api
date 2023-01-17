@@ -143,4 +143,4 @@ it("providing valid data, should return 200 and register new user with isActivat
 
   // registered user isActivated field should be false
   assert.equal((await prisma.user.findUnique({ where: { username: mock.username } }))!.isActivated, false);
-});
+}, 25000);

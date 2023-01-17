@@ -88,7 +88,7 @@ it("valid request, should return 200 and add a new comment to the beat", async (
     .set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
-  const beat = await request(app).get(`/api/beat/${id}`);
+  const beat = await request(app).get(`/api/beat/${id}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(beat.body.comments.length).toBe(1);
   await expect(beat.body.comments[0].content).toBe("First comment");
 });

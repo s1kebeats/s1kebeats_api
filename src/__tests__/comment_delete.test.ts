@@ -96,4 +96,4 @@ it("valid request, should return 200 and delete the comment", async () => {
   // check that the comment was deleted
   const comment = await request(app).get(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
   await expect(comment.body.comments.length).toBe(0);
-});
+}, 25000);

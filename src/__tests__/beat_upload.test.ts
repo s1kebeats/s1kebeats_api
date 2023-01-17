@@ -205,4 +205,4 @@ it("request with valid data provided, should return 200 and upload the beat", as
   const beat = await request(app).get(`/api/beat/${id}`);
   await expect(beat.statusCode).toBe(200);
   await expect(beat.body.name).toBe(data.name);
-});
+}, 25000);

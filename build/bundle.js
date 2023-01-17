@@ -542,6 +542,8 @@ import { Router } from "express";
 // src/middlewares/auth-middleware.ts
 import passport from "passport";
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
+import { Strategy as PassportAnonymousStrategy } from "passport-anonymous";
+passport.use(new PassportAnonymousStrategy());
 passport.use(
   new JwtStrategy(
     {
@@ -563,7 +565,9 @@ passport.use(
     })
   )
 );
-var auth_middleware_default = passport.authenticate("jwt", { session: false });
+var requiredAuthMiddleware = passport.authenticate("jwt", { session: false });
+var optionalAuthMiddleware = passport.authenticate(["jwt", "anonymous"], { session: false });
+var auth_middleware_default = requiredAuthMiddleware;
 
 // src/middlewares/validation-middleware.ts
 import { validationResult } from "express-validator";
@@ -772,44 +776,45 @@ router2.get("/:username", author_controller_default.getIndividualAuthor);
 var author_router_default = router2;
 
 // src/services/beat-service.ts
-import PrismaClient9 from "@prisma/client";
+import PrismaClient8 from "@prisma/client";
 
 // src/prisma-selects/beat-individual-select.ts
-import PrismaClient7 from "@prisma/client";
-var beatIndividualSelect = PrismaClient7.Prisma.validator()({
-  select: {
-    id: true,
-    name: true,
-    bpm: true,
-    description: true,
-    createdAt: true,
-    downloads: true,
-    plays: true,
-    image: true,
-    mp3: true,
-    wavePrice: true,
-    stemsPrice: true,
-    tags: true,
-    user: __spreadValues({}, author_select_default),
-    comments: {
-      take: 10,
-      select: {
-        content: true,
-        user: __spreadValues({}, author_select_default)
-      }
-    },
-    _count: {
-      select: {
-        likes: true
+function beatIndividualSelect(authorized) {
+  return {
+    select: {
+      id: true,
+      name: true,
+      bpm: true,
+      description: true,
+      createdAt: true,
+      downloads: true,
+      plays: true,
+      image: true,
+      mp3: true,
+      wavePrice: true,
+      stemsPrice: true,
+      tags: true,
+      user: __spreadValues({}, author_select_default),
+      comments: authorized ? {
+        take: 10,
+        select: {
+          content: true,
+          user: __spreadValues({}, author_select_default)
+        }
+      } : false,
+      _count: {
+        select: {
+          likes: true
+        }
       }
     }
-  }
-});
+  };
+}
 var beat_individual_select_default = beatIndividualSelect;
 
 // src/prisma-selects/beat-select.ts
-import PrismaClient8 from "@prisma/client";
-var beatSelect = PrismaClient8.Prisma.validator()({
+import PrismaClient7 from "@prisma/client";
+var beatSelect = PrismaClient7.Prisma.validator()({
   select: {
     id: true,
     name: true,
@@ -829,7 +834,7 @@ var beatSelect = PrismaClient8.Prisma.validator()({
 var beat_select_default = beatSelect;
 
 // src/services/beat-service.ts
-var prisma4 = new PrismaClient9.PrismaClient();
+var prisma4 = new PrismaClient8.PrismaClient();
 var BeatService = class {
   getBeats(viewed = 0) {
     return __async(this, null, function* () {
@@ -901,7 +906,8 @@ var BeatService = class {
           tags: tags != null ? {
             some: {
               name: {
-                in: tags
+                in: tags,
+                mode: "insensitive"
               }
             }
           } : void 0
@@ -911,13 +917,13 @@ var BeatService = class {
       return beats;
     });
   }
-  getIndividualBeat(id) {
+  getIndividualBeat(id, authorized) {
     return __async(this, null, function* () {
       const beatFindUniqueArgs = __spreadValues({
         where: {
           id
         }
-      }, beat_individual_select_default);
+      }, beat_individual_select_default(authorized));
       const beat = yield prisma4.beat.findUnique(beatFindUniqueArgs);
       if (beat == null) {
         throw ApiError.NotFound("Beat was not found.");
@@ -962,7 +968,7 @@ var BeatService = class {
     return __async(this, null, function* () {
       const beat = yield prisma4.beat.create(__spreadValues({
         data
-      }, beat_individual_select_default));
+      }, beat_individual_select_default(false)));
       return beat;
     });
   }
@@ -973,7 +979,7 @@ var BeatService = class {
           id: beatId
         },
         data
-      }, beat_individual_select_default));
+      }, beat_individual_select_default(false)));
       return beat;
     });
   }
@@ -991,8 +997,8 @@ var BeatService = class {
 var beat_service_default = new BeatService();
 
 // src/services/comment-service.ts
-import PrismaClient10 from "@prisma/client";
-var prisma5 = new PrismaClient10.PrismaClient();
+import PrismaClient9 from "@prisma/client";
+var prisma5 = new PrismaClient9.PrismaClient();
 var CommentService = class {
   uploadComment(data) {
     return __async(this, null, function* () {
@@ -1033,8 +1039,8 @@ var CommentService = class {
 var comment_service_default = new CommentService();
 
 // src/services/like-service.ts
-import PrismaClient11 from "@prisma/client";
-var prisma6 = new PrismaClient11.PrismaClient();
+import PrismaClient10 from "@prisma/client";
+var prisma6 = new PrismaClient10.PrismaClient();
 var LikeService = class {
   getLikeByIdentifier(beatId, userId) {
     return __async(this, null, function* () {
@@ -1108,8 +1114,9 @@ var BeatController = class {
   getIndividualBeat(req, res, next) {
     return __async(this, null, function* () {
       try {
+        console.log(req.user);
         const id = +req.params.id;
-        const beat = yield beat_service_default.getIndividualBeat(id);
+        const beat = yield beat_service_default.getIndividualBeat(id, !!req.user);
         return res.json(beat);
       } catch (error) {
         next(error);
@@ -1312,7 +1319,13 @@ router3.get(
   validation_middleware_default,
   beat_controller_default.getBeats
 );
-router3.get("/:id", param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.getIndividualBeat);
+router3.get(
+  "/:id",
+  optionalAuthMiddleware,
+  param("id").isDecimal().bail(),
+  validation_middleware_default,
+  beat_controller_default.getIndividualBeat
+);
 router3.post(
   "/:id/comment",
   auth_middleware_default,
@@ -1470,8 +1483,8 @@ import { Router as Router6 } from "express";
 import { query as query4 } from "express-validator";
 
 // src/services/tag-service.ts
-import PrismaClient12 from "@prisma/client";
-var prisma7 = new PrismaClient12.PrismaClient();
+import PrismaClient11 from "@prisma/client";
+var prisma7 = new PrismaClient11.PrismaClient();
 var TagService = class {
   findTags(name, viewed) {
     return __async(this, null, function* () {

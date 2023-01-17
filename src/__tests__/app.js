@@ -525,33 +525,34 @@ import { Router } from "express";
 
 // src/middlewares/auth-middleware.ts
 import passport from "passport";
-
-// src/middlewares/passport-jwt-strategy.ts
 import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-var passport_jwt_strategy_default = new JwtStrategy(
-  {
-    jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
-    secretOrKey: process.env.JWT_ACCESS_SECRET,
-  },
-  (jwtPayload, done) =>
-    __async(void 0, null, function* () {
-      try {
-        const user = yield user_service_default.getUserById(jwtPayload.id);
-        if (user != null) {
-          done(null, user);
+import { Strategy as PassportAnonymousStrategy } from "passport-anonymous";
+passport.use(new PassportAnonymousStrategy());
+passport.use(
+  new JwtStrategy(
+    {
+      jwtFromRequest: ExtractJwt.fromAuthHeaderAsBearerToken(),
+      secretOrKey: process.env.JWT_ACCESS_SECRET,
+    },
+    (jwtPayload, done) =>
+      __async(void 0, null, function* () {
+        try {
+          const user = yield user_service_default.getUserById(jwtPayload.id);
+          if (user != null) {
+            done(null, user);
+            return;
+          }
+          done(null, false);
           return;
+        } catch (error) {
+          done(error, false);
         }
-        done(null, false);
-        return;
-      } catch (error) {
-        done(error, false);
-      }
-    })
+      })
+  )
 );
-
-// src/middlewares/auth-middleware.ts
-passport.use(passport_jwt_strategy_default);
-var auth_middleware_default = passport.authenticate("jwt", { session: false });
+var requiredAuthMiddleware = passport.authenticate("jwt", { session: false });
+var optionalAuthMiddleware = passport.authenticate(["jwt", "anonymous"], { session: false });
+var auth_middleware_default = requiredAuthMiddleware;
 
 // src/middlewares/validation-middleware.ts
 import { validationResult } from "express-validator";
@@ -1296,20 +1297,6 @@ var beat_controller_default = new BeatController();
 // src/router/beat-router.ts
 import { body as body2, param, query as query2 } from "express-validator";
 import { Router as Router3 } from "express";
-
-// src/middlewares/optional-auth-middleware.ts
-import passport2 from "passport";
-passport2.use(passport_jwt_strategy_default);
-function optionalAuth(err, req, res, next) {
-  passport2.authenticate("jwt", { session: false }, (err2, user, info) => {
-    if (user) {
-      req.user = user;
-    }
-    next();
-  })(req, res, next);
-}
-
-// src/router/beat-router.ts
 var router3 = Router3();
 router3.post(
   "/upload",
@@ -1336,7 +1323,7 @@ router3.get(
 );
 router3.get(
   "/:id",
-  optionalAuth,
+  optionalAuthMiddleware,
   param("id").isDecimal().bail(),
   validation_middleware_default,
   beat_controller_default.getIndividualBeat

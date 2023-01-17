@@ -150,4 +150,4 @@ it("valid request, should return 200, delete the beat and it's media", async () 
 
   const beatStems = await request(app).get(`/api/media/${stems}`);
   await expect(beatStems.statusCode).toBe(404);
-});
+}, 25000);

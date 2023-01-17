@@ -10,7 +10,8 @@
     "build:test": "node ./build_test_env.js",
     "format": "prettier --write .",
     "lint": "eslint --fix .",
-    "test": "npm run build:test && npm run format && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest -b --runInBand"
+    "test:build": "npm run build:test && npm run format && cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --silent",
+    "test": "cross-env NODE_OPTIONS=--experimental-vm-modules npx jest --runInBand --silent"
   },
   "author": "",
   "license": "ISC",
@@ -24,6 +25,7 @@
     "@types/jsonwebtoken": "^9.0.0",
     "@types/nodemailer": "^6.4.7",
     "@types/passport": "^1.0.11",
+    "@types/passport-anonymous": "^1.0.3",
     "@types/passport-jwt": "^3.0.8",
     "@types/sharp": "^0.31.1",
     "@types/supertest": "^2.0.12",
@@ -61,6 +63,7 @@
     "nanoid": "^4.0.0",
     "nodemailer": "^6.8.0",
     "passport": "^0.6.0",
+    "passport-anonymous": "^1.0.1",
     "passport-jwt": "^4.0.1",
     "sharp": "^0.31.3"
   },
@@ -100,7 +103,9 @@
     ],
     "testPathIgnorePatterns": [
       "src/__tests__/app.js",
-      "src/__tests__/app.js.map"
+      "src/__tests__/app.js.map",
+      "src/__tests__/media",
+      "src/__tests__/utils"
     ]
   }
 }
