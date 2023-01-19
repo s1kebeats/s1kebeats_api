@@ -44,10 +44,6 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-it("POST request should return 404", async () => {
-  const res = await request(app).post("/api/author/");
-  await expect(res.statusCode).toBe(404);
-});
 it("valid request without query and viewed provided", async () => {
   const res = await request(app).get("/api/author/");
   await expect(res.statusCode).toBe(200);

@@ -45,7 +45,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/like`);
+  const res = await request(app).put(`/api/beat/${id}/like`);
   await expect(res.statusCode).toBe(401);
 });
 it("request to not existing beat should return 404", async () => {
@@ -55,7 +55,7 @@ it("request to not existing beat should return 404", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/-1/like").set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).put("/api/-1/like").set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(404);
 });
 it("valid request, should return 200 and add the like", async () => {
@@ -65,7 +65,7 @@ it("valid request, should return 200 and add the like", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/like`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).put(`/api/beat/${id}/like`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
   const beat = await request(app).get(`/api/beat/${id}`);
@@ -78,7 +78,7 @@ it("valid request, should return 200 and remove the like", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/like`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).put(`/api/beat/${id}/like`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
   const beat = await request(app).get(`/api/beat/${id}`);

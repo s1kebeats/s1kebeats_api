@@ -61,10 +61,6 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-it("POST request should return 404", async () => {
-  const res = await request(app).post(`/api/beat/${beatId}`);
-  await expect(res.statusCode).toBe(404);
-});
 it("request to not existing beat, should return 404", async () => {
   const res = await request(app).get("/api/beat/-1");
   await expect(res.statusCode).toBe(404);

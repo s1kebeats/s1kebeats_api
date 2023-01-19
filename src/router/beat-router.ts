@@ -54,7 +54,7 @@ router.post(
   beatController.comment
 );
 
-router.post(
+router.put(
   "/:id/like",
   authMiddleware,
   param("id").isDecimal().bail(),
@@ -62,9 +62,15 @@ router.post(
   beatController.likeToggle
 );
 
-router.post("/:id/delete", authMiddleware, param("id").isDecimal().bail(), validationMiddleware, beatController.delete);
+router.delete(
+  "/:id/delete",
+  authMiddleware,
+  param("id").isDecimal().bail(),
+  validationMiddleware,
+  beatController.delete
+);
 
-router.post(
+router.patch(
   "/:id/edit",
   authMiddleware,
   param("id").isDecimal().bail(),

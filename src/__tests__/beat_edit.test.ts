@@ -68,7 +68,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("not authorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/edit`);
+  const res = await request(app).patch(`/api/beat/${id}/edit`);
   await expect(res.statusCode).toBe(401);
 });
 it("request to edit a beat that doesn't exist, should return 404", async () => {
@@ -78,7 +78,7 @@ it("request to edit a beat that doesn't exist, should return 404", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/beat/-1/edit").set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).patch("/api/beat/-1/edit").set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(404);
 });
 it("request to edit beat that belongs to other user, should return 401", async () => {
@@ -88,7 +88,7 @@ it("request to edit beat that belongs to other user, should return 401", async (
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(401);
 });
 it("providing stemsPrice without stems media file, should return 400", async () => {
@@ -98,7 +98,7 @@ it("providing stemsPrice without stems media file, should return 400", async () 
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
     stemsPrice: 1000,
   });
   await expect(res.statusCode).toBe(400);
@@ -110,7 +110,7 @@ it("providing stems without stemsPrice, should return 400", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
     stems: "stems/randomFile",
   });
   await expect(res.statusCode).toBe(400);
@@ -122,7 +122,7 @@ it("request with wrong tags, should return 400", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
     tags: "_/f",
   });
   await expect(res.statusCode).toBe(400);
@@ -196,7 +196,7 @@ it("providing valid data, should return 200, edit the beat and delete old media"
   };
 
   const res = await request(app)
-    .post(`/api/beat/${id}/edit`)
+    .patch(`/api/beat/${id}/edit`)
     .set("Authorization", `Bearer ${accessToken}`)
     .send(editPayload);
   await expect(res.statusCode).toBe(200);

@@ -599,7 +599,7 @@ router.post(
   validation_middleware_default,
   user_controller_default.login
 );
-router.post(
+router.patch(
   "/edit",
   auth_middleware_default,
   body("username").if(body("username").exists()).matches(/^[0-9a-zA-Z]+$/).bail(),
@@ -1334,15 +1334,21 @@ router3.post(
   validation_middleware_default,
   beat_controller_default.comment
 );
-router3.post(
+router3.put(
   "/:id/like",
   auth_middleware_default,
   param("id").isDecimal().bail(),
   validation_middleware_default,
   beat_controller_default.likeToggle
 );
-router3.post("/:id/delete", auth_middleware_default, param("id").isDecimal().bail(), validation_middleware_default, beat_controller_default.delete);
-router3.post(
+router3.delete(
+  "/:id/delete",
+  auth_middleware_default,
+  param("id").isDecimal().bail(),
+  validation_middleware_default,
+  beat_controller_default.delete
+);
+router3.patch(
   "/:id/edit",
   auth_middleware_default,
   param("id").isDecimal().bail(),
@@ -1469,7 +1475,7 @@ router5.get(
   validation_middleware_default,
   comment_controller_default.getComments
 );
-router5.post(
+router5.delete(
   "/delete/:id",
   auth_middleware_default,
   param2("id").isDecimal().bail(),

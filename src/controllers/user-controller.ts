@@ -107,8 +107,8 @@ class UserController {
         image,
       }: Record<string, string>) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
       // delete old profile image, if it's updated
-      if (payload.image && original.image) {
-        mediaService.deleteObject(original.image);
+      if (payload.image && original!.image) {
+        mediaService.deleteObject(original!.image);
       }
       await userService.edit(userId, payload);
 

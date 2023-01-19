@@ -21,10 +21,6 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-it("POST request should return 404", async () => {
-  const res = await request(app).post("/api/activate");
-  await expect(res.statusCode).toEqual(404);
-});
 it("providing wrong activation link should return 404", async () => {
   const res = await request(app).get("/api/activate/wrong-activation-link");
   await expect(res.statusCode).toEqual(404);

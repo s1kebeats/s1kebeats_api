@@ -49,7 +49,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toEqual(404);
 });
 it("unauthorized request should return 401", async () => {
-  const res = await request(app).post("/api/edit");
+  const res = await request(app).patch("/api/edit");
   await expect(res.statusCode).toEqual(401);
 });
 it("providing used username, should return 400", async () => {
@@ -59,7 +59,7 @@ it("providing used username, should return 400", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
     username: "s1kebeats",
   });
   await expect(res.statusCode).toEqual(400);
@@ -71,7 +71,7 @@ it("providing username with banned characters, should return 400", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
     username: "__newusername",
   });
   await expect(res.statusCode).toEqual(400);
@@ -83,7 +83,7 @@ it("providing wrong image key, should return 400", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
+  const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
     image: "notInsideImageFolder",
   });
   await expect(res.statusCode).toEqual(400);
@@ -95,7 +95,7 @@ it("providing valid data, should return 200 and edit the user", async () => {
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/edit").set("Authorization", `Bearer ${accessToken}`).send(editPayload);
+  const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send(editPayload);
   await expect(res.statusCode).toEqual(200);
 
   // check that the user was edited

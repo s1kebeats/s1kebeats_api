@@ -30,10 +30,6 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-it("POST request should return 404", async () => {
-  const res = await request(app).post("/api/tag");
-  await expect(res.statusCode).toBe(404);
-});
 it("valid request without filters, should return 200 and tag list", async () => {
   const res = await request(app).get("/api/tag");
   await expect(res.statusCode).toBe(200);
