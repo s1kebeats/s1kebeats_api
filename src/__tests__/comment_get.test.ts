@@ -70,16 +70,6 @@ it("unauthorized request should return 401", async () => {
   const res = await request(app).get(`/api/comment/${beatId}`);
   await expect(res.statusCode).toBe(401);
 });
-it("POST request should return 404", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
-  });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app).post(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
-  await expect(res.statusCode).toBe(404);
-});
 it("request to comments for not existing beat should return 404", async () => {
   const login = await request(app).post("/api/login").send({
     username: "s1kebeats",

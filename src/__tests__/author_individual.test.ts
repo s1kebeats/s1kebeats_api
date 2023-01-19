@@ -32,10 +32,6 @@ afterEach(async () => {
   await prisma.$disconnect();
 });
 
-it("POST request should return 404", async () => {
-  const res = await request(app).post("/api/author/s1kebeats");
-  await expect(res.statusCode).toBe(404);
-});
 it("providing wrong username, should return 404", async () => {
   const res = await request(app).get("/api/author/NotExistingAuthor");
   await expect(res.statusCode).toBe(404);

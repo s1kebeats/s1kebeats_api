@@ -13,7 +13,7 @@ router.get(
   validationMiddleware,
   commentController.getComments
 );
-router.post(
+router.delete(
   "/delete/:id",
   authMiddleware,
   param("id").isDecimal().bail(),

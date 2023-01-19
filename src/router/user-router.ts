@@ -31,7 +31,7 @@ router.post(
 );
 
 // users data editing
-router.post(
+router.patch(
   "/edit",
   authMiddleware,
   body("username")

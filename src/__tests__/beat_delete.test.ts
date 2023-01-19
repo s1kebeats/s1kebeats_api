@@ -53,7 +53,7 @@ it("GET request should return 404", async () => {
   await expect(res.statusCode).toBe(404);
 });
 it("unauthorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/delete`);
+  const res = await request(app).delete(`/api/beat/${id}/delete`);
   await expect(res.statusCode).toBe(401);
 });
 it("request to delete a beat that doesn't exist, should return 404", async () => {
@@ -63,7 +63,7 @@ it("request to delete a beat that doesn't exist, should return 404", async () =>
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post("/api/beat/-1/delete").set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).delete("/api/beat/-1/delete").set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(404);
 });
 it("request to delete beat that belongs to other user, should return 401", async () => {
@@ -73,7 +73,7 @@ it("request to delete beat that belongs to other user, should return 401", async
   });
   const accessToken = login.body.accessToken;
 
-  const res = await request(app).post(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).delete(`/api/beat/${id}/delete`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(401);
 });
 it("valid request, should return 200, delete the beat and it's media", async () => {
@@ -131,7 +131,7 @@ it("valid request, should return 200, delete the beat and it's media", async () 
   });
   const id = beatUpload.body.id;
 
-  const res = await request(app).post(`/api/beat/${id}/delete`).set("Authorization", `Bearer ${accessToken}`);
+  const res = await request(app).delete(`/api/beat/${id}/delete`).set("Authorization", `Bearer ${accessToken}`);
   await expect(res.statusCode).toBe(200);
 
   // check that beat was deleted
