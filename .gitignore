@@ -1,0 +1,7 @@
+node_modules
+coverage
+build
+.env
+src/__tests__/app.js
+src/__tests__/app.js.map
+server/
