@@ -57,9 +57,6 @@ describe("beat deletion", () => {
     expect(res.statusCode).toBe(401);
   });
   test("valid request, should return 200, delete the beat and it's media", async () => {
-    // NOT WORKING PROPERLY BECAUSE GET_MEDIA ENDPOINT ALWAYS RETURNS 404
-    expect(false).toBeTruthy();
-
     const login = await request(app).post("/api/login").send(activatedUser);
     const accessToken = login.body.accessToken;
 

@@ -7,6 +7,6 @@ import validationMiddleware from "../middlewares/validation-middleware";
 const router = Router();
 
 router.post("/upload", authMiddleware, body("path").notEmpty().bail(), validationMiddleware, mediaController.upload);
-router.get("/", express.static(path.resolve("server")));
+router.get("/:path/:file", mediaController.get);
 
 export default router;

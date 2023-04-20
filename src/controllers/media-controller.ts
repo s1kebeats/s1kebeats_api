@@ -3,6 +3,9 @@ import { UploadedFile } from "express-fileupload";
 import sharp from "sharp";
 import ApiError from "../exceptions/api-error";
 import mediaService from "../services/media-service";
+import path from "path";
+import { open, close } from "fs";
+import fs from "fs";
 
 class MediaController {
   // local media server
@@ -24,43 +27,37 @@ class MediaController {
       next(error);
     }
   }
-  // async get(req: Request, res: Response, next: NextFunction) {
-  //   try {
-  //     const { file, path: folder } = req.params;
-  //     const filePath = path.resolve(__dirname) + `${folder}/${file}`
+  async get(req: Request, res: Response, next: NextFunction) {
+    try {
+      const { file, path: folder } = req.params;
+      const filePath = path.resolve(`server/${folder}/${file}`);
 
-  //     open(filePath, 'r', (err, fd) => {
-  //       if (err) {
-  //         if (err.code === 'ENOENT') {
-  //           next(ApiError.NotFound('File does not exist'));
-  //         }
-  //       }
+      open(filePath, "r", (err, fd) => {
+        if (err) {
+          if (err.code === "ENOENT") {
+            next(ApiError.NotFound("File does not exist."));
+            return;
+          }
 
-  //       try {
-  //         readMyData(fd);
-  //       }
-  //       }
-  //     });
-
-  //       // Check if file specified by the filePath exists
-  //       fs.exists(filePath, function (exists) {
-  //           if (exists) {
-  //               // Content-type is very interesting part that guarantee that
-  //               // Web browser will handle response in an appropriate manner.
-  //               response.writeHead(200, {
-  //                   "Content-Type": "application/octet-stream",
-  //                   "Content-Disposition": "attachment; filename=" + fileName
-  //               });
-  //               fs.createReadStream(filePath).pipe(response);
-  //               return;
-  //           }
-  //           response.writeHead(400, { "Content-Type": "text/plain" });
-  //           response.end("ERROR File does not exist");
-  //       });
-  //   } catch (error) {
-  //     next(error);
-  //   }
-  // }
+          throw err;
+        }
+        try {
+          res.writeHead(200, {
+            "Content-Type": "application/octet-stream",
+            "Content-Disposition": "attachment",
+          });
+          fs.createReadStream(filePath).pipe(res);
+          return;
+        } finally {
+          close(fd, (err) => {
+            if (err) throw err;
+          });
+        }
+      });
+    } catch (error: any) {
+      next(error);
+    }
+  }
 }
 
 export default new MediaController();
