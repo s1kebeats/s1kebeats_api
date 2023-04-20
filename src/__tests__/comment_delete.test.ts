@@ -2,6 +2,7 @@ import request from "supertest";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
+import { describe, beforeAll, afterAll, expect, test } from "vitest";
 
 let commentId: number | null = null;
 let beatId: number | null = null;

@@ -1,6 +1,7 @@
 import { UploadedFile } from "express-fileupload";
 import path from "path";
 import ApiError from "../exceptions/api-error";
+import fs from "fs";
 
 class MediaService {
   // file validation function with extension and maxSize
@@ -76,7 +77,9 @@ class MediaService {
   }
 
   async deleteMedia(location: string) {
-    //TODO: deletion
+    await fs.unlink(path.resolve("server/" + location), (error: any) => {
+      if (error) throw error;
+    });
   }
 }
 

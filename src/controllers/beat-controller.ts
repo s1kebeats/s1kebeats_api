@@ -42,7 +42,6 @@ class BeatController {
   // get individual beat data
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
-      console.log(req.user);
       const id = +req.params.id;
       const beat: BeatIndividual = await beatService.getIndividualBeat(id, !!req.user);
       return res.json(beat);
@@ -76,7 +75,7 @@ class BeatController {
           ? {
               connectOrCreate: tags.split(",").map((tag: string) => {
                 if (!tag.match(/^[0-9a-zA-Z]+$/)) {
-                  throw ApiError.BadRequest("Wrong tags");
+                  throw ApiError.BadRequest("Wrong tags.");
                 }
                 return {
                   where: { name: tag },
@@ -201,7 +200,7 @@ class BeatController {
       const beat = await beatService.getBeatById(id);
       let like: PrismaClient.Like | null;
       like = await likeService.getLikeByIdentifier(beat.id, userId);
-      if (like != null) {
+      if (like) {
         // delete the like from db
         like = await likeService.deleteLike(beat.id, userId);
       } else {

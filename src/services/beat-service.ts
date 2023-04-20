@@ -172,7 +172,7 @@ class BeatService {
   }
 
   async deleteBeat(beat: PrismaClient.Beat) {
-    // delete media files from AWS S3
+    // delete media files
     await this.deleteBeatMedia(beat);
     // delete beat from db
     await prisma.beat.delete({

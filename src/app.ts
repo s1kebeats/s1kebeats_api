@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import express from "express";
 import cors from "cors";
-import path from "path";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
 import router from "./router/index";
@@ -22,7 +21,6 @@ app.use(
     origin: process.env.CLIENT_URL,
   })
 );
-app.get("/media", express.static(path.resolve("server")));
 app.use("/api", router);
 
 app.use(errorMiddleware);

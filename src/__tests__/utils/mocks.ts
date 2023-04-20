@@ -17,10 +17,10 @@ const secondUser: PrismaClient.Prisma.UserCreateInput = {
   password: "Password1234",
   email: "second@gmail.com",
   activationLink: "second-activation-link",
-  isActivated: false,
+  isActivated: true,
 };
 
-const firstBeat = {
+const beatUpload = {
   name: "first",
   bpm: 140,
   description: "first beat",
@@ -35,4 +35,29 @@ const firstBeat = {
   image: "image/",
 };
 
-export { activatedUser, secondUser, firstBeat };
+const firstBeat = {
+  name: "first",
+  tags: {
+    connectOrCreate: [
+      {
+        where: { name: "firstTag" },
+        create: { name: "firstTag" },
+      },
+      {
+        where: { name: "secondTag" },
+        create: { name: "secondTag" },
+      },
+    ],
+  },
+  user: {
+    connect: {
+      username: activatedUser.username,
+    },
+  },
+  wavePrice: 499,
+  wave: "wave/",
+  mp3: "mp3/",
+  image: "image/",
+};
+
+export { activatedUser, secondUser, beatUpload, firstBeat };

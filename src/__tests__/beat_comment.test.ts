@@ -2,93 +2,71 @@ import request from "supertest";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
+import { describe, beforeAll, afterAll, expect, test } from "vitest";
+import { activatedUser, firstBeat } from "./utils/mocks";
 
-let id: number | null = null;
-beforeEach(async () => {
-  await prisma.user.createMany({
-    data: [
-      {
-        username: "s1kebeats",
-        password: await (async () => await bcrypt.hash("Password1234", 3))(),
-        email: "s1kebeats@gmail.com",
-        activationLink: "s1kebeats-activation-link",
-        isActivated: true,
+describe("beat comment", () => {
+  let id: number | null = null;
+  beforeAll(async () => {
+    await prisma.user.create({
+      data: {
+        ...activatedUser,
+        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
       },
-    ],
+    });
+    const beat = await prisma.beat.create({
+      data: firstBeat,
+    });
+    id = beat.id;
   });
-  const beat = await prisma.beat.create({
-    data: {
-      name: "outtahere",
-      user: {
-        connect: {
-          username: "s1kebeats",
-        },
-      },
-      wavePrice: 499,
-      wave: "wave/",
-      mp3: "mp3/",
-      image: "image/",
-    },
+
+  afterAll(async () => {
+    await prisma.user.deleteMany();
+    await prisma.beat.deleteMany();
+    await prisma.comment.deleteMany();
   });
-  id = beat.id;
-});
 
-afterEach(async () => {
-  await prisma.user.deleteMany();
-  await prisma.beat.deleteMany();
-  await prisma.comment.deleteMany();
-  await prisma.$disconnect();
-});
-
-it("GET request should return 404", async () => {
-  const res = await request(app).get(`/api/beat/${id}/comment`);
-  expect(res.statusCode).toBe(404);
-});
-it("unauthorized request should return 401", async () => {
-  const res = await request(app).post(`/api/beat/${id}/comment`);
-  expect(res.statusCode).toBe(401);
-});
-it("request without comment content provided should return 400", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
+  test("GET request should return 404", async () => {
+    const res = await request(app).get(`/api/beat/${id}/comment`);
+    expect(res.statusCode).toBe(404);
   });
-  const accessToken = login.body.accessToken;
-
-  const res = await request(app).post(`/api/beat/${id}/comment`).set("Authorization", `Bearer ${accessToken}`);
-  expect(res.statusCode).toBe(400);
-});
-it("valid request to not existing beat should return 404", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
+  test("unauthorized request should return 401", async () => {
+    const res = await request(app).post(`/api/beat/${id}/comment`);
+    expect(res.statusCode).toBe(401);
   });
-  const accessToken = login.body.accessToken;
+  test("request without comment content provided should return 400", async () => {
+    const login = await request(app).post("/api/login").send(activatedUser);
+    const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .post("/api/beat/-1/comment")
-    .send({
-      content: "Comment content",
-    })
-    .set("Authorization", `Bearer ${accessToken}`);
-  expect(res.statusCode).toBe(404);
-});
-it("valid request, should return 200 and add a new comment to the beat", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
+    const res = await request(app).post(`/api/beat/${id}/comment`).set("Authorization", `Bearer ${accessToken}`);
+    expect(res.statusCode).toBe(400);
   });
-  const accessToken = login.body.accessToken;
+  test("valid request to not existing beat should return 404", async () => {
+    const login = await request(app).post("/api/login").send(activatedUser);
+    const accessToken = login.body.accessToken;
 
-  const res = await request(app)
-    .post(`/api/beat/${id}/comment`)
-    .send({
-      content: "First comment",
-    })
-    .set("Authorization", `Bearer ${accessToken}`);
-  expect(res.statusCode).toBe(200);
+    const res = await request(app)
+      .post("/api/beat/-1/comment")
+      .send({
+        content: "Comment content",
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(res.statusCode).toBe(404);
+  });
+  test("valid request, should return 200 and add a new comment to the beat", async () => {
+    const login = await request(app).post("/api/login").send(activatedUser);
+    const accessToken = login.body.accessToken;
 
-  const beat = await request(app).get(`/api/beat/${id}`).set("Authorization", `Bearer ${accessToken}`);
-  expect(beat.body.comments.length).toBe(1);
-  expect(beat.body.comments[0].content).toBe("First comment");
+    const res = await request(app)
+      .post(`/api/beat/${id}/comment`)
+      .send({
+        content: "First comment",
+      })
+      .set("Authorization", `Bearer ${accessToken}`);
+    expect(res.statusCode).toBe(200);
+
+    const beat = await request(app).get(`/api/beat/${id}`).set("Authorization", `Bearer ${accessToken}`);
+    expect(beat.body.comments.length).toBe(1);
+    expect(beat.body.comments[0].content).toBe("First comment");
+  });
 });

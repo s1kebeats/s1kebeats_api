@@ -2,88 +2,61 @@ import request from "supertest";
 import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
+import { describe, beforeAll, afterAll, expect, test } from "vitest";
+import { activatedUser, firstBeat } from "./utils/mocks";
 
-async function checkIndividualAuthorResponse(body: any) {
-  expect(body.wave).toBe(undefined);
-  expect(body.wavePrice).toBe(499);
-  expect(body.name).toBe("outtahere");
-  expect(body.user.username).toBe("s1kebeats");
-  expect(body.tags.length).toBe(2);
-  expect(body.image).toBe("image/");
-  expect(body.related.length).toBe(0);
-}
-
-let beatId: number | null = null;
-beforeEach(async () => {
-  await prisma.user.create({
-    data: {
-      username: "s1kebeats",
-      displayedName: "Arthur Datsenko-Boos",
-      image: "path/to/image",
-      password: await (async () => await bcrypt.hash("Password1234", 3))(),
-      email: "s1kebeats@gmail.com",
-      activationLink: "s1kebeats-activation-link",
-      isActivated: true,
-    },
-  });
-  const beat = await prisma.beat.create({
-    data: {
-      name: "outtahere",
-      tags: {
-        connectOrCreate: [
-          {
-            where: { name: "s1kebeats" },
-            create: { name: "s1kebeats" },
-          },
-          {
-            where: { name: "wheezy" },
-            create: { name: "wheezy" },
-          },
-        ],
+describe("individual beat", () => {
+  let beatId: number | null = null;
+  beforeAll(async () => {
+    await prisma.user.create({
+      data: {
+        ...activatedUser,
+        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
       },
-      user: {
-        connect: {
-          username: "s1kebeats",
-        },
-      },
-      wavePrice: 499,
-      wave: "wave/",
-      mp3: "mp3/",
-      image: "image/",
-    },
+    });
+    const beat = await prisma.beat.create({
+      data: firstBeat,
+    });
+    beatId = beat.id;
   });
-  beatId = beat.id;
-});
 
-afterEach(async () => {
-  await prisma.user.deleteMany();
-  await prisma.beat.deleteMany();
-  await prisma.$disconnect();
-});
-
-it("request to not existing beat, should return 404", async () => {
-  const res = await request(app).get("/api/beat/-1");
-  expect(res.statusCode).toBe(404);
-});
-it("valid unauthorized request, should return 200 and send individual beat data", async () => {
-  const res = await request(app).get(`/api/beat/${beatId}`);
-  expect(res.statusCode).toBe(200);
-
-  expect(res.body.comments).toBe(undefined);
-  // check response body
-  await checkIndividualAuthorResponse(res.body);
-});
-it("valid authorized request, should return 200 and send individual beat data", async () => {
-  const login = await request(app).post("/api/login").send({
-    username: "s1kebeats",
-    password: "Password1234",
+  afterAll(async () => {
+    await prisma.user.deleteMany();
+    await prisma.beat.deleteMany();
   });
-  const accessToken = login.body.accessToken;
 
-  const res = await request(app).get(`/api/beat/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
-  expect(res.statusCode).toBe(200);
-  console.log(res.body);
-  expect(res.body.comments.length).toBe(0);
-  // check response body
-  await checkIndividualAuthorResponse(res.body);
+  test("request to non-existing beat, should return 404", async () => {
+    const res = await request(app).get("/api/beat/-1");
+    expect(res.statusCode).toBe(404);
+  });
+  test("valid unauthorized request, should return 200 and send individual beat data without comments", async () => {
+    const res = await request(app).get(`/api/beat/${beatId}`);
+    expect(res.statusCode).toBe(200);
+
+    expect(res.body.comments).toBe(undefined);
+    // check response body
+    expect(res.body.wave).toBe(undefined);
+    expect(res.body.wavePrice).toBe(firstBeat.wavePrice);
+    expect(res.body.name).toBe(firstBeat.name);
+    expect(res.body.user.username).toBe(firstBeat.user.connect.username);
+    expect(res.body.tags.length).toBe(firstBeat.tags.connectOrCreate.length);
+    expect(res.body.image).toBe(firstBeat.image);
+    expect(res.body.related.length).toBe(0);
+  });
+  test("valid authorized request, should return 200 and send individual beat data with comments", async () => {
+    const login = await request(app).post("/api/login").send(activatedUser);
+    const accessToken = login.body.accessToken;
+
+    const res = await request(app).get(`/api/beat/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
+    expect(res.statusCode).toBe(200);
+    expect(res.body.comments.length).toBe(0);
+    // check response body
+    expect(res.body.wave).toBe(undefined);
+    expect(res.body.wavePrice).toBe(firstBeat.wavePrice);
+    expect(res.body.name).toBe(firstBeat.name);
+    expect(res.body.user.username).toBe(firstBeat.user.connect.username);
+    expect(res.body.tags.length).toBe(firstBeat.tags.connectOrCreate.length);
+    expect(res.body.image).toBe(firstBeat.image);
+    expect(res.body.related.length).toBe(0);
+  });
 });

@@ -5,7 +5,7 @@ import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 import PrismaClient from "@prisma/client";
 
-const firstBeatMock: PrismaClient.Prisma.BeatCreateInput = {
+const beatUploadMock: PrismaClient.Prisma.BeatCreateInput = {
   name: "outtahere",
   tags: {
     connectOrCreate: [
@@ -51,7 +51,7 @@ beforeEach(async () => {
     ],
   });
   const beat = await prisma.beat.create({
-    data: firstBeatMock,
+    data: beatUploadMock,
   });
   id = beat.id;
 });

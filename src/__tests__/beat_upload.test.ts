@@ -3,7 +3,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser, firstBeat } from "./utils/mocks";
+import { activatedUser, beatUpload } from "./utils/mocks";
 
 describe("upload", () => {
   beforeEach(async () => {
@@ -28,7 +28,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("not authorized request, should return 401", async () => {
-    const res = await request(app).post("/api/beat/upload").send(firstBeat);
+    const res = await request(app).post("/api/beat/upload").send(beatUpload);
     expect(res.statusCode).toBe(401);
   });
   test("request without name provided should return 400", async () => {
@@ -38,7 +38,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ name, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ name, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request without wavePrice provided should return 400", async () => {
@@ -48,7 +48,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ wavePrice, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ wavePrice, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request without wave provided should return 400", async () => {
@@ -58,7 +58,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ wave, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ wave, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request without mp3 provided should return 400", async () => {
@@ -68,7 +68,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ mp3, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ mp3, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with stemsPrice but without stems provided should return 400", async () => {
@@ -78,7 +78,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ stems, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ stems, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with stems but without stemsPrice provided should return 400", async () => {
@@ -88,7 +88,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ stemsPrice, ...rest }) => ({ ...rest }))(firstBeat));
+      .send((({ stemsPrice, ...rest }) => ({ ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong stems path, should return 400", async () => {
@@ -98,7 +98,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ stems, ...rest }) => ({ stems: "image/key", ...rest }))(firstBeat));
+      .send((({ stems, ...rest }) => ({ stems: "image/key", ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong wave path, should return 400", async () => {
@@ -108,7 +108,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ wave, ...rest }) => ({ wave: "image/key", ...rest }))(firstBeat));
+      .send((({ wave, ...rest }) => ({ wave: "image/key", ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong mp3 path, should return 400", async () => {
@@ -118,7 +118,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ mp3, ...rest }) => ({ mp3: "image/key", ...rest }))(firstBeat));
+      .send((({ mp3, ...rest }) => ({ mp3: "image/key", ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong image path, should return 400", async () => {
@@ -128,7 +128,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ image, ...rest }) => ({ image: "wave/key", ...rest }))(firstBeat));
+      .send((({ image, ...rest }) => ({ image: "wave/key", ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong tags, should return 400", async () => {
@@ -138,7 +138,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ tags, ...rest }) => ({ tags: ",./[", ...rest }))(firstBeat));
+      .send((({ tags, ...rest }) => ({ tags: ",./[", ...rest }))(beatUpload));
     expect(res.statusCode).toBe(400);
   });
   test("request with valid data provided, should return 200 and upload the beat", async () => {
@@ -148,7 +148,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send(firstBeat);
+      .send(beatUpload);
     expect(res.statusCode).toBe(200);
 
     const id = res.body.id;
