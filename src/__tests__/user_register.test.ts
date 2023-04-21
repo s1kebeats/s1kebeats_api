@@ -15,7 +15,7 @@ const existingUser = {
 
 const newUser = {
   username: "new",
-  password: await (async () => await bcrypt.hash("Password1234", 3))(),
+  password: "Password1234",
   email: "new@gmail.com",
   activationLink: "new-activation-link",
 };

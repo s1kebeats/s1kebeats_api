@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser, secondUser, firstBeat } from "./utils/mocks";
+import { activatedUsers, beatCreateInputs } from "./utils/mocks";
 
 describe("beat deletion", () => {
   let id: null | number = null;
@@ -12,17 +12,17 @@ describe("beat deletion", () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
         {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
+          ...activatedUsers[1],
+          password: await (async () => await bcrypt.hash(activatedUsers[1].password, 3))(),
         },
       ],
     });
     const beat = await prisma.beat.create({
-      data: firstBeat,
+      data: beatCreateInputs[0],
     });
     id = beat.id;
   });
@@ -41,21 +41,21 @@ describe("beat deletion", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request to delete a beat that doesn't exist, should return 404", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).delete("/api/beat/-1/delete").set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(404);
   });
   test("request to delete beat that belongs to other user, should return 401", async () => {
-    const login = await request(app).post("/api/login").send(secondUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[1]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).delete(`/api/beat/${id}/delete`).set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(401);
   });
   test("valid request, should return 200, delete the beat and it's media", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const imageUpload = await request(app)

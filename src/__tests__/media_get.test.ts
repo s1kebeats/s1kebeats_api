@@ -4,14 +4,14 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 describe("get media", () => {
   beforeAll(async () => {
     await prisma.user.create({
       data: {
-        ...activatedUser,
-        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
       },
     });
   });
@@ -24,7 +24,7 @@ describe("get media", () => {
     expect(res.statusCode).toBe(404);
   });
   test("request to existing media should return 200", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const upload = await request(app)

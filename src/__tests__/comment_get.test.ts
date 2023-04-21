@@ -3,7 +3,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 let beatId: number | null = null;
 
@@ -11,8 +11,8 @@ describe("get comments", () => {
   beforeAll(async () => {
     const user = await prisma.user.create({
       data: {
-        ...activatedUser,
-        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
       },
     });
     const userId = user.id;
@@ -69,14 +69,14 @@ describe("get comments", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request to comments for not existing beat should return 404", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).get("/api/comment/-1").set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(404);
   });
   test("valid request, should return 200 and comments", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).get(`/api/comment/${beatId}`).set("Authorization", `Bearer ${accessToken}`);
@@ -85,7 +85,7 @@ describe("get comments", () => {
     expect(res.body.viewed).toBe(5);
   });
   test("valid request with viewed = 10, should return 200 and skip comments", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)

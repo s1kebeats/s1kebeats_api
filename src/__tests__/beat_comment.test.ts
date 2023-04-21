@@ -3,19 +3,19 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser, firstBeat } from "./utils/mocks";
+import { activatedUsers, beatCreateInputs } from "./utils/mocks";
 
 describe("beat comment", () => {
   let id: number | null = null;
   beforeAll(async () => {
     await prisma.user.create({
       data: {
-        ...activatedUser,
-        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
       },
     });
     const beat = await prisma.beat.create({
-      data: firstBeat,
+      data: beatCreateInputs[0],
     });
     id = beat.id;
   });
@@ -35,14 +35,14 @@ describe("beat comment", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request without comment content provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).post(`/api/beat/${id}/comment`).set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(400);
   });
   test("valid request to not existing beat should return 404", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken: string = login.body.accessToken;
 
     const res = await request(app)
@@ -54,7 +54,7 @@ describe("beat comment", () => {
     expect(res.statusCode).toBe(404);
   });
   test("valid request, should return 200 and add a new comment to the beat", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)

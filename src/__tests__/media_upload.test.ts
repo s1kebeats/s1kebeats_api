@@ -4,15 +4,15 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 describe("media upload", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
       ],
     });
@@ -34,7 +34,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(401);
   });
   test("no file attached should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -44,7 +44,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("no path provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -54,7 +54,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("invalid path provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -65,7 +65,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing media file with wrong extension to image path should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -76,7 +76,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing media file with wrong extension to stems path should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -87,7 +87,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing media file with wrong extension to mp3 path should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -98,7 +98,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing media file with wrong extension to wav path should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -109,7 +109,7 @@ describe("media upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("valid data provided, should return 200 and upload the file", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)

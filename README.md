@@ -127,6 +127,8 @@
 
   - `/:id`
 
+    **auth**: optional (only authorized can access beat comments);
+
     **params**: {
 
     - `id`: number;

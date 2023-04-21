@@ -3,15 +3,15 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser, beatUpload } from "./utils/mocks";
+import { activatedUsers, beatUpload } from "./utils/mocks";
 
 describe("upload", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
       ],
     });
@@ -32,7 +32,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request without name provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -42,7 +42,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request without wavePrice provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -52,7 +52,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request without wave provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -62,7 +62,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request without mp3 provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -72,7 +72,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with stemsPrice but without stems provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -82,7 +82,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with stems but without stemsPrice provided should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -92,7 +92,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong stems path, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -102,7 +102,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong wave path, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -112,7 +112,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong mp3 path, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -122,7 +122,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong image path, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -132,7 +132,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong tags, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -142,7 +142,7 @@ describe("upload", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with valid data provided, should return 200 and upload the beat", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)

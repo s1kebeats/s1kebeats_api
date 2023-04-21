@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser, firstBeat, secondUser, beatUpload } from "./utils/mocks";
+import { activatedUsers, beatCreateInputs, beatUpload } from "./utils/mocks";
 
 describe("beat edit", () => {
   let id: null | number = null;
@@ -12,17 +12,17 @@ describe("beat edit", () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
         {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
+          ...activatedUsers[1],
+          password: await (async () => await bcrypt.hash(activatedUsers[1].password, 3))(),
         },
       ],
     });
     const beat = await prisma.beat.create({
-      data: firstBeat,
+      data: beatCreateInputs[0],
     });
     id = beat.id;
   });
@@ -41,21 +41,21 @@ describe("beat edit", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request to edit a beat that doesn't exist, should return 404", async () => {
-    const login = await request(app).post("/api/login").send(secondUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[1]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/beat/-1/edit").set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(404);
   });
   test("request to edit beat that belongs to other user, should return 401", async () => {
-    const login = await request(app).post("/api/login").send(secondUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[1]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`);
     expect(res.statusCode).toBe(401);
   });
   test("providing stemsPrice without stems media file, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
@@ -64,7 +64,7 @@ describe("beat edit", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing stems without stemsPrice, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
@@ -73,7 +73,7 @@ describe("beat edit", () => {
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong tags, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch(`/api/beat/${id}/edit`).set("Authorization", `Bearer ${accessToken}`).send({
@@ -82,7 +82,7 @@ describe("beat edit", () => {
     expect(res.statusCode).toBe(400);
   });
   test("providing valid data, should return 200, edit the beat and delete old media", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const imageUpload = await request(app)

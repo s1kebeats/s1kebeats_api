@@ -3,7 +3,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser, secondUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 const editPayload = {
   username: "newUsername",
@@ -17,17 +17,11 @@ const editPayload = {
 
 describe("user edit", () => {
   beforeEach(async () => {
-    await prisma.user.createMany({
-      data: [
-        {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
-        },
-        {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
-        },
-      ],
+    await prisma.user.create({
+      data: {
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
+      },
     });
   });
 
@@ -44,7 +38,7 @@ describe("user edit", () => {
     expect(res.statusCode).toBe(401);
   });
   test("providing used username, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
@@ -53,7 +47,7 @@ describe("user edit", () => {
     expect(res.statusCode).toEqual(400);
   });
   test("providing username with banned characters, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
@@ -62,7 +56,7 @@ describe("user edit", () => {
     expect(res.statusCode).toEqual(400);
   });
   test("providing wrong image key, should return 400", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
@@ -71,7 +65,7 @@ describe("user edit", () => {
     expect(res.statusCode).toEqual(400);
   });
   test("providing valid data, should return 200 and edit the user", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send(editPayload);

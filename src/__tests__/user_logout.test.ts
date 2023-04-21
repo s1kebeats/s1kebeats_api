@@ -3,21 +3,15 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser, secondUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 describe("logout", () => {
   beforeEach(async () => {
-    await prisma.user.createMany({
-      data: [
-        {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
-        },
-        {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
-        },
-      ],
+    await prisma.user.create({
+      data: {
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
+      },
     });
   });
 
@@ -40,7 +34,7 @@ describe("logout", () => {
   test("providing valid refresh token, should return 200 and invalidate refreshToken", async () => {
     const login = await request(app)
       .post("/api/login")
-      .send({ ...activatedUser, refresh: true });
+      .send({ ...activatedUsers[0], refresh: true });
     const refreshToken = login.headers["set-cookie"][0].split(" ")[0];
 
     const res = await request(app).post("/api/logout").set("Cookie", refreshToken);

@@ -3,15 +3,15 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { secondUser } from "./utils/mocks";
+import { nonActivatedUser } from "./utils/mocks";
 
 describe("activate", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [
         {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
+          ...nonActivatedUser,
+          password: await (async () => await bcrypt.hash(nonActivatedUser.password, 3))(),
         },
       ],
     });
@@ -26,10 +26,10 @@ describe("activate", () => {
     expect(res.statusCode).toBe(404);
   });
   test("providing valid activation link should return 200 and update user's isActivated field to true", async () => {
-    const res = await request(app).post(`/api/activate/${secondUser.activationLink}`);
+    const res = await request(app).post(`/api/activate/${nonActivatedUser.activationLink}`);
     expect(res.statusCode).toBe(200);
 
-    const newlyActivatedUser = await prisma.user.findUnique({ where: { username: secondUser.username } });
+    const newlyActivatedUser = await prisma.user.findUnique({ where: { username: nonActivatedUser.username } });
 
     // check that user isActivated field is true
     expect(newlyActivatedUser!.isActivated).toBeTruthy();

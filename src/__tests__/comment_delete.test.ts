@@ -3,7 +3,7 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser, firstBeat, secondUser } from "./utils/mocks";
+import { activatedUsers, beatCreateInputs } from "./utils/mocks";
 
 describe("comment deletion", () => {
   let commentId: number | null = null;
@@ -12,17 +12,17 @@ describe("comment deletion", () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
         {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
+          ...activatedUsers[1],
+          password: await (async () => await bcrypt.hash(activatedUsers[1].password, 3))(),
         },
       ],
     });
     const beat = await prisma.beat.create({
-      data: firstBeat,
+      data: beatCreateInputs[0],
     });
     beatId = beat.id;
     const comment = await prisma.comment.create({
@@ -30,7 +30,7 @@ describe("comment deletion", () => {
         content: "Sum comment",
         user: {
           connect: {
-            username: activatedUser.username,
+            username: activatedUsers[0].username,
           },
         },
         beat: {
@@ -58,7 +58,7 @@ describe("comment deletion", () => {
     expect(res.statusCode).toBe(401);
   });
   test("request to delete a comment that belongs to other user should return 401", async () => {
-    const login = await request(app).post("/api/login").send(secondUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[1]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)
@@ -67,7 +67,7 @@ describe("comment deletion", () => {
     expect(res.statusCode).toBe(401);
   });
   test("valid request, should return 200 and delete the comment", async () => {
-    const login = await request(app).post("/api/login").send(activatedUser);
+    const login = await request(app).post("/api/login").send(activatedUsers[0]);
     const accessToken = login.body.accessToken;
 
     const res = await request(app)

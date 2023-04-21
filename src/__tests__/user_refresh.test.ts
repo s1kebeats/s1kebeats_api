@@ -3,17 +3,15 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
+import { activatedUsers } from "./utils/mocks";
 
 describe("refresh", () => {
   beforeEach(async () => {
-    await prisma.user.createMany({
-      data: [
-        {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
-        },
-      ],
+    await prisma.user.create({
+      data: {
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
+      },
     });
   });
 
@@ -37,7 +35,7 @@ describe("refresh", () => {
     const login = await request(app)
       .post("/api/login")
       .send({
-        ...activatedUser,
+        ...activatedUsers[0],
         refresh: true,
       });
     let refreshTokenCookie = login.headers["set-cookie"][0].split(" ")[0];

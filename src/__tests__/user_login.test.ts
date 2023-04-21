@@ -3,19 +3,19 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
-import { activatedUser, secondUser } from "./utils/mocks";
+import { activatedUsers, nonActivatedUser } from "./utils/mocks";
 
 describe("login", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [
         {
-          ...activatedUser,
-          password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
         },
         {
-          ...secondUser,
-          password: await (async () => await bcrypt.hash(secondUser.password, 3))(),
+          ...nonActivatedUser,
+          password: await (async () => await bcrypt.hash(nonActivatedUser.password, 3))(),
         },
       ],
     });
@@ -32,35 +32,35 @@ describe("login", () => {
   test("should return 400 without username provided", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send((({ username, ...rest }) => rest)(activatedUser));
+      .send((({ username, ...rest }) => rest)(activatedUsers[0]));
     expect(res.statusCode).toBe(400);
   });
   test("should return 400 without password provided", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send((({ password, ...rest }) => rest)(activatedUser));
+      .send((({ password, ...rest }) => rest)(activatedUsers[0]));
     expect(res.statusCode).toBe(400);
   });
   test("logging with wrong password should return 401", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send((({ password, ...rest }) => ({ password: "wrongpassword", ...rest }))(activatedUser));
+      .send((({ password, ...rest }) => ({ password: "wrongpassword", ...rest }))(activatedUsers[0]));
     expect(res.statusCode).toBe(401);
   });
   test("logging with unregistered username should return 401", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send((({ username, ...rest }) => ({ username: "wrongusername", ...rest }))(activatedUser));
+      .send((({ username, ...rest }) => ({ username: "wrongusername", ...rest }))(activatedUsers[0]));
     expect(res.statusCode).toBe(401);
   });
   test("logging into account without activated email should return 403", async () => {
-    const res = await request(app).post("/api/login").send(secondUser);
+    const res = await request(app).post("/api/login").send(nonActivatedUser);
     expect(res.statusCode).toBe(403);
   });
   test("providing right data, refresh=true, should return 200 and set http-only refresh token cookie", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send({ ...activatedUser, refresh: true });
+      .send({ ...activatedUsers[0], refresh: true });
     expect(res.statusCode).toBe(200);
     // refresh token cookie check
     expect(res.headers["set-cookie"][0].includes("refreshToken=")).toBeTruthy();
@@ -69,7 +69,7 @@ describe("login", () => {
   test("providing right data, refresh=false, should return 200 and should not set http-only refresh token cookie", async () => {
     const res = await request(app)
       .post("/api/login")
-      .send({ ...activatedUser, refresh: false });
+      .send({ ...activatedUsers[0], refresh: false });
     expect(res.statusCode).toBe(200);
     // refresh token cookie check
     expect(res.headers["set-cookie"]).toBeUndefined();

@@ -3,131 +3,18 @@ import prisma from "../client";
 import bcrypt from "bcrypt";
 import app from "./app.js";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
+import { activatedUsers, beatCreateInputs } from "./utils/mocks";
 
 describe("beat search", () => {
   beforeAll(async () => {
     await prisma.user.create({
       data: {
-        ...activatedUser,
-        password: await (async () => await bcrypt.hash(activatedUser.password, 3))(),
+        ...activatedUsers[0],
+        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
       },
     });
-    await prisma.beat.create({
-      data: {
-        name: "Chaze",
-        bpm: 140,
-        user: {
-          connect: {
-            username: activatedUser.username,
-          },
-        },
-        wavePrice: 899,
-        wave: "/wave",
-        mp3: "/mp3",
-        tags: {
-          connectOrCreate: [
-            {
-              where: { name: "s1kebeats" },
-              create: { name: "s1kebeats" },
-            },
-            {
-              where: { name: "keyglock" },
-              create: { name: "keyglock" },
-            },
-          ],
-        },
-      },
-    });
-    await prisma.beat.create({
-      data: {
-        name: "outtahere",
-        bpm: 122,
-        user: {
-          connect: {
-            username: activatedUser.username,
-          },
-        },
-        wavePrice: 1499,
-        wave: "/wave",
-        mp3: "/mp3",
-        tags: {
-          connectOrCreate: [
-            {
-              where: { name: "s1kebeats" },
-              create: { name: "s1kebeats" },
-            },
-            {
-              where: { name: "gunna" },
-              create: { name: "gunna" },
-            },
-            {
-              where: { name: "wheezy" },
-              create: { name: "wheezy" },
-            },
-          ],
-        },
-      },
-    });
-    await prisma.beat.create({
-      data: {
-        name: "Turnt",
-        bpm: 140,
-        user: {
-          connect: {
-            username: activatedUser.username,
-          },
-        },
-        wavePrice: 1299,
-        wave: "/wave",
-        mp3: "/mp3",
-        tags: {
-          connectOrCreate: [
-            {
-              where: { name: "s1kebeats" },
-              create: { name: "s1kebeats" },
-            },
-            {
-              where: { name: "LilTjay" },
-              create: { name: "LilTjay" },
-            },
-            {
-              where: { name: "Emotional" },
-              create: { name: "Emotional" },
-            },
-          ],
-        },
-      },
-    });
-    await prisma.beat.create({
-      data: {
-        name: "PSD",
-        bpm: 160,
-        user: {
-          connect: {
-            username: activatedUser.username,
-          },
-        },
-        wavePrice: 1099,
-        wave: "/wave",
-        mp3: "/mp3",
-        tags: {
-          connectOrCreate: [
-            {
-              where: { name: "s1kebeats" },
-              create: { name: "s1kebeats" },
-            },
-            {
-              where: { name: "agressive" },
-              create: { name: "agressive" },
-            },
-            {
-              where: { name: "Emotional" },
-              create: { name: "Emotional" },
-            },
-          ],
-        },
-      },
+    await prisma.beat.createMany({
+      data: [...beatCreateInputs],
     });
   });
 
@@ -154,7 +41,7 @@ describe("beat search", () => {
     expect(res.body.beats[0].name).toBe("outtahere");
   });
   test("valid request with filter by text, should return 200 and beat with name or author username containing text query (4)", async () => {
-    const res = await request(app).get(`/api/beat/?q=${activatedUser.username}`);
+    const res = await request(app).get(`/api/beat/?q=${activatedUsers[0].username}`);
     expect(res.statusCode).toBe(200);
     expect(res.body.beats.length).toBe(4);
   });
@@ -183,7 +70,7 @@ describe("beat search", () => {
     expect(res.body.beats[0].name).toBe("Chaze");
   });
   test("valid request with filter by both bpm and text, should return 200 filter beats", async () => {
-    const res = await request(app).get(`/api/beat/?q=${activatedUser.username}&bpm=122`);
+    const res = await request(app).get(`/api/beat/?q=${activatedUsers[0].username}&bpm=122`);
     expect(res.statusCode).toBe(200);
     expect(res.body.beats.length).toBe(1);
     expect(res.body.beats[0].name).toBe("outtahere");
