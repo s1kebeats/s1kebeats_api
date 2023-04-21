@@ -13,12 +13,12 @@ class MediaService {
       // multiple
       if (Array.isArray(extensions)) {
         if (!extensions.includes(ext)) {
-          throw ApiError.BadRequest(`invalid file format`);
+          throw ApiError.BadRequest("invalid file format");
         }
       } else {
         // single
         if (ext !== extensions) {
-          throw ApiError.BadRequest(`invalid file format`);
+          throw ApiError.BadRequest("invalid file format");
         }
       }
     }
@@ -77,7 +77,7 @@ class MediaService {
   }
 
   async deleteMedia(location: string) {
-    await fs.unlink(path.resolve("server/" + location), (error: any) => {
+    await fs.unlink(path.resolve(`server/${location}`), (error: any) => {
       if (error) throw error;
     });
   }

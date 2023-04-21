@@ -4,9 +4,7 @@ import bcrypt from "bcrypt";
 import app from "./app.js";
 import mediaLocations from "./media/mediaLocations";
 import { describe, beforeAll, afterAll, expect, test } from "vitest";
-import { activatedUser } from "./utils/mocks";
-import { secondUser } from "./utils/mocks";
-import { firstBeat } from "./utils/mocks";
+import { activatedUser, secondUser, firstBeat } from "./utils/mocks";
 
 describe("beat deletion", () => {
   let id: null | number = null;

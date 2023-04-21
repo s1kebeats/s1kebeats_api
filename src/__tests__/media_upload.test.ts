@@ -6,7 +6,7 @@ import app from "./app.js";
 import { describe, beforeEach, afterEach, expect, test } from "vitest";
 import { activatedUser } from "./utils/mocks";
 
-describe("upload", () => {
+describe("media upload", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [

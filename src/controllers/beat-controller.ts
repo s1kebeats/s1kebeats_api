@@ -43,7 +43,7 @@ class BeatController {
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
       const id = +req.params.id;
-      const beat: BeatIndividual = await beatService.getIndividualBeat(id, !!req.user);
+      const beat: BeatIndividual = await beatService.getIndividualBeat(id, !(req.user == null));
       return res.json(beat);
     } catch (error) {
       next(error);
@@ -74,7 +74,7 @@ class BeatController {
         tags: tags
           ? {
               connectOrCreate: tags.split(",").map((tag: string) => {
-                if (!tag.match(/^[0-9a-zA-Z]+$/)) {
+                if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
                   throw ApiError.BadRequest("Wrong tags.");
                 }
                 return {
@@ -127,7 +127,7 @@ class BeatController {
         stems,
       }) => ({
         name,
-        bpm: +bpm,
+        bpm: bpm ? +bpm : undefined,
         description,
         tags: tags
           ? {
@@ -144,8 +144,8 @@ class BeatController {
             }
           : undefined,
 
-        wavePrice: +wavePrice,
-        stemsPrice: +stemsPrice,
+        wavePrice: wavePrice ? +wavePrice : undefined,
+        stemsPrice: stemsPrice ? +stemsPrice : undefined,
 
         image,
         wave,
@@ -153,14 +153,14 @@ class BeatController {
         stems,
       }))(req.body);
       const merged = { ...original, ...payload };
-      if ((merged.stemsPrice && !merged.stems) || (merged.stems && !merged.stemsPrice)) {
+      if ((merged.stemsPrice || merged.stems) && !(merged.stemsPrice && merged.stems)) {
         next(ApiError.BadRequest("Provide both stems and stems price"));
         return;
       }
       const mediaFileKeys = ["mp3", "wave", "stems", "image"] as const;
       for (const key of mediaFileKeys) {
         if (payload[key] && original[key]) {
-          mediaService.deleteMedia(original[key]!);
+          await mediaService.deleteMedia(original[key]!);
         }
       }
       const beat = await beatService.editBeat(original.id, payload);
@@ -200,7 +200,7 @@ class BeatController {
       const beat = await beatService.getBeatById(id);
       let like: PrismaClient.Like | null;
       like = await likeService.getLikeByIdentifier(beat.id, userId);
-      if (like) {
+      if (like != null) {
         // delete the like from db
         like = await likeService.deleteLike(beat.id, userId);
       } else {

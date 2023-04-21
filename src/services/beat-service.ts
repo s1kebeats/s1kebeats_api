@@ -1,5 +1,4 @@
 import PrismaClient from "@prisma/client";
-import authorSelect from "prisma-selects/author-select";
 
 import ApiError from "../exceptions/api-error";
 import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select";

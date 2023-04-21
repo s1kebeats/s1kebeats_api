@@ -108,7 +108,7 @@ class UserController {
       }: Record<string, string>) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
       // delete old profile image, if it's updated
       if (payload.image && original!.image) {
-        mediaService.deleteMedia(original!.image);
+        await mediaService.deleteMedia(original!.image);
       }
       await userService.edit(userId, payload);
 
@@ -123,7 +123,7 @@ class UserController {
       const { username } = req.params;
       const available = await userService.getUserByUsername(username);
       return res.json({
-        available: !available,
+        available: available == null,
       });
     } catch (error) {
       next(error);

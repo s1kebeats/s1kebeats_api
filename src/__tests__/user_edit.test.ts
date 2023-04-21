@@ -14,12 +14,8 @@ const editPayload = {
   vk: "newVk",
   image: "image/newImage",
 };
-async function checkEditedUser(body: any) {
-  for (const key of Object.keys(editPayload)) {
-    expect(body[key]).toEqual(editPayload[key as keyof typeof editPayload]);
-  }
-}
-describe("edit", () => {
+
+describe("user edit", () => {
   beforeEach(async () => {
     await prisma.user.createMany({
       data: [
@@ -83,6 +79,8 @@ describe("edit", () => {
 
     // check that the user was edited
     const user = await request(app).get(`/api/author/${editPayload.username}`);
-    await checkEditedUser(user.body);
+    for (const key of Object.keys(editPayload)) {
+      expect(user.body[key]).toEqual(editPayload[key as keyof typeof editPayload]);
+    }
   });
 });

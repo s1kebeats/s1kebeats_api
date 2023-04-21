@@ -34,7 +34,7 @@ class UserService {
   }: Pick<PrismaClient.Prisma.UserCreateInput, "email" | "username" | "password">): Promise<UserDto> {
     // check if username is already registered
     const existingUser = await this.getUserByUsername(username);
-    if (existingUser) {
+    if (existingUser != null) {
       throw ApiError.BadRequest(`Username "${username}" is already taken.`);
     }
     // hash password

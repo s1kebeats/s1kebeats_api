@@ -1,9 +1,8 @@
 import beatController from "../controllers/beat-controller";
-import authMiddleware from "../middlewares/auth-middleware";
+import authMiddleware, { optionalAuthMiddleware } from "../middlewares/auth-middleware";
 import { body, param, query } from "express-validator";
 import { Router } from "express";
 import validationMiddleware from "../middlewares/validation-middleware";
-import { optionalAuthMiddleware } from "../middlewares/auth-middleware";
 
 const router = Router();
 

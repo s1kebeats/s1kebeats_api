@@ -43,7 +43,7 @@ describe("beat comment", () => {
   });
   test("valid request to not existing beat should return 404", async () => {
     const login = await request(app).post("/api/login").send(activatedUser);
-    const accessToken = login.body.accessToken;
+    const accessToken: string = login.body.accessToken;
 
     const res = await request(app)
       .post("/api/beat/-1/comment")
