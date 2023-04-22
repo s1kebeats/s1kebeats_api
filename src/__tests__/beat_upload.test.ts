@@ -78,7 +78,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ stems, ...rest }) => ({ ...rest }))(beatUpload));
+      .send({ ...beatUpload, stemsPrice: 1 });
     expect(res.statusCode).toBe(400);
   });
   test("request with stems but without stemsPrice provided should return 400", async () => {
@@ -88,7 +88,7 @@ describe("upload", () => {
     const res = await request(app)
       .post("/api/beat/upload")
       .set("Authorization", `Bearer ${accessToken}`)
-      .send((({ stemsPrice, ...rest }) => ({ ...rest }))(beatUpload));
+      .send({ ...beatUpload, stems: "stems/" });
     expect(res.statusCode).toBe(400);
   });
   test("request with wrong stems path, should return 400", async () => {

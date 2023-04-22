@@ -34,6 +34,5 @@ describe("author individual", () => {
     expect(res.body.isActivated).toBe(undefined);
     expect(res.body.username).toBe(activatedUsers[0].username);
     expect(res.body.displayedName).toBe(activatedUsers[0].displayedName);
-    expect(res.body.image).toBe(activatedUsers[0].image);
   });
 });

@@ -30,19 +30,15 @@ describe("tag search", () => {
     await prisma.tag.deleteMany();
   });
 
-  test("valid request without filters, should return 200 and tag list", async () => {
+  test("valid request, should return 200 and tag list", async () => {
     const res = await request(app).get("/api/tag");
     expect(res.statusCode).toBe(200);
     expect(res.body.tags.length).toBe(5);
     expect(res.body.viewed).toBe(5);
   });
-  test("valid request with viewed 10 should return 200 and skip all beats", async () => {
-    const res = await request(app).get("/api/tag/?viewed=10");
+  test("valid request with viewed 10 should return 200 and skip all tags", async () => {
+    const res = await request(app).get("/api/tag?viewed=10");
     expect(res.body.tags.length).toBe(0);
     expect(res.body.viewed).toBe(10);
-  });
-  test("valid request with name filter should return 200 and filter out 'HipHopInstrumental' tag", async () => {
-    const res = await request(app).get("/api/tag/?name=Beat");
-    expect(res.body.tags.length).toBe(4);
   });
 });

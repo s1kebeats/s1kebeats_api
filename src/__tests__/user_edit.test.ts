@@ -17,11 +17,17 @@ const editPayload = {
 
 describe("user edit", () => {
   beforeEach(async () => {
-    await prisma.user.create({
-      data: {
-        ...activatedUsers[0],
-        password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
-      },
+    await prisma.user.createMany({
+      data: [
+        {
+          ...activatedUsers[0],
+          password: await (async () => await bcrypt.hash(activatedUsers[0].password, 3))(),
+        },
+        {
+          ...activatedUsers[1],
+          password: await (async () => await bcrypt.hash(activatedUsers[1].password, 3))(),
+        },
+      ],
     });
   });
 
@@ -42,7 +48,7 @@ describe("user edit", () => {
     const accessToken = login.body.accessToken;
 
     const res = await request(app).patch("/api/edit").set("Authorization", `Bearer ${accessToken}`).send({
-      username: secondUser.username,
+      username: activatedUsers[1].username,
     });
     expect(res.statusCode).toEqual(400);
   });
