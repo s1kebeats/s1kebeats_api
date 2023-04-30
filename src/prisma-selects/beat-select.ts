@@ -7,6 +7,7 @@ const beatSelect = PrismaClient.Prisma.validator<PrismaClient.Prisma.BeatArgs>()
     image: true,
     mp3: true,
     wavePrice: true,
+    stemsPrice: true,
     user: {
       select: {
         id: true,
