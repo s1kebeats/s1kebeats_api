@@ -44,7 +44,6 @@ class MediaController {
         try {
           res.writeHead(200, {
             "Content-Type": "application/octet-stream",
-            "Content-Disposition": "attachment",
           });
           fs.createReadStream(filePath).pipe(res);
           return;
