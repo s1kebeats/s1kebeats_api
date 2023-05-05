@@ -111,6 +111,7 @@
     - **image**?: string containing "image/";
     - **bpm**?: decimal string;
     - **description**?: string, 255 chars max;
+    - **tags**?: string, comma-separated tag names;
 
     }
 
