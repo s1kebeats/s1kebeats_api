@@ -1,12 +1,12 @@
-import ApiError from "../exceptions/api-error";
-import beatService from "../services/beat-service";
-import { Request, Response, NextFunction } from "express";
-import PrismaClient from "@prisma/client";
-import commentService from "../services/comment-service";
-import likeService from "../services/like-service";
-import { Beat } from "../prisma-selects/beat-select";
-import { BeatIndividual } from "../prisma-selects/beat-individual-select";
-import mediaService from "../services/media-service";
+import ApiError from '../exceptions/api-error';
+import beatService from '../services/beat-service';
+import { Request, Response, NextFunction } from 'express';
+import PrismaClient from '@prisma/client';
+import commentService from '../services/comment-service';
+import likeService from '../services/like-service';
+import { Beat } from '../prisma-selects/beat-select';
+import { BeatIndividual } from '../prisma-selects/beat-individual-select';
+import mediaService from '../services/media-service';
 
 class BeatController {
   // find many beats
@@ -14,25 +14,32 @@ class BeatController {
     try {
       let beats: Beat[];
       if (Object.keys(req.query).length > 0) {
-        const query: { q?: string; bpm?: number; tags?: string[]; orderBy?: string } = (({
-          q,
-          bpm,
-          tags,
-          orderBy,
-        }) => ({
+        const query: {
+          q?: string;
+          bpm?: number;
+          tags?: string[];
+          orderBy?: string;
+        } = (({ q, bpm, tags, orderBy }) => ({
           q,
           bpm: bpm ? +bpm : undefined,
-          tags: tags ? tags.split(",") : undefined,
+          tags: tags ? tags.split(',') : undefined,
           orderBy,
         }))(req.query as Record<string, string>);
-        beats = await beatService.findBeats(query, req.query.viewed ? +req.query.viewed : 0);
+        beats = await beatService.findBeats(
+          query,
+          req.query.viewed ? +req.query.viewed : 0
+        );
       } else {
         // get all beats
-        beats = await beatService.getBeats(req.query.viewed ? +req.query.viewed : 0);
+        beats = await beatService.getBeats(
+          req.query.viewed ? +req.query.viewed : 0
+        );
       }
       return res.json({
         beats,
-        viewed: req.query.viewed ? +req.query.viewed + beats.length : beats.length,
+        viewed: req.query.viewed
+          ? +req.query.viewed + beats.length
+          : beats.length,
       });
     } catch (error) {
       next(error);
@@ -43,7 +50,10 @@ class BeatController {
   async getIndividualBeat(req: Request, res: Response, next: NextFunction) {
     try {
       const id = +req.params.id;
-      const beat: BeatIndividual = await beatService.getIndividualBeat(id, !(req.user == null));
+      const beat: BeatIndividual = await beatService.getIndividualBeat(
+        id,
+        !(req.user == null)
+      );
       return res.json(beat);
     } catch (error) {
       next(error);
@@ -73,9 +83,9 @@ class BeatController {
         description,
         tags: tags
           ? {
-              connectOrCreate: tags.split(",").map((tag: string) => {
+              connectOrCreate: tags.split(',').map((tag: string) => {
                 if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
-                  throw ApiError.BadRequest("Wrong tags.");
+                  throw ApiError.BadRequest('Wrong tags.');
                 }
                 return {
                   where: { name: tag },
@@ -132,9 +142,9 @@ class BeatController {
         tags: tags
           ? {
               set: [],
-              connectOrCreate: tags.split(",").map((tag: string) => {
+              connectOrCreate: tags.split(',').map((tag: string) => {
                 if (tag.match(/^[0-9a-zA-Z]+$/) == null) {
-                  throw ApiError.BadRequest("Wrong tags");
+                  throw ApiError.BadRequest('Wrong tags');
                 }
                 return {
                   where: { name: tag },
@@ -153,11 +163,14 @@ class BeatController {
         stems,
       }))(req.body);
       const merged = { ...original, ...payload };
-      if ((merged.stemsPrice || merged.stems) && !(merged.stemsPrice && merged.stems)) {
-        next(ApiError.BadRequest("Provide both stems and stems price"));
+      if (
+        (merged.stemsPrice || merged.stems) &&
+        !(merged.stemsPrice && merged.stems)
+      ) {
+        next(ApiError.BadRequest('Provide both stems and stems price'));
         return;
       }
-      const mediaFileKeys = ["mp3", "wave", "stems", "image"] as const;
+      const mediaFileKeys = ['mp3', 'wave', 'stems', 'image'] as const;
       for (const key of mediaFileKeys) {
         if (payload[key] && original[key]) {
           await mediaService.deleteMedia(original[key]!);
@@ -224,7 +237,7 @@ class BeatController {
         return;
       }
       await beatService.deleteBeat(beat);
-      return res.json("success");
+      return res.json('success');
     } catch (error) {
       next(error);
     }

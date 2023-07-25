@@ -1,18 +1,22 @@
-import PrismaClient from "@prisma/client";
-import bcrypt from "bcrypt";
-import { nanoid } from "nanoid";
+import PrismaClient from '@prisma/client';
+import bcrypt from 'bcrypt';
+import { nanoid } from 'nanoid';
 
-import UserDto from "../dtos/user-dto";
-import mailService from "./mail-service";
-import tokenService from "./token-service";
-import ApiError from "../exceptions/api-error";
-import AuthResponse from "../models/AuthResponse";
+import UserDto from '../dtos/user-dto';
+import mailService from './mail-service';
+import tokenService from './token-service';
+import ApiError from '../exceptions/api-error';
+import AuthResponse from '../models/AuthResponse';
 
 const prisma = new PrismaClient.PrismaClient();
 
 class UserService {
   // tokens and login/register dto generator
-  async generateData(user: PrismaClient.User, ip: string, refresh: boolean): Promise<AuthResponse> {
+  async generateData(
+    user: PrismaClient.User,
+    ip: string,
+    refresh: boolean
+  ): Promise<AuthResponse> {
     // remove confidentional information from user data
     const userDto = new UserDto(user);
     // generate tokens
@@ -31,7 +35,10 @@ class UserService {
     email,
     username,
     password,
-  }: Pick<PrismaClient.Prisma.UserCreateInput, "email" | "username" | "password">): Promise<UserDto> {
+  }: Pick<
+    PrismaClient.Prisma.UserCreateInput,
+    'email' | 'username' | 'password'
+  >): Promise<UserDto> {
     // check if username is already registered
     const existingUser = await this.getUserByUsername(username);
     if (existingUser != null) {
@@ -40,7 +47,7 @@ class UserService {
     // hash password
     const hashedPassword: string = await bcrypt.hash(password, 3);
     // generate unique activation link
-    const activationLink: string = nanoid(64);
+    const activationLink: string = nanoid(6);
     const userCreateArgs: PrismaClient.Prisma.UserCreateArgs = {
       data: {
         email,
@@ -51,7 +58,7 @@ class UserService {
     };
     const user = await prisma.user.create(userCreateArgs);
     // send email with activation link
-    await mailService.sendActivationMail(email, `${process.env.CLIENT_LOCAL_URL!}/activate/${activationLink}`);
+    await mailService.sendActivationMail(email, activationLink);
     const userDto = new UserDto(user);
     return userDto;
   }
@@ -64,7 +71,7 @@ class UserService {
       },
     });
     if (user == null) {
-      throw ApiError.NotFound("Wrong activation link.");
+      throw ApiError.NotFound('Wrong activation link.');
     }
     // update user isActivated state to true
     await prisma.user.update({
@@ -77,7 +84,12 @@ class UserService {
     });
   }
 
-  async login(username: string, password: string, ip: string, refresh: boolean): Promise<AuthResponse> {
+  async login(
+    username: string,
+    password: string,
+    ip: string,
+    refresh: boolean
+  ): Promise<AuthResponse> {
     const user = await prisma.user.findUnique({
       where: { username },
     });
@@ -85,7 +97,10 @@ class UserService {
       throw ApiError.UnauthorizedUser();
     }
     // compare passwords
-    const passwordEquals: boolean = await bcrypt.compare(password, user.password);
+    const passwordEquals: boolean = await bcrypt.compare(
+      password,
+      user.password
+    );
     if (!passwordEquals) {
       throw ApiError.UnauthorizedUser();
     }
@@ -123,14 +138,20 @@ class UserService {
     return data;
   }
 
-  async edit(userId: number, payload: PrismaClient.Prisma.UserUpdateInput): Promise<void> {
+  async edit(
+    userId: number,
+    payload: PrismaClient.Prisma.UserUpdateInput
+  ): Promise<void> {
     if (payload.username) {
       // check if username isn't already registered
-      const existingUser: PrismaClient.User | null = await prisma.user.findUnique({
-        where: { username: payload.username as string },
-      });
+      const existingUser: PrismaClient.User | null =
+        await prisma.user.findUnique({
+          where: { username: payload.username as string },
+        });
       if (existingUser != null) {
-        throw ApiError.BadRequest(`Username "${payload.username as string}" is already taken.`);
+        throw ApiError.BadRequest(
+          `Username "${payload.username as string}" is already taken.`
+        );
       }
     }
     const userUpdateArgs: PrismaClient.Prisma.UserUpdateArgs = {
