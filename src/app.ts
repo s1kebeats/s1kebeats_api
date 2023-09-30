@@ -3,8 +3,9 @@ import express from "express";
 import cors from "cors";
 import cookieParser from "cookie-parser";
 import fileUpload from "express-fileupload";
-import router from "./router/index";
+import router from "./router";
 import errorMiddleware from "./middlewares/error-middleware";
+import { isLocalOrigin } from "./utils";
 
 dotenv.config();
 
@@ -16,10 +17,12 @@ app.use(fileUpload());
 app.use(express.json({ limit: "1000mb" }));
 app.use(cookieParser());
 app.use(
-  cors({
-    credentials: true,
-    origin: [process.env.CLIENT_LOCAL_URL!, process.env.CLIENT_EXPOSED_URL!],
-  })
+  cors((req, cb) =>
+    cb(null, {
+      credentials: true,
+      origin: isLocalOrigin(req.header("Origin")),
+    })
+  )
 );
 app.use("/api", router);
 
