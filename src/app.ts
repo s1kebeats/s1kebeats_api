@@ -11,10 +11,10 @@ dotenv.config();
 
 const app = express();
 // enable req.ip
-app.set("trust proxy", true);
+app.set('trust proxy', true);
 
 app.use(fileUpload());
-app.use(express.json({ limit: "1000mb" }));
+app.use(express.json({ limit: '1000mb' }));
 app.use(cookieParser());
 app.use(
   cors((req, cb) =>
@@ -24,7 +24,7 @@ app.use(
     })
   )
 );
-app.use("/api", router);
+app.use('/api', router);
 
 app.use(errorMiddleware);
 

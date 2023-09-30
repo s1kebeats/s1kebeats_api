@@ -1,8 +1,8 @@
-import passport from "passport";
-import dotenv from "dotenv";
-import { ExtractJwt, Strategy as JwtStrategy } from "passport-jwt";
-import { Strategy as PassportAnonymousStrategy } from "passport-anonymous";
-import userService from "../services/user-service";
+import passport from 'passport';
+import dotenv from 'dotenv';
+import { ExtractJwt, Strategy as JwtStrategy } from 'passport-jwt';
+import { Strategy as PassportAnonymousStrategy } from 'passport-anonymous';
+import userService from '../services/user-service';
 
 dotenv.config();
 
@@ -29,8 +29,10 @@ passport.use(
   )
 );
 
-const requiredAuthMiddleware = passport.authenticate("jwt", { session: false });
-const optionalAuthMiddleware = passport.authenticate(["jwt", "anonymous"], { session: false });
+const requiredAuthMiddleware = passport.authenticate('jwt', { session: false });
+const optionalAuthMiddleware = passport.authenticate(['jwt', 'anonymous'], {
+  session: false,
+});
 
 export { optionalAuthMiddleware };
 export default requiredAuthMiddleware;

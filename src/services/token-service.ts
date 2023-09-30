@@ -1,6 +1,6 @@
-import jsonwebtoken, { JwtPayload } from "jsonwebtoken";
-import PrismaClient from "@prisma/client";
-import UserDto from "../dtos/user-dto";
+import jsonwebtoken, { JwtPayload } from 'jsonwebtoken';
+import PrismaClient from '@prisma/client';
+import UserDto from '../dtos/user-dto';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -16,20 +16,32 @@ class TokenService {
       accessToken: string;
       refreshToken?: string;
     } = {
-      accessToken: jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_ACCESS_SECRET!, {
-        expiresIn: "15m",
-      }),
+      accessToken: jsonwebtoken.sign(
+        Object.assign({}, payload),
+        process.env.JWT_ACCESS_SECRET!,
+        {
+          expiresIn: '15m',
+        }
+      ),
     };
     if (refresh) {
-      tokens.refreshToken = jsonwebtoken.sign(Object.assign({}, payload), process.env.JWT_REFRESH_SECRET!, {
-        expiresIn: "30d",
-      });
+      tokens.refreshToken = jsonwebtoken.sign(
+        Object.assign({}, payload),
+        process.env.JWT_REFRESH_SECRET!,
+        {
+          expiresIn: '30d',
+        }
+      );
     }
 
     return tokens;
   }
 
-  async saveToken(userId: number, ip: string, refreshToken: string): Promise<PrismaClient.Token> {
+  async saveToken(
+    userId: number,
+    ip: string,
+    refreshToken: string
+  ): Promise<PrismaClient.Token> {
     // update existing refresh token or create new token
     const tokenUpsertArgs: PrismaClient.Prisma.TokenUpsertArgs = {
       where: {
@@ -74,7 +86,10 @@ class TokenService {
   // decode data from given tokens
   validateAccessToken(accessToken: string): null | JwtPayload {
     try {
-      const decoded = jsonwebtoken.verify(accessToken, process.env.JWT_ACCESS_SECRET!) as JwtPayload;
+      const decoded = jsonwebtoken.verify(
+        accessToken,
+        process.env.JWT_ACCESS_SECRET!
+      ) as JwtPayload;
       // return user data
       return decoded;
     } catch (error) {
@@ -84,7 +99,10 @@ class TokenService {
 
   validateRefreshToken(refreshToken: string): null | JwtPayload {
     try {
-      const decoded = jsonwebtoken.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as JwtPayload;
+      const decoded = jsonwebtoken.verify(
+        refreshToken,
+        process.env.JWT_REFRESH_SECRET!
+      ) as JwtPayload;
       // return user data
       return decoded;
     } catch (error) {

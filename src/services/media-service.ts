@@ -1,11 +1,15 @@
-import { UploadedFile } from "express-fileupload";
-import path from "path";
-import ApiError from "../exceptions/api-error";
-import fs from "fs";
+import { UploadedFile } from 'express-fileupload';
+import path from 'path';
+import ApiError from '../exceptions/api-error';
+import fs from 'fs';
 
 class MediaService {
   // file validation function with extension and maxSize
-  validate(file: UploadedFile, extensions?: string | string[], maxSize?: number) {
+  validate(
+    file: UploadedFile,
+    extensions?: string | string[],
+    maxSize?: number
+  ) {
     // extensions validation
     if (extensions) {
       // get file extension
@@ -13,12 +17,12 @@ class MediaService {
       // multiple
       if (Array.isArray(extensions)) {
         if (!extensions.includes(ext)) {
-          throw ApiError.BadRequest("invalid file format");
+          throw ApiError.BadRequest('invalid file format');
         }
       } else {
         // single
         if (ext !== extensions) {
-          throw ApiError.BadRequest("invalid file format");
+          throw ApiError.BadRequest('invalid file format');
         }
       }
     }
@@ -32,39 +36,39 @@ class MediaService {
 
   validateMedia(file: UploadedFile, path: string) {
     switch (path) {
-      case "image": {
-        this.validate(file, [".png", ".jpg", ".jpeg"]);
+      case 'image': {
+        this.validate(file, ['.png', '.jpg', '.jpeg']);
         break;
       }
-      case "mp3": {
+      case 'mp3': {
         this.validate(
           file,
-          ".mp3",
+          '.mp3',
           // 150mb
           150 * 1024 * 1024
         );
         break;
       }
-      case "wave": {
+      case 'wave': {
         this.validate(
           file,
-          ".wav",
+          '.wav',
           // 300mb
           300 * 1024 * 1024
         );
         break;
       }
-      case "stems": {
+      case 'stems': {
         this.validate(
           file,
-          [".zip", ".rar"],
+          ['.zip', '.rar'],
           // 500mb
           500 * 1024 * 1024
         );
         break;
       }
       default: {
-        throw ApiError.BadRequest("invalid path");
+        throw ApiError.BadRequest('invalid path');
       }
     }
   }

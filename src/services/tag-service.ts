@@ -1,4 +1,4 @@
-import PrismaClient from "@prisma/client";
+import PrismaClient from '@prisma/client';
 
 const prisma = new PrismaClient.PrismaClient();
 
@@ -8,7 +8,7 @@ class TagService {
       where: {
         name: {
           contains: name,
-          mode: "insensitive",
+          mode: 'insensitive',
         },
       },
       take: 10,

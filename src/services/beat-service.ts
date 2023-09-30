@@ -1,9 +1,11 @@
-import PrismaClient from "@prisma/client";
+import PrismaClient from '@prisma/client';
 
-import ApiError from "../exceptions/api-error";
-import beatIndividualSelect, { BeatIndividual } from "../prisma-selects/beat-individual-select";
-import beatSelect, { Beat } from "../prisma-selects/beat-select";
-import mediaService from "./media-service";
+import ApiError from '../exceptions/api-error';
+import beatIndividualSelect, {
+  BeatIndividual,
+} from '../prisma-selects/beat-individual-select';
+import beatSelect, { Beat } from '../prisma-selects/beat-select';
+import mediaService from './media-service';
 const prisma = new PrismaClient.PrismaClient();
 
 export interface BeatIndividualWithRelated extends BeatIndividual {
@@ -21,25 +23,32 @@ class BeatService {
     return beats;
   }
 
-  formatBeatOrderBy(orderBy: string): PrismaClient.Prisma.BeatAvgOrderByAggregateInput {
-    if (orderBy.includes("Lower")) {
+  formatBeatOrderBy(
+    orderBy: string
+  ): PrismaClient.Prisma.BeatAvgOrderByAggregateInput {
+    if (orderBy.includes('Lower')) {
       return {
-        [orderBy.slice(0, -5)]: "asc",
+        [orderBy.slice(0, -5)]: 'asc',
       };
     }
-    if (orderBy.includes("Higher")) {
+    if (orderBy.includes('Higher')) {
       return {
-        [orderBy.slice(0, -6)]: "desc",
+        [orderBy.slice(0, -6)]: 'desc',
       };
     }
     return {
-      id: "desc",
+      id: 'desc',
     };
   }
 
   // find beats with query
   async findBeats(
-    { q, bpm, tags, orderBy }: { q?: string; bpm?: number; tags?: string[]; orderBy?: string },
+    {
+      q,
+      bpm,
+      tags,
+      orderBy,
+    }: { q?: string; bpm?: number; tags?: string[]; orderBy?: string },
     viewed = 0
   ): Promise<Beat[]> {
     let nameQuery: PrismaClient.Prisma.BeatWhereInput = {};
@@ -49,7 +58,7 @@ class BeatService {
           {
             name: {
               contains: q,
-              mode: "insensitive",
+              mode: 'insensitive',
             },
           },
           {
@@ -58,13 +67,13 @@ class BeatService {
                 {
                   username: {
                     contains: q,
-                    mode: "insensitive",
+                    mode: 'insensitive',
                   },
                 },
                 {
                   displayedName: {
                     contains: q,
-                    mode: "insensitive",
+                    mode: 'insensitive',
                   },
                 },
               ],
@@ -79,7 +88,7 @@ class BeatService {
       orderBy: orderBy
         ? this.formatBeatOrderBy(orderBy)
         : {
-            id: "desc",
+            id: 'desc',
           },
       where: {
         ...nameQuery,
@@ -92,7 +101,7 @@ class BeatService {
                 some: {
                   name: {
                     in: tags,
-                    mode: "insensitive",
+                    mode: 'insensitive',
                   },
                 },
               }
@@ -103,7 +112,10 @@ class BeatService {
     return beats;
   }
 
-  async getIndividualBeat(id: number, authorized: boolean): Promise<BeatIndividualWithRelated> {
+  async getIndividualBeat(
+    id: number,
+    authorized: boolean
+  ): Promise<BeatIndividualWithRelated> {
     const beatFindUniqueArgs = {
       where: {
         id,
@@ -112,7 +124,7 @@ class BeatService {
     };
     const beat = await prisma.beat.findUnique(beatFindUniqueArgs);
     if (beat == null) {
-      throw ApiError.NotFound("Beat was not found.");
+      throw ApiError.NotFound('Beat was not found.');
     }
     // related beats (beats with same tags or author)
     const relatedBeats = await this.findBeats({
@@ -132,7 +144,7 @@ class BeatService {
       },
     });
     if (beat == null) {
-      throw ApiError.NotFound("Beat was not found.");
+      throw ApiError.NotFound('Beat was not found.');
     }
     return beat;
   }
@@ -151,7 +163,9 @@ class BeatService {
     return await Promise.all(fileData);
   }
 
-  async uploadBeat(data: PrismaClient.Prisma.BeatCreateInput): Promise<BeatIndividual> {
+  async uploadBeat(
+    data: PrismaClient.Prisma.BeatCreateInput
+  ): Promise<BeatIndividual> {
     const beat = await prisma.beat.create({
       data,
       ...beatIndividualSelect(false),
@@ -159,7 +173,10 @@ class BeatService {
     return beat;
   }
 
-  async editBeat(beatId: number, data: PrismaClient.Prisma.BeatUpdateInput): Promise<BeatIndividual> {
+  async editBeat(
+    beatId: number,
+    data: PrismaClient.Prisma.BeatUpdateInput
+  ): Promise<BeatIndividual> {
     const beat = await prisma.beat.update({
       where: {
         id: beatId,

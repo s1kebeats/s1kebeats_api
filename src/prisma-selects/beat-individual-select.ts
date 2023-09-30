@@ -1,5 +1,5 @@
-import PrismaClient from "@prisma/client";
-import authorSelect from "./author-select";
+import PrismaClient from '@prisma/client';
+import authorSelect from './author-select';
 
 function beatIndividualSelect(authorized: boolean) {
   return {
@@ -39,5 +39,7 @@ function beatIndividualSelect(authorized: boolean) {
   };
 }
 
-export type BeatIndividual = PrismaClient.Prisma.BeatGetPayload<ReturnType<typeof beatIndividualSelect>>;
+export type BeatIndividual = PrismaClient.Prisma.BeatGetPayload<
+  ReturnType<typeof beatIndividualSelect>
+>;
 export default beatIndividualSelect;

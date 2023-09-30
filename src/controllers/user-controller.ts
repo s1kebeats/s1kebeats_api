@@ -1,8 +1,8 @@
-import userService from "../services/user-service";
-import ApiError from "../exceptions/api-error";
-import { Request, Response, NextFunction } from "express";
-import PrismaClient from "@prisma/client";
-import mediaService from "../services/media-service";
+import userService from '../services/user-service';
+import ApiError from '../exceptions/api-error';
+import { Request, Response, NextFunction } from 'express';
+import PrismaClient from '@prisma/client';
+import mediaService from '../services/media-service';
 
 class UserController {
   async register(req: Request, res: Response, next: NextFunction) {
@@ -10,7 +10,7 @@ class UserController {
       const payload: Pick<
         PrismaClient.Prisma.UserCreateInput,
         // activationLink is generated automatically, so we don't need to pass it in the payload type
-        "email" | "username" | "password"
+        'email' | 'username' | 'password'
       > = (({ email, username, password }: Record<string, string>) => ({
         email,
         username,
@@ -26,19 +26,31 @@ class UserController {
   async login(req: Request, res: Response, next: NextFunction) {
     try {
       const ip = req.ip;
-      const { username, password, refresh }: { username: string; password: string; refresh: boolean } = req.body;
+      const {
+        username,
+        password,
+        refresh,
+      }: { username: string; password: string; refresh: boolean } = req.body;
 
-      const userData = await userService.login(username, password, ip, !!refresh);
+      const userData = await userService.login(
+        username,
+        password,
+        ip,
+        !!refresh
+      );
       if (refresh) {
         // set refresh token httpOnly cookie
-        res.cookie("refreshToken", userData.refreshToken, {
+        res.cookie('refreshToken', userData.refreshToken, {
           // 30 days
           maxAge: 30 * 24 * 60 * 1000,
           httpOnly: true,
-          secure: process.env.NODE_ENV === "production",
+          secure: process.env.NODE_ENV === 'production',
         });
       }
-      return res.json({ accessToken: userData.accessToken, user: userData.user });
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (error) {
       next(error);
     }
@@ -54,8 +66,8 @@ class UserController {
       }
       await userService.logout(refreshToken, ip);
       // remove cookie with refresh token
-      res.clearCookie("resfreshToken");
-      return res.json("sucess");
+      res.clearCookie('resfreshToken');
+      return res.json('sucess');
     } catch (error) {
       next(error);
     }
@@ -65,7 +77,7 @@ class UserController {
     try {
       const { activationLink } = req.params;
       await userService.activate(activationLink);
-      return res.json("success");
+      return res.json('success');
     } catch (error) {
       next(error);
     }
@@ -81,13 +93,16 @@ class UserController {
       }
       const userData = await userService.refresh(refreshToken, ip);
       // update refresh token cookie
-      res.cookie("refreshToken", userData.refreshToken, {
+      res.cookie('refreshToken', userData.refreshToken, {
         // 30 days
         maxAge: 30 * 24 * 60 * 1000,
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === 'production',
       });
-      return res.json({ accessToken: userData.accessToken, user: userData.user });
+      return res.json({
+        accessToken: userData.accessToken,
+        user: userData.user,
+      });
     } catch (error) {
       next(error);
     }
@@ -105,14 +120,22 @@ class UserController {
         youtube,
         instagram,
         image,
-      }: Record<string, string>) => ({ username, displayedName, about, vk, youtube, instagram, image }))(req.body);
+      }: Record<string, string>) => ({
+        username,
+        displayedName,
+        about,
+        vk,
+        youtube,
+        instagram,
+        image,
+      }))(req.body);
       // delete old profile image, if it's updated
       if (payload.image && original!.image) {
         await mediaService.deleteMedia(original!.image);
       }
       await userService.edit(userId, payload);
 
-      return res.json("success");
+      return res.json('success');
     } catch (error) {
       next(error);
     }
