@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 dependencies:
   '@prisma/client':
     specifier: ^4.8.0
@@ -10,6 +14,9 @@ dependencies:
   bcrypt:
     specifier: ^5.1.0
     version: 5.1.0
+  client:
+    specifier: link:node_modules\.prisma\client
+    version: link:node_modules/.prisma/client
   cookie-parser:
     specifier: ^1.4.6
     version: 1.4.6
@@ -46,6 +53,9 @@ dependencies:
   passport-jwt:
     specifier: ^4.0.1
     version: 4.0.1
+  prisma-client:
+    specifier: link:prisma\prisma-client
+    version: link:prisma/prisma-client
   sharp:
     specifier: ^0.31.3
     version: 0.31.3
